@@ -1,0 +1,43 @@
+<div class="row">
+    <div class = "col-lg-6">
+        <div class="panel panel-info dashboard-button-panel">
+            <div class="panel-heading">IaaS Provider</div>
+            <button data-ng-click="cloudServiceCtrl.showKeystone()" type="button" class="btn btn-primary btn-lg">OpenStack</button>
+            <button type="button" class="btn btn-primary btn-lg" disabled="true">CloudStack</button>
+        </div>
+
+        <div class="panel panel-info dashboard-button-panel">
+            <div class="panel-heading">PaaS Provider</div>
+            <button type="button" class="btn btn-primary btn-lg" disabled="true">OpenShift</button>
+            <button type="button" class="btn btn-primary btn-lg" disabled="true">CloudFoundry</button>
+        </div>
+    </div>
+</div>
+
+<div class="row" data-ng-if="cloudServiceCtrl.hasExternalUserIds()">
+    <div class="col-lg-6">
+        <div class="panel panel-warning">
+
+            <div class="panel-heading">
+                User IDs for External Applications
+            </div>
+
+            <div class="panel-body">
+                <table class="table">
+                    <tr data-ng-repeat="externalUserId in cloudServiceCtrl.externalUserIds">
+                        <td>{{externalUserId.source}}</td>
+                        <td>
+                            <input type="text" data-ng-model="externalUserId.userId">
+                        </td>
+                    </tr>
+                </table>
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    data-ng-click="cloudServiceCtrl.updateExternalUserIds()">
+                        Save
+                    </button>
+            </div>
+        </div>
+    </div>
+</div>

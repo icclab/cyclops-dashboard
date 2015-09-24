@@ -1,0 +1,57 @@
+<div class="row alert alert-warning">
+    <div class="col-md-6">
+        <label>From: </label>
+        <p class="input-group">
+            <input
+                type="text"
+                class="form-control"
+                datepicker-popup="{{dateFormat}}"
+                ng-model="fromDate"
+                is-open="fromPickerOpen"
+                min-date=""
+                max-date=""
+                datepicker-options=""
+                date-disabled=""
+                ng-required="true"
+                placeholder="{{defaultValue}}"
+                close-text="Close" />
+
+            <span class="input-group-btn">
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="openFromDatePicker($event)">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </button>
+            </span>
+        </p>
+    </div>
+
+    <div class="col-md-6">
+        <label>To:</label>
+        <p class="input-group">
+            <input
+                type="text"
+                class="form-control"
+                datepicker-popup="{{dateFormat}}"
+                ng-model="toDate"
+                is-open="toPickerOpen"
+                min-date=""
+                max-date=""
+                datepicker-options=""
+                date-disabled=""
+                ng-required="true"
+                placeholder="{{defaultValue}}"
+                close-text="Close" />
+
+            <span class="input-group-btn">
+                <button
+                    type="button"
+                    class="btn btn-default"
+                    ng-click="openToDatePicker($event)">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                    </button>
+            </span>
+        </p>
+    </div>
+</div>

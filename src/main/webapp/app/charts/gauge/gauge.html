@@ -1,0 +1,17 @@
+<!--
+<div class="panel panel-default">
+    <div class="panel-heading">
+        {{gaugeChartCtrl.chartName}}
+        <span data-ng-if="gaugeChartCtrl.chartDataUnit"> ({{gaugeChartCtrl.chartDataUnit}})</span>
+        </div>
+    <div class="panel-body">
+
+    </div>
+</div>
+-->
+
+<nvd3
+    options='gaugeChartCtrl.chartOptions'
+    data='gaugeChartCtrl.chartData'
+    class="with-3d-shadow with-transitions">
+</nvd3>

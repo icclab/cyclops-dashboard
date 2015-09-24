@@ -1,0 +1,16 @@
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.war
+*.ear
+
+
+# IDE Project Files #
+.idea
+*.sublime-*
+out/
+target/
+
+# Dashboard test coverage information
+dashboard/web/app-test/coverage/

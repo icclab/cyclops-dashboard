@@ -1,0 +1,18 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">
+        <div
+            class="row huge text-center"
+            data-ng-if="cumulativeChartCtrl.chartDataUnit == 'B'">
+            {{ cumulativeChartCtrl.chartData | xbytes:true }}
+        </div>
+        <div
+            class="row huge text-center"
+            data-ng-if="cumulativeChartCtrl.chartDataUnit == 'ns'">
+            {{ cumulativeChartCtrl.chartData | xtime }}
+        </div>
+    </div>
+    <div class="panel-body text-center">
+        {{cumulativeChartCtrl.chartName}}
+        <span data-ng-if="cumulativeChartCtrl.chartDataUnit"> ({{cumulativeChartCtrl.chartDataUnit}})</span>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+<div data-ng-if="!overviewCtrl.hasKeystoneId()" class="col-lg-12">
+    <div class="alert alert-warning">
+        No data providers have been configured yet.
+        Please link at least one provider with this dashboard.
+        <a ui-sref="cloudservices">Configure now</a>
+    </div>
+</div>
+
+<div data-ng-if="overviewCtrl.hasKeystoneId()" class="chart-container">
+    <date-span-selection
+        date-format="{{overviewCtrl.dateFormat}}"
+        on-date-changed="overviewCtrl.onDateChanged(from, to)"
+        default-value="{{overviewCtrl.defaultDate}}"></date-span-selection>
+    <chart-container></chart-container>
+</div>

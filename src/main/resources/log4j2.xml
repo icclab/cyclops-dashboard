@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <File name="dashboard" filename="/var/log/dashboard/dashboard.log" append="false">
+            <PatternLayout pattern="[ %-6p] %d{yyyy-MM-dd HH:mm:ss} (%C{2}:%L) - %m%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.apache.log4j.xml" level="TRACE"/>
+        <Root level="TRACE">
+            <AppenderRef ref="dashboard"/>
+        </Root>
+    </Loggers>
+</Configuration>

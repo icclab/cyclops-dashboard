@@ -1,0 +1,103 @@
+<!doctype html>
+<html data-ng-app="dashboard" lang="en">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RCB Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <!---<link rel="stylesheet" type="text/css" href="css/bootstrapSandstone.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrapSuperhero.min.css">
+    <link rel="stylesheet" type="text/css" href="css/bootstrapUnited.min.css">--->
+    <link rel="stylesheet" type="text/css" href="css/nv.d3.min.css">
+    <link rel="stylesheet" type="text/css" href="css/dashboard.css">
+    <link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="css/metisMenu.min.css">
+    <link rel="stylesheet" type="text/css" href="css/sb-admin-2.css">
+    <link rel="stylesheet" type="text/css" href="css/timeline.css">
+    <link rel="stylesheet" type="text/css" href="css/loading-bar.css">
+    <link rel="stylesheet" type="text/css" href="css/ng-toasty.css">
+</head>
+<body>
+
+    <div id="wrapper">
+
+        <div ng-controller="toasty-controller">
+            <toasty-container></toasty-container>
+        </div>
+
+        <!-- NAVIGATION RENDERING TARGET -->
+        <div ui-view="navigation" data-ng-controller="NotificationController as notificationCtrl"></div>
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="dashboard-content-container">
+
+                            <!-- CONTENT RENDERING TARGET -->
+                            <div ui-view="content"></div>
+
+                        </div>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+        <!-- /#page-wrapper -->
+    </div>
+
+    <script src="libs/jquery.min.js"></script>
+    <script src="libs/date.js"></script>
+    <script src="libs/bootstrap.min.js"></script>
+    <script src="libs/metisMenu.min.js"></script>
+    <script src="libs/sb-admin-2.js"></script>
+    <script src="libs/angular.min.js"></script>
+    <script src="libs/d3.min.js"></script>
+    <script src="libs/nv.d3.min.js"></script>
+    <script src="libs/angular-nvd3.min.js"></script>
+    <script src="libs/angular-animate.min.js"></script>
+    <script src="libs/angular-ui-router.min.js"></script>
+    <script src="libs/ui-bootstrap-tpls-0.12.1.min.js"></script>
+    <script src="libs/loading-bar.min.js"></script>
+    <script src="libs/ng-toasty.min.js"></script>
+    <script src="app.js"></script>
+    <script src="services/session-service.js"></script>
+    <script src="services/rest-service.js"></script>
+    <script src="services/chart-data-service.js"></script>
+    <script src="services/usage-data-service.js"></script>
+    <script src="services/external-usage-data-service.js"></script>
+    <script src="services/rate-data-service.js"></script>
+    <script src="services/charge-data-service.js"></script>
+    <script src="services/external-charge-data-service.js"></script>
+    <script src="services/meterselection-data-service.js"></script>
+    <script src="services/bill-data-service.js"></script>
+    <script src="services/alert-service.js"></script>
+    <script src="utils/date-util.js"></script>
+    <script src="filter/xbyte-filter.js"></script>
+    <script src="filter/xtime-filter.js"></script>
+    <script src="utils/response-parser.js"></script>
+    <script src="navigation/navigation.js"></script>
+    <script src="login/login.js"></script>
+    <script src="overview/overview.js"></script>
+    <script src="rate/rate.js"></script>
+    <script src="charge/charge.js"></script>
+    <script src="keystone/keystone.js"></script>
+    <script src="bills/bills.js"></script>
+    <script src="cloud-services/cloud-services.js"></script>
+    <script src="admin/meters/meters.js"></script>
+    <script src="admin/users/users.js"></script>
+    <script src="admin/rate/rate.js"></script>
+    <script src="admin/billing/billing.js"></script>
+    <script src="notifications/notifications.js"></script>
+    <script src="charts/chart-container.js"></script>
+    <script src="charts/gauge/gauge.js"></script>
+    <script src="charts/cumulative/cumulative.js"></script>
+    <script src="directives/date-span-selection/date-span-selection.js"></script>
+    <script src="modals/pdf/pdf-modal.js"></script>
+    <script src="modals/user-bills/user-bills-modal.js"></script>
+    <script src="registration/registration.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<div class="modal-header">
+    <h3 class="modal-title">Existing Bills</h3>
+</div>
+<div class="modal-body">
+    <div class="row">
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Paid</th>
+                    <th>Approved</th>
+                    <th>Details</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr data-ng-repeat="bill in userBillsModalCtrl.bills">
+                    <td>{{bill.from}}</td>
+                    <td>{{bill.to}}</td>
+                    <td>{{bill.paid}}<button data-ng-click="userBillsModalCtrl.markAsPaid(bill,false)" class="btn btn-danger pull-right">Unpaid</button><button data-ng-click="userBillsModalCtrl.markAsPaid(bill,true)" class="btn btn-warning pull-right">Paid</button></td>
+                    <td>{{bill.approved}}</td>
+                    <td><button data-ng-click="userBillsModalCtrl.showDetails(bill)" class="btn btn-primary">Details</button></td>
+                    <td><button data-ng-click="userBillsModalCtrl.updateBillStatus(bill,false)" class="btn btn-danger pull-right">Deny</button><button data-ng-click="userBillsModalCtrl.updateBillStatus(bill,true)" class="btn btn-success pull-right">Approve</button></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="userBillsModalCtrl.close()">Close</button>
+</div>

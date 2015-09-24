@@ -1,0 +1,55 @@
+Version 0.5.0
+Date 24/Jun/2015
+Notes
+1. Removed OpenAM dependency, switch to Gatekeeper for Auth
+2. Initial cache implementation for UDR data
+3. Bill approval mechanisms
+
+*************************************************************
+
+Version 0.1.1
+Date 19/Jun/2015
+Notes
+1. Documentation
+
+*************************************************************
+
+Version 0.1.0
+Date 15/Jun/2015
+Notes
+1. [User] Charts for external meters
+2. [User] View billing information and bill PDFs
+3. [Admin] Create bills for users
+4. [Admin] Add external meters
+
+*************************************************************
+
+Version 0.0.3
+Date 15/Apr/2015
+Notes
+1. [User] Dynamically created charts for charge data
+
+*************************************************************
+
+Version 0.0.2
+Date 13/Apr/2015
+Notes
+1. [User] Dynamically created charts for usage data
+2. [User] Dynamically created charts for rate data
+3. [User] Alert Messages
+4. [Admin] User Management
+5. [Admin] Configure the Rate Microservice 
+
+*************************************************************
+
+Version 0.0.1
+Date 23/Mar/2015
+Notes
+1. Initial release
+2. Partial one click installation script (Tomcat, OpenAM installation / deployment)
+3. [User] Authentication / Authorisation via OpenAM
+4. [User] Linking an account to OpenStack
+5. [User] Displaying some usage data
+6. [Admin] Listing users and admins
+7. [Admin] Displaying list of all available meters
+8. [Admin] Configuring UDR Microservice to use different set of meters

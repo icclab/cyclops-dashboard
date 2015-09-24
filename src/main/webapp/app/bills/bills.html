@@ -1,0 +1,64 @@
+<div class="row">
+    <div class="col-lg-4">
+        <div class="panel panel-info">
+            <div class="panel-heading">
+                <div class="row huge text-center">
+                    CHF 12.50
+                </div>
+            </div>
+            <div class="panel-body text-center">
+                Current Bill
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-2">
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <div class="row huge text-center">
+                    {{(billCtrl.dues).length}}
+                </div>
+            </div>
+            <div class="panel-body text-center">
+                Due Bills
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-2">
+        <div class="panel panel-success">
+            <div class="panel-heading">
+                <div class="row huge text-center">
+                    {{(billCtrl.paids).length}}
+                    <!--{{ (billCtrl.bills).length }}--->
+                </div>
+            </div>
+            <div class="panel-body text-center">
+                Paid Bills
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>From</th>
+                <th>To</th>
+                <th>Status</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr
+                data-ng-repeat="bill in billCtrl.bills"
+                data-ng-class="billCtrl.getClassForBill(bill)">
+                <td>{{bill.from}}</td>
+                <td>{{bill.to}}</td>
+                <td>{{bill.status}}</td>
+                <td><button data-ng-click="billCtrl.showDetails(bill)" class="btn btn-primary pull-right">Details</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
