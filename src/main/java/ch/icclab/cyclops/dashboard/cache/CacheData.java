@@ -46,14 +46,14 @@ public class CacheData {
     private String columnSignature;
 
 
-    private SortedMap<Long, String> usageDataMap;
+    private ArrayList<String> usageDataArray;//SortedMap<Long, String> usageDataArray;
     String meterName;
 
     /**
      * @param stringData
      * @author Manu
-     * <p/>
-     * This method adds the data points to the usageDataMap linked to their timestamp
+     * <p>
+     * This method adds the data points to the usageDataArray linked to their timestamp
      */
     public CacheData(String stringData, String meter) {
         logger.debug("Attempting to format the data for inserting in the cache...");
@@ -66,7 +66,7 @@ public class CacheData {
         this.columnSignature = columns.concat("]");
         columns = columns.substring(1, columns.length());
         logger.debug("[" + meterName + "] Obtained Columns from the data: " + columnSignature);
-        usageDataMap = new TreeMap<Long, String>();
+        usageDataArray = new ArrayList<String>();
 
         //get the time from the string splitting and store all the points.
         String[] columnsArray = columns.split(",");
@@ -81,7 +81,7 @@ public class CacheData {
     }
 
     /**
-     * This method puts the data referring to a timestamp into the usageDataMap
+     * This method puts the data referring to a timestamp into the usageDataArray
      *
      * @param response
      */
@@ -97,46 +97,27 @@ public class CacheData {
             if (timeIndex == points.length - 1)
                 time = time.substring(0, time.length() - 1);
             logger.debug("[" + meterName + "] Obtained time from data: " + time);
-            if (!usageDataMap.keySet().contains(formatDate(time).getTime())) { //Long.valueOf(time) in influxdb 0.8.x and formatDate(time).getTime() in influxdb 0.9
-                if (i == 0) {
-                    if (points[i].substring(points[i].length() - 4, points[i].length()).equals("]}]}"))
-                        points[i] = points[i].substring(1, points[i].length() - 5);
-                    else
-                        points[i] = points[i].substring(1, points[i].length());
-                    usageDataMap.put(formatDate(time).getTime(), points[i]);//Long.valueOf(time) in influxdb 0.8.x and formatDate(time).getTime() in influxdb 0.9
-                } else if (i == points.length - 1) {
-                    if (points[i].substring(points[i].length() - 1, points[i].length()).equals("]")) {
-                        points[i] = points[i].substring(0, points[i].length() - 1);
-                    }
-                    if (points[i].substring(points[i].length() - 4, points[i].length()).equals("]}]}")) {
-                        points[i] = points[i].substring(0, points[i].length() - 5);
-                    }
-                    usageDataMap.put(formatDate(time).getTime(), points[i]);//Long.valueOf(time) in influxdb 0.8.x and formatDate(time).getTime() in influxdb 0.9
-                } else {
-                    usageDataMap.put(formatDate(time).getTime(), points[i]);//Long.valueOf(time) in influxdb 0.8.x and formatDate(time).getTime() in influxdb 0.9
+            //if (!usageDataArray.keySet().contains(formatDate(time).getTime())) {
+            if (i == 0) {
+                if (points[i].substring(points[i].length() - 4, points[i].length()).equals("]}]}"))
+                    points[i] = points[i].substring(1, points[i].length() - 5);
+                else
+                    points[i] = points[i].substring(1, points[i].length());
+                usageDataArray.add(points[i]);
+            } else if (i == points.length - 1) {
+                if (points[i].substring(points[i].length() - 1, points[i].length()).equals("]")) {
+                    points[i] = points[i].substring(0, points[i].length() - 1);
                 }
-                logger.info("[" + meterName + "] Added point: " + points[i]);//Logging this as "debug" will increase notably the size of the cache file
+                if (points[i].substring(points[i].length() - 4, points[i].length()).equals("]}]}")) {
+                    points[i] = points[i].substring(0, points[i].length() - 5);
+                }
+                usageDataArray.add(points[i]);
+            } else {
+                usageDataArray.add(points[i]);
             }
+            logger.info("[" + meterName + "] Added point: " + points[i]);//Logging this as "debug" will increase notably the size of the cache file
         }
     }
-
-    /*public String getData() {
-        String result = headerSignature + "[[";
-        for (Long time : usageDataMap.keySet()) {
-            result = result.concat(usageDataMap.get(time) + "],[");
-        }
-        result = result.substring(0, result.length() - 2);
-        result = result.concat(endingSignature);
-        return result;
-    }
-
-    public ArrayList<String> getDataList() {
-        ArrayList<String> usageArray = new ArrayList<String>();
-        for (Long key : usageDataMap.keySet()) {
-            usageArray.add(usageDataMap.get(key));
-        }
-        return usageArray;
-    }*/
 
     /**
      * This method returns the whole data points between @to and @from correctly formatted in the following way:
@@ -149,22 +130,20 @@ public class CacheData {
     public String getDataFromTo(Date from, Date to) {
         String result = headerSignature + "[[";
         String point;
-        for (Long time : usageDataMap.keySet()) {
-            if (time >= from.getTime() && time <= to.getTime()) {
-                point = formatPoint(usageDataMap.get(time));
-                result = result.concat(point + "],[");
-            }
+        for (String s : usageDataArray) {
+            point = formatPoint(s);
+            result = result.concat(point + "],[");
         }
         result = result.substring(0, result.length() - 2);
-        if(result.charAt(result.length()-1)==':')
+        if (result.charAt(result.length() - 1) == ':')
             result = result.concat("[");
         result = result.concat(endingSignature);
         logger.info("Generated response from getData() :" + result);//Logging this as "debug" will increase notably the size of the cache file
         return result;
     }
 
-    public SortedMap<Long, String> getUsageDataMap() {
-        return usageDataMap;
+    public ArrayList<String> getUsageDataArray() {
+        return usageDataArray;
     }
 
     private Date formatDate(String dateAndTime) {
@@ -183,12 +162,12 @@ public class CacheData {
         return result;
     }
 
-    private String formatPoint(String point){
-        String date = point.substring(0,21);
+    private String formatPoint(String point) {
+        String date = point.substring(0, 21);
         Long timestamp = formatDate(date).getTime();
         String result = String.valueOf(timestamp).concat(point.substring(22));
-        if(result.charAt(result.length()-1)==']')
-            result = result.substring(0, result.length()-1);
+        if (result.charAt(result.length() - 1) == ']')
+            result = result.substring(0, result.length() - 1);
         return result;
     }
 

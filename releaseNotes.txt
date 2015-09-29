@@ -1,18 +1,16 @@
-Version 0.5.0
-Date 24/Jun/2015
+Version 0.5.1
+Date 29/Sep/2015
 Notes
-1. Removed OpenAM dependency, switch to Gatekeeper for Auth
-2. Initial cache implementation for UDR data
-3. Bill approval mechanisms
+1. Bill approval feature for admin
+2. Caching implemented, configurable
+3. Duplicate data points removal delegated to UDR
 
-*************************************************************
+************************************************************
 
 Version 0.1.1
 Date 19/Jun/2015
 Notes
 1. Documentation
-
-*************************************************************
 
 Version 0.1.0
 Date 15/Jun/2015

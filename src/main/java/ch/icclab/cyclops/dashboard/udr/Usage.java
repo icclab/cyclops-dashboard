@@ -18,6 +18,7 @@
 package ch.icclab.cyclops.dashboard.udr;
 
 import ch.icclab.cyclops.dashboard.application.DashboardApplication;
+import ch.icclab.cyclops.dashboard.cache.CacheData;
 import ch.icclab.cyclops.dashboard.cache.TLBInput;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthClientResource;
@@ -35,6 +36,7 @@ import org.restlet.resource.ResourceException;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
@@ -48,7 +50,7 @@ public class Usage extends OAuthServerResource {
 
     /**
      * This method updates gets the usage data from the UDR microservice
-     * <p/>
+     * <p>
      * The method receives the the user's keystone ID and two timestamps (from / to) from the dashboard frontend.
      * It then sends this information to the UDR Endpoint, requesting the usage data during the given time frame. The
      * UDR endpoint is configured in /WEB-INF/configuration.txt as UDR_USAGE_URL
@@ -73,38 +75,43 @@ public class Usage extends OAuthServerResource {
             String oauthToken = getOAuthTokenFromHeader();
             String url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
             OAuthClientResource clientResource = new OAuthClientResource(url, oauthToken);
-
+            Representation representation;
             StringRepresentation result = null;
-            if (!hashMap.containsKey(keystoneId)) {
-                Representation representation = clientResource.get();
-                logger.debug("Attempting to insert data in the <Userid,TLBInput> HashMap");
-                hashMap.put(keystoneId, new TLBInput(representation.getText(), stringToDate(from), stringToDate(to)));
+            if (LoadConfiguration.configuration.get("CACHE").equalsIgnoreCase("true")) {
+                if (!hashMap.containsKey(keystoneId)) {
+                    representation = clientResource.get();
+                    logger.debug("Attempting to insert data in the <Userid,TLBInput> HashMap");
+                    hashMap.put(keystoneId, new TLBInput(representation.getText(), stringToDate(from), stringToDate(to)));
+                } else {
+                    Date minInserted = hashMap.get(keystoneId).getFrom();
+                    Date maxInserted = hashMap.get(keystoneId).getTo();
+
+                    if (stringToDate(from).getTime() < minInserted.getTime()) {
+                        form.set("to", dateToString(minInserted));
+
+                        url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                        clientResource = new OAuthClientResource(url, oauthToken);
+                        representation = clientResource.get();
+                        hashMap.get(keystoneId).addData(representation.getText(), stringToDate(from), minInserted);
+                    }
+                    if (maxInserted.getTime() < stringToDate(to).getTime()) {
+                        form.set("from", dateToString(maxInserted));
+
+                        url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                        clientResource = new OAuthClientResource(url, oauthToken);
+                        representation = clientResource.get();
+                        hashMap.get(keystoneId).addData(representation.getText(), maxInserted, stringToDate(to));
+                    }
+                }
+                Date dateTo = stringToDate(to);
+                Date dateFrom = stringToDate(from);
+                result = new StringRepresentation(hashMap.get(keystoneId).getData(stringToDate(from), stringToDate(to)));
+                return result;
             } else {
-                Date minInserted = hashMap.get(keystoneId).getFrom();
-                Date maxInserted = hashMap.get(keystoneId).getTo();
-                Representation representation;
-
-                if (stringToDate(from).getTime() < minInserted.getTime()) {
-                    form.set("to", dateToString(minInserted));
-
-                    url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
-                    clientResource = new OAuthClientResource(url, oauthToken);
-                    representation = clientResource.get();
-                    hashMap.get(keystoneId).addData(representation.getText(), stringToDate(from), minInserted);
-                }
-                if (maxInserted.getTime() < stringToDate(to).getTime()) {
-                    form.set("from", dateToString(maxInserted));
-
-                    url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
-                    clientResource = new OAuthClientResource(url, oauthToken);
-                    representation = clientResource.get();
-                    hashMap.get(keystoneId).addData(representation.getText(), maxInserted, stringToDate(to));
-                }
+                representation = clientResource.get();
+                String data = new TLBInput().formatRawData(representation.getText(), stringToDate(from), stringToDate(to));
+                return new StringRepresentation(data);
             }
-            Date dateTo = stringToDate(to);
-            Date dateFrom = stringToDate(from);
-            result = new StringRepresentation(hashMap.get(keystoneId).getData(stringToDate(from), stringToDate(to)));
-            return result;
         } catch (Exception e) {
             logger.error("Error while getting usage data: " + e.getMessage());
             ErrorReporter.reportException(e);
@@ -114,6 +121,7 @@ public class Usage extends OAuthServerResource {
 
     /**
      * Private function that creates a Date from a String
+     *
      * @param date
      * @return
      */
@@ -129,6 +137,7 @@ public class Usage extends OAuthServerResource {
 
     /**
      * Private function that formats a Date into a String
+     *
      * @param date
      * @return
      */
@@ -144,6 +153,7 @@ public class Usage extends OAuthServerResource {
 
     /**
      * Private function that formats a Date into a String in UTF
+     *
      * @param date
      * @return
      */
@@ -157,7 +167,6 @@ public class Usage extends OAuthServerResource {
             return null;
         }
     }
-
 
 
 }

@@ -106,6 +106,8 @@
             else
                 var toDate = dateUtil.formatDateFromTimestamp(to) + " "+hours +":"+date.getMinutes();
             var fromDate = dateUtil.formatDateFromTimestamp(from) + " 00:00";
+            //var toDate = dateUtil.formatDateFromTimestamp(to) + " 23:59";
+
             me.updateCharts(fromDate, toDate);
         };
 

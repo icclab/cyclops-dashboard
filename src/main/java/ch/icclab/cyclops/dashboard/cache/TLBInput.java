@@ -43,6 +43,9 @@ public class TLBInput {
         addData(data, from, to);
     }
 
+    public TLBInput(){
+    }
+
     /**
      * This method attempts to add data into the Cache from @from to @to if its not present. In case of
      * having data for the meter in which we are trying to have add data, it will only add the data regarding
@@ -89,6 +92,41 @@ public class TLBInput {
         }else{
             header = responses[0].split("}}")[0]+"\"OpenStack\":[  ";
         }
+    }
+
+    public String formatRawData(String response, Date from, Date to){
+        String result = response;
+        ArrayList<String> responseArrayList = new ArrayList<String>();
+        String[] responses = response.split("},\\{");
+        String headerSignature = "";
+        SortedMap<String, CacheData> localMeterHashMap = new TreeMap<String, CacheData>();
+        if(!response.split("\"usage\":")[1].equals("{}}")){
+            for (int i = 0; i < responses.length; i++) {
+                if (!responseArrayList.contains(responses[i]))//checking if the response contains repeated fields
+                    if (i > 0) {
+                        if (i == responses.length - 1)
+                            responses[i] = responses[i].substring(0, responses[i].length() - 5);
+                        if (!responses[i - 1].contains(responses[i]))
+                            responseArrayList.add(responses[i]);
+                    } else {
+                        headerSignature = responses[i].split("\\{\"name\":")[0];
+                        responseArrayList.add("{\"name\":" + responses[i].split("\\{\"name\":")[1]);
+                    }
+            }
+            for (String resp : responseArrayList) {
+                String meterName = resp.split("name\":")[1];
+                meterName = meterName.split("\"")[1];
+                if (meterHashMap.containsKey(meterName)) {
+                    this.cacheData = meterHashMap.get(meterName);
+                    this.cacheData.putData(resp);
+                } else {
+                    this.cacheData = new CacheData(resp, meterName);
+                    header = headerSignature;
+                    meterHashMap.put(meterName, cacheData);
+                }
+            }
+        }
+        return this.getData(from,to);
     }
 
     /**
