@@ -30,3 +30,4 @@ KeystonePassword==
 KeystoneTenantName==
 MAX_CACHED_USERS==5
 DATA_PERIOD==5
+CACHE==false
