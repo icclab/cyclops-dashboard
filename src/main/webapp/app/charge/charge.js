@@ -85,8 +85,8 @@
 
         //https://docs.angularjs.org/guide/directive#creating-a-directive-that-wraps-other-elements
         this.onDateChanged = function(from, to) {
-            var fromDate = dateUtil.formatDateFromTimestamp(from) + " 00:00";
-            var toDate = dateUtil.formatDateFromTimestamp(to) + " 23:59";
+            var fromDate = dateUtil.formatDateFromTimestamp(from) + " 00:00:00";
+            var toDate = dateUtil.formatDateFromTimestamp(to) + " 23:59:59";
             me.updateCharts(sessionService.getKeystoneId(), fromDate, toDate);
         };
 

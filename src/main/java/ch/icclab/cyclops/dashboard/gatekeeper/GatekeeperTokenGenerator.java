@@ -36,15 +36,21 @@ public class GatekeeperTokenGenerator {
 
     /**
      * This method returns a representation with the token information gotten from the gatekeeper
+     *
      * @param username
      * @param password
      * @return
      */
-    public Representation getGatekeeperToken(String username, String password){
+    public Representation getGatekeeperToken(String username, String password) {
         try {
             DatabaseHelper databaseHelper = new DatabaseHelper();
             logger.trace("Attempting go get the userId from the database.");
-            String userId = databaseHelper.getUserId(username);
+            String userId;
+            if (username.equals(LoadConfiguration.configuration.get("GK_ADMIN"))) {
+                logger.debug("Asking for a token to authenticating the query");
+                userId = "1";
+            } else
+                userId = databaseHelper.getUserId(username);
             logger.debug("Attempting to get the token from the Gatekeeper.");
             ClientResource clientResource = new ClientResource(LoadConfiguration.configuration.get("GK_TOKEN_URL"));
             Series<Header> headers = (Series<Header>) clientResource.getRequestAttributes().get("org.restlet.http.headers");
@@ -58,8 +64,8 @@ public class GatekeeperTokenGenerator {
             headers.set("X-Auth-Uid", userId);
 
             return clientResource.post(MediaType.APPLICATION_JSON);
-        }catch (Exception e) {
-            logger.error("Error while getting the token from the Gatekeeper: "+e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error while getting the token from the Gatekeeper: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(500);
         }

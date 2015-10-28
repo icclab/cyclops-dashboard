@@ -831,4 +831,8 @@ public class DatabaseHelper {
             throw new DatabaseInteractionException(e.getMessage(), e);
         }
     }
+
+    public void removeUser(String username) {
+
+    }
 }

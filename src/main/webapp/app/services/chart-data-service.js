@@ -96,7 +96,7 @@
                 var service = me.getServiceDelegate(type);
                 var serviceData = service.getFormattedData();
                 var dataPoints = serviceData[meterName].points || [];
-                dataPoints.reverse();
+                //dataPoints.reverse();
                 var numPoints = dataPoints.length;
                 var data = [];
 

@@ -110,7 +110,7 @@
 
             for(var i = 0; i < rawPoints.length; i++) {
                 var rawPoint = rawPoints[i];
-                formattedPoints.push([rawPoint[0], rawPoint[2]]);
+                formattedPoints.push([rawPoint[0], rawPoint[1]]);//in previous versions rawPoint[2] due to the seq. numbmer in influxdb entries
             }
 
             return formattedPoints;

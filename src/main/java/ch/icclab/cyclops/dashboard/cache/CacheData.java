@@ -134,7 +134,7 @@ public class CacheData {
             point = formatPoint(s);
             result = result.concat(point + "],[");
         }
-        result = result.substring(0, result.length() - 2);
+        result = result.substring(0, result.length() - 3);//-2, cambiado a -3 para external data
         if (result.charAt(result.length() - 1) == ':')
             result = result.concat("[");
         result = result.concat(endingSignature);
@@ -165,7 +165,8 @@ public class CacheData {
     private String formatPoint(String point) {
         String date = point.substring(0, 21);
         Long timestamp = formatDate(date).getTime();
-        String result = String.valueOf(timestamp).concat(point.substring(22));
+        String result = "\"".concat(String.valueOf(timestamp)).concat("\",").concat(point.split(",")[1]);
+        //String result = String.valueOf(timestamp).concat(point.substring(22));
         if (result.charAt(result.length() - 1) == ']')
             result = result.substring(0, result.length() - 1);
         return result;

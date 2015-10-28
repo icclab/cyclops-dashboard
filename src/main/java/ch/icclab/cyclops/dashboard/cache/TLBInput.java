@@ -125,8 +125,10 @@ public class TLBInput {
                     meterHashMap.put(meterName, cacheData);
                 }
             }
+            return this.getData(from,to);
+        }else{
+            return "";
         }
-        return this.getData(from,to);
     }
 
     /**

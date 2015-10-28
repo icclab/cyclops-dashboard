@@ -122,8 +122,8 @@
 
         this.getInternalBillItems = function (params) {
             var deferred = $q.defer();
-            var from = params.from + " 00:00";
-            var to = params.to + " 23:59";
+            var from = params.from + " 00:00:00";
+            var to = params.to + " 23:59:59";
 
             restService.getBillingInformation(params.userId, from, to).then(
                 function (response) {
@@ -146,8 +146,8 @@
             var deferred = $q.defer();
             var promises = [];
             var exIds = params.externalUserIds;
-            var from = params.from + " 00:00";
-            var to = params.to + " 23:59";
+            var from = params.from + " 00:00:00";
+            var to = params.to + " 23:59:59";
 
             for (var i = 0; i < exIds.length; i++) {
 
@@ -224,7 +224,7 @@
         this.getUsers = function () {
             restService.getAllUsers()
                 .then(
-                function(response) {
+                function (response) {
                     me.users = responseParser.getUserListFromResponse(response.data);
                 }, function () {
                     alertService.showError("Could not fetch list of users");

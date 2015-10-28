@@ -1,12 +1,3 @@
-Version 0.5.1
-Date 29/Sep/2015
-Notes
-1. Bill approval feature for admin
-2. Caching implemented, configurable
-3. Duplicate data points removal delegated to UDR
-
-************************************************************
-
 Version 0.1.1
 Date 19/Jun/2015
 Notes

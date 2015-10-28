@@ -63,6 +63,7 @@ public class DashboardApplication extends Application {
         DatabaseHelper dbHelper = new DatabaseHelper();
         logger.debug("Attempting to initianize the Representation HashMap Variable.");
         representationHashMap = new HashMap<String, TLBInput>();
+
         try {
             logger.trace("Attempting to Create the database.");
             dbHelper.createDatabaseIfNotExists();
@@ -71,6 +72,7 @@ public class DashboardApplication extends Application {
             logger.error("Error while creating the Database: "+e.getMessage());
             ErrorReporter.reportException(e);
         }
+
 
         Router router = new Router(getContext());
         router.attach("/login", Login.class);
@@ -112,6 +114,9 @@ public class DashboardApplication extends Application {
             try {
                 loadConfig.run(context);
                 logger.trace("Configuration loaded");
+                Registration registration = new Registration();
+                registration.registerAdmin();
+                logger.trace("----------------------------Admin Created");
             } catch (IOException e) {
                 logger.error("Error while loading the configuration: "+e.getMessage());
                 e.printStackTrace();

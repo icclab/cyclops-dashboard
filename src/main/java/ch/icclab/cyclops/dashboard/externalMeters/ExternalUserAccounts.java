@@ -44,6 +44,9 @@ public class ExternalUserAccounts extends ServerResource {
         try {
             ClientResource clientResource = new ClientResource(LoadConfiguration.configuration.get("UDR_METER_URL"));
             logger.debug("Attempting to get the list of external user IDs.");
+            Form query = getRequest().getResourceRef().getQueryAsForm();
+            String userId = query.getFirstValue("user_id", "");
+            if (!userId.equals("undefined")) {
             Representation representation = clientResource.get();
             JsonRepresentation jsonRepresentation = new JsonRepresentation(representation);
             JSONObject jsonObject = jsonRepresentation.getJsonObject();
@@ -52,6 +55,7 @@ public class ExternalUserAccounts extends ServerResource {
             int sourceNameIndex = -1;
             int meterTypeIndex = -1;
             int statusIndex = -1;
+
 
             for (int i = 0; i < columns.length(); i++) {
                 if (columns.get(i).equals("metersource"))
@@ -70,48 +74,49 @@ public class ExternalUserAccounts extends ServerResource {
             ArrayList<String> activeMeters = new ArrayList<String>();
             ArrayList<String> unactiveMeters = new ArrayList<String>();
 
-            Form query = getRequest().getResourceRef().getQueryAsForm();
-            String userId = query.getFirstValue("user_id", "");
             JSONArray response = new JSONArray();
 
-            logger.debug("Sorting active and unactive meters.");
-            if (points.length() > 0) {
-                for (int i = 0; i < points.length(); i++) {
-                    JSONArray innerArray = points.getJSONArray(i);
-                    if (innerArray.getString(meterTypeIndex).equals("external"))
-                        if (innerArray.getInt(statusIndex) == 1) {
-                            activeMeters.add(innerArray.getString(sourceNameIndex));
-                        } else
-                            unactiveMeters.add(innerArray.getString(sourceNameIndex));
+                logger.debug("Sorting active and unactive meters.");
+                if (points.length() > 0) {
+                    for (int i = 0; i < points.length(); i++) {
+                        JSONArray innerArray = points.getJSONArray(i);
+                        if (innerArray.getString(meterTypeIndex).equals("external"))
+                            if (innerArray.getInt(statusIndex) == 1) {
+                                if (!activeMeters.contains(innerArray.getString(sourceNameIndex)))
+                                    activeMeters.add(innerArray.getString(sourceNameIndex));
+                            } else
+                                unactiveMeters.add(innerArray.getString(sourceNameIndex));
+                    }
                 }
+
+                logger.trace("Attempting to get the user Ids from the database.");
+                DatabaseHelper dbHelper = new DatabaseHelper();
+                List<ExternalUserId> activeExternalIds = dbHelper.getExternalUserIds(userId, activeMeters, true);
+                List<ExternalUserId> unactiveExternalIds = dbHelper.getExternalUserIds(userId, unactiveMeters, false);
+
+                for (ExternalUserId exId : activeExternalIds) {
+                    JSONObject externalId = new JSONObject();
+                    externalId.put("source", exId.getSource());
+                    externalId.put("userId", exId.getUserId());
+                    response.put(externalId);
+                }
+                logger.debug("All external Ids added to the response.");
+
+                for (ExternalUserId exId : unactiveExternalIds) {
+                    JSONObject externalId = new JSONObject();
+                    externalId.put("source", exId.getSource());
+                    response.put(externalId);
+                }
+                logger.debug("All internal Ids added to the response.");
+
+                return new JsonRepresentation(response);
             }
-
-            logger.trace("Attempting to get the user Ids from the database.");
-            DatabaseHelper dbHelper = new DatabaseHelper();
-            List<ExternalUserId> activeExternalIds = dbHelper.getExternalUserIds(userId, activeMeters, true);
-            List<ExternalUserId> unactiveExternalIds = dbHelper.getExternalUserIds(userId, unactiveMeters, false);
-
-            for (ExternalUserId exId : activeExternalIds) {
-                JSONObject externalId = new JSONObject();
-                externalId.put("source", exId.getSource());
-                externalId.put("userId", exId.getUserId());
-                response.put(externalId);
-            }
-            logger.debug("All external Ids added to the response.");
-
-            for (ExternalUserId exId : unactiveExternalIds) {
-                JSONObject externalId = new JSONObject();
-                externalId.put("source", exId.getSource());
-                response.put(externalId);
-            }
-            logger.debug("All internal Ids added to the response.");
-
-            return new JsonRepresentation(response);
         } catch (Exception e) {
-            logger.error("Error obtaining the External User Accounts: "+e.getMessage());
+            logger.error("Error obtaining the External User Accounts: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(500);
         }
+        return new JsonRepresentation("[]");
     }
 
     @Post("json")
@@ -133,7 +138,7 @@ public class ExternalUserAccounts extends ServerResource {
 
             return new StringRepresentation("");
         } catch (Exception e) {
-            logger.error("Error while updating External Ids: "+e.getMessage());
+            logger.error("Error while updating External Ids: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(500);
         }

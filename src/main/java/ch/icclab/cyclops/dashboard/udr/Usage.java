@@ -71,52 +71,57 @@ public class Usage extends OAuthServerResource {
             Form form = new Form();
             form.add("from", from);
             form.add("to", to);
+            if (!keystoneId.equals("undefined")) {
+                String oauthToken = getOAuthTokenFromHeader();
+                String url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                OAuthClientResource clientResource = new OAuthClientResource(url, oauthToken);
+                Representation representation;
+                StringRepresentation result = null;
+                if (LoadConfiguration.configuration.get("CACHE").equalsIgnoreCase("true")) {
+                    if (!hashMap.containsKey(keystoneId)) {
+                        representation = clientResource.get();
+                        logger.debug("Attempting to insert data in the <Userid,TLBInput> HashMap");
+                        hashMap.put(keystoneId, new TLBInput(representation.getText(), stringToDate(from), stringToDate(to)));
+                    } else {
+                        Date minInserted = hashMap.get(keystoneId).getFrom();
+                        Date maxInserted = hashMap.get(keystoneId).getTo();
 
-            String oauthToken = getOAuthTokenFromHeader();
-            String url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
-            OAuthClientResource clientResource = new OAuthClientResource(url, oauthToken);
-            Representation representation;
-            StringRepresentation result = null;
-            if (LoadConfiguration.configuration.get("CACHE").equalsIgnoreCase("true")) {
-                if (!hashMap.containsKey(keystoneId)) {
-                    representation = clientResource.get();
-                    logger.debug("Attempting to insert data in the <Userid,TLBInput> HashMap");
-                    hashMap.put(keystoneId, new TLBInput(representation.getText(), stringToDate(from), stringToDate(to)));
+                        if (stringToDate(from).getTime() < minInserted.getTime()) {
+                            form.set("to", dateToString(minInserted));
+
+                            url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                            clientResource = new OAuthClientResource(url, oauthToken);
+                            representation = clientResource.get();
+                            hashMap.get(keystoneId).addData(representation.getText(), stringToDate(from), minInserted);
+                        }
+                        if (maxInserted.getTime() < stringToDate(to).getTime()) {
+                            form.set("from", dateToString(maxInserted));
+
+                            url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                            clientResource = new OAuthClientResource(url, oauthToken);
+                            representation = clientResource.get();
+                            hashMap.get(keystoneId).addData(representation.getText(), maxInserted, stringToDate(to));
+                        }
+                    }
+                    Date dateTo = stringToDate(to);
+                    Date dateFrom = stringToDate(from);
+                    result = new StringRepresentation(hashMap.get(keystoneId).getData(stringToDate(from), stringToDate(to)));
+                    return result;
                 } else {
-                    Date minInserted = hashMap.get(keystoneId).getFrom();
-                    Date maxInserted = hashMap.get(keystoneId).getTo();
-
-                    if (stringToDate(from).getTime() < minInserted.getTime()) {
-                        form.set("to", dateToString(minInserted));
-
-                        url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
-                        clientResource = new OAuthClientResource(url, oauthToken);
-                        representation = clientResource.get();
-                        hashMap.get(keystoneId).addData(representation.getText(), stringToDate(from), minInserted);
-                    }
-                    if (maxInserted.getTime() < stringToDate(to).getTime()) {
-                        form.set("from", dateToString(maxInserted));
-
-                        url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
-                        clientResource = new OAuthClientResource(url, oauthToken);
-                        representation = clientResource.get();
-                        hashMap.get(keystoneId).addData(representation.getText(), maxInserted, stringToDate(to));
-                    }
+                    representation = clientResource.get();
+                    String data = new TLBInput().formatRawData(representation.getText(), stringToDate(from), stringToDate(to));
+                    if (data.equals(""))
+                        return null;
+                    else
+                        return new StringRepresentation(data);
                 }
-                Date dateTo = stringToDate(to);
-                Date dateFrom = stringToDate(from);
-                result = new StringRepresentation(hashMap.get(keystoneId).getData(stringToDate(from), stringToDate(to)));
-                return result;
-            } else {
-                representation = clientResource.get();
-                String data = new TLBInput().formatRawData(representation.getText(), stringToDate(from), stringToDate(to));
-                return new StringRepresentation(data);
             }
         } catch (Exception e) {
             logger.error("Error while getting usage data: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(500);
         }
+        return new StringRepresentation("[]");
     }
 
     /**

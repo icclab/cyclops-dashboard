@@ -72,8 +72,8 @@
                         };
                     }
 
-                    var newUsage = formattedData[meterName].usage + meterUsage;
-                    var newPrice = formattedData[meterName].price + meterPrice;
+                    var newUsage = parseFloat(formattedData[meterName].usage) + parseFloat(meterUsage);
+                    var newPrice = parseFloat(formattedData[meterName].price) + parseFloat(meterPrice);
 
                     formattedData[meterName].usage = newUsage;
                     formattedData[meterName].price = newPrice;
