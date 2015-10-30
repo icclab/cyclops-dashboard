@@ -95,11 +95,12 @@
 
             for(var meterName in me.meters) {
                 var meter = me.meters[meterName];
-                var rate = meter.rate;
+                var rate = meter.rate.replace(/"/,'');
+                rate = rate.replace(/"/,'');
 
-                //replace illegal numbers / strings with 1
+                //replace illegal numbers / strings with 0
                 if(isNaN(rate) || rate < 0) {
-                    rate = 1;
+                    rate = 0;
                 }
 
                 rates[meterName] = rate;

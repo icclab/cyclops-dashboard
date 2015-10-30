@@ -69,8 +69,8 @@ public class Registration extends ServerResource {
             logger.trace("User created correctly in the Gatekeeper.");
             JSONObject response = postResponse.getJsonObject();
             String info = response.getString("info");
-            String[] splitted = info.split("\"");
-            String userId = splitted[15];
+            String[] splitted = info.split("\"id\":\"");
+            String userId = splitted[1].split("\"")[0];
             logger.trace("Attempting to store the new user in the database.");
             DatabaseHelper databaseHelper = new DatabaseHelper();
             databaseHelper.registerUser(username, passwordHash, name, surname, email, admin);
@@ -131,8 +131,8 @@ public class Registration extends ServerResource {
                 logger.trace("User created correctly in the Gatekeeper.");
                 JSONObject response = postResponse.getJsonObject();
                 String info = response.getString("info");
-                String[] splitted = info.split("\"");
-                String userId = splitted[15];
+                String[] splitted = info.split("\"id\":\"");
+                String userId = splitted[1].split("\"")[0];
                 logger.trace("Attempting to store the new user in the database.");
                 databaseHelper.registerUser(username, passwordHash, name, surname, email, admin);
                 databaseHelper.registerOnGK(username, passwordHash, userId);

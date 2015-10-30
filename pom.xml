@@ -8,7 +8,6 @@
     <artifactId>dashboard</artifactId>
     <packaging>war</packaging>
     <version>1.0-SNAPSHOT</version>
-    
     <prerequisites>
         <maven>3.2.1</maven>
     </prerequisites>
@@ -26,7 +25,6 @@
             </plugins>
         </pluginManagement>
     </build>
-
     <repositories>
         <repository>
             <id>maven-repo</id>

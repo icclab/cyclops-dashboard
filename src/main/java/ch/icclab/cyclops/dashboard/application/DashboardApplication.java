@@ -116,7 +116,7 @@ public class DashboardApplication extends Application {
                 logger.trace("Configuration loaded");
                 Registration registration = new Registration();
                 registration.registerAdmin();
-                logger.trace("----------------------------Admin Created");
+                logger.trace("Admin Created");
             } catch (IOException e) {
                 logger.error("Error while loading the configuration: "+e.getMessage());
                 e.printStackTrace();
