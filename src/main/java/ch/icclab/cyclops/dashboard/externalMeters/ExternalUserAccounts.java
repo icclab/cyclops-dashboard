@@ -102,12 +102,12 @@ public class ExternalUserAccounts extends ServerResource {
                 }
                 logger.debug("All external Ids added to the response.");
 
-                for (ExternalUserId exId : unactiveExternalIds) {
+                /*for (ExternalUserId exId : unactiveExternalIds) {
                     JSONObject externalId = new JSONObject();
                     externalId.put("source", exId.getSource());
                     response.put(externalId);
                 }
-                logger.debug("All internal Ids added to the response.");
+                logger.debug("All internal Ids added to the response.");*/
 
                 return new JsonRepresentation(response);
             }

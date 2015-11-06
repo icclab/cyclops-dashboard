@@ -99,10 +99,12 @@ public class BillPDF extends ServerResource {
                     String key = (String) keys.next();
                     JSONObject billItem = (JSONObject) billDetails.get(key);
                     Long usage = billItem.getLong("usage");
-                    Double rate = billItem.getDouble("rate");
-                    String unit = billItem.getString("unit");
+                    Double cost = billItem.getDouble("price");
+                    //String unit = billItem.getString("unit");
                     Double discount = billItem.getDouble("discount");
-                    bill.addItem(key, usage, rate, unit, discount);
+                    //bill.addItem(key, usage, rate, unit, discount);
+                    //TODO just testing workflow
+                    bill.addItem(key, usage, cost, "CHF", discount);
                 }
 
                 String logoPath = LoadConfiguration.configuration.get("WEB-INF") + "/images/icclab-logo-small.png";

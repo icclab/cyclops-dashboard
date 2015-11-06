@@ -68,7 +68,7 @@ public class BillGenerator {
             drawHeader(contentStream);
             drawFooter(document, contentStream, logo);
             drawBillDetail(contentStream, bill.getInfo());
-            drawItemizedDetail(contentStream, bill.getUsage(), bill.getRates(), bill.getUnits(), bill.getDiscounts());
+            drawItemizedDetail(contentStream, bill.getUsage(), bill.getCosts(), bill.getUnits(), bill.getDiscounts());
             contentStream.close();
             document.save(path);
             document.close();
@@ -206,11 +206,11 @@ public class BillGenerator {
      *
      * @param contentStream (required) reference to the PDPageContentStream object.
      * @param usage (required) dictionary containing the various meter usage values
-     * @param rate (required) dictionary containing the rates for the corresponding meters in usage dictionary, all meters entry must be present
+     * @param cost (required) dictionary containing the rates for the corresponding meters in usage dictionary, all meters entry must be present
      * @param unit (required) dictionary containing the unit symbol for the corresponding meters in usage dictionary, all meters entry must be present
      * @param discount (required) dictionary containing the individual volume based discount for the corresponding meters in usage dictionary, all meters entry must be present
      */
-    static void drawItemizedDetail(PDPageContentStream contentStream, HashMap<String, Long> usage, HashMap<String, Double> rate, HashMap<String, String> unit, HashMap<String, Double> discount) {
+    static void drawItemizedDetail(PDPageContentStream contentStream, HashMap<String, Long> usage, HashMap<String, Double> cost, HashMap<String, String> unit, HashMap<String, Double> discount) {
         try {
             final int TABLE_X = 40;
             final int TABLE_Y = 605;
@@ -219,7 +219,7 @@ public class BillGenerator {
 
             HashMap<String, Double> itemCost = new HashMap<String, Double>();
             int headerOffset = drawItemizedDetailTableHeader(contentStream, TABLE_X, TABLE_Y);
-            int tableOffset = drawItemizedDetailTable(contentStream, TABLE_X, TABLE_Y - headerOffset, usage, rate, unit, itemCost);
+            int tableOffset = drawItemizedDetailTable(contentStream, TABLE_X, TABLE_Y - headerOffset, usage, cost, unit, itemCost);
             drawItemizedDetailSummary(contentStream, SUMMARY_X, TABLE_Y - tableOffset - SUMMARY_OFFSET_Y - 40, itemCost, discount);
         } catch (IOException ex) {
             System.err.println("Exception caught: " + ex);
@@ -238,7 +238,7 @@ public class BillGenerator {
 
         contentStream.beginText();
         contentStream.moveTextPositionByAmount(ITEM_NAME_OFFSET_X, y - (HEADER_HEIGHT + FONT_SIZE) / 2);
-        contentStream.drawString("Resource Name");
+        contentStream.drawString("Instance Id");
 
         contentStream.moveTextPositionByAmount(ITEM_USAGE_OFFSET_X, 0);
         contentStream.drawString("Usage Value");
@@ -247,7 +247,7 @@ public class BillGenerator {
         contentStream.drawString("Unit");
 
         contentStream.moveTextPositionByAmount(ITEM_RATE_OFFSET_X, 0);
-        contentStream.drawString("Resource Rate");
+        contentStream.drawString("Price");
 
         contentStream.moveTextPositionByAmount(ITEM_COST_OFFSET_X, 0);
         contentStream.drawString("Usage Cost");
@@ -260,7 +260,7 @@ public class BillGenerator {
         return HEADER_HEIGHT;
     }
 
-    private static int drawItemizedDetailTable(PDPageContentStream contentStream, int x, int y, HashMap<String, Long> usage, HashMap<String, Double> rate, HashMap<String, String> unit, HashMap<String, Double> itemCost) throws IOException {
+    private static int drawItemizedDetailTable(PDPageContentStream contentStream, int x, int y, HashMap<String, Long> usage, HashMap<String, Double> resourceCost, HashMap<String, String> unit, HashMap<String, Double> itemCost) throws IOException {
         final int FONT_SIZE = 10;
         final int DELIMITER_PADDING = 8;
         final int INITIAL_FONT_OFFSET = 12;
@@ -294,10 +294,10 @@ public class BillGenerator {
             font = PDType1Font.COURIER_BOLD;
             contentStream.setFont(font, FONT_SIZE);
             contentStream.moveTextPositionByAmount(ITEM_RATE_OFFSET_X, ITEM_RATE_OFFSET_Y);
-            contentStream.drawString(prettyPrintRate(rate.get(key)));
+            contentStream.drawString(prettyPrintRate(resourceCost.get(key)));
             rowHeight += ITEM_RATE_OFFSET_Y;
 
-            double cost = Math.round(usage.get(key) * rate.get(key) * 100.0) / 100.0; // rounds to 2 decimal places
+            double cost = resourceCost.get(key);//Math.round(usage.get(key) * rate.get(key) * 100.0) / 100.0; // rounds to 2 decimal places
             itemCost.put(key, cost);
 
             font = PDType1Font.COURIER_BOLD_OBLIQUE;

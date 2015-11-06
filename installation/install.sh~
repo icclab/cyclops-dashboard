@@ -32,9 +32,7 @@ mkdir $HOME/bills/
 chmod 777 $HOME/bills/
 mkdir $HOME/sqlite/
 chmod 777 $HOME/sqlite/
-sudo mkdir /var/log/dashboard/
-sudo chmod 777 /var/log/dashboard/
-sudo -k
+
 echo "---------------------------------------------------------------------------"
 echo "| Getting the Dashboard package"
 echo "---------------------------------------------------------------------------"

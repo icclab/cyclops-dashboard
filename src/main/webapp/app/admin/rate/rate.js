@@ -95,8 +95,8 @@
 
             for(var meterName in me.meters) {
                 var meter = me.meters[meterName];
-                var rate = meter.rate.replace(/"/,'');
-                rate = rate.replace(/"/,'');
+                var rate = meter.rate;//.replace(/"/,'');
+                //rate = rate.replace("\"","");
 
                 //replace illegal numbers / strings with 0
                 if(isNaN(rate) || rate < 0) {

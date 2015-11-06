@@ -120,10 +120,24 @@
             return deferred.promise;
         };
 
+        this.loadTnovaUserId = function (params) {
+            var deferred = $q.defer();
+            deferred.resolve({
+                userId: "p1",//userId,
+                firstName: "T-Nova",
+                lastName: "User",
+                from: me.fromDate,
+                to: me.toDate
+            });
+            deferred.resolve(params);
+            return deferred.promise;
+        };
+
+
         this.getInternalBillItems = function (params) {
             var deferred = $q.defer();
-            var from = params.from + " 00:00:00";
-            var to = params.to + " 23:59:59";
+            var from = params.from + "T00:00:00";
+            var to = params.to + "T23:59:59";
 
             restService.getBillingInformation(params.userId, from, to).then(
                 function (response) {
@@ -167,6 +181,54 @@
                     for (var i = 0; i < responses.length; i++) {
                         var response = responses[i];
                         billDataService.setRawData(response.data);
+                    }
+                    ;
+
+                    deferred.resolve(params);
+                },
+                function () {
+                    deferred.reject("Could not load all external meter data");
+                }
+            );
+
+            return deferred.promise;
+        };
+
+        this.getTnovaBillItems = function (params) {
+            var deferred = $q.defer();
+            var promises = [];
+            var exIds = "p1";
+            var from = params.from + "T00:00:00";
+            var to = params.to + "T23:59:59";
+
+
+            var promise = restService.getBillingInformation(exIds, from, to).then(
+                function (response) {
+                    //Store the data for the internal billing items in the
+                    //billDataService. The service should already contain
+                    //external billing items.
+                    billDataService.setRawData(response.data);
+                    params.billItems = billDataService.getFormattedData();
+                    deferred.resolve(params);
+                },
+                function () {
+                    deferred.reject("Could not load charge data for user");
+                }
+            );
+
+            promises.push(promise);
+
+
+            $q.all(promises).then(
+                function (responses) {
+
+                    //for each external meter that was loaded, store the data
+                    //in the billDataService. The data will later be used after
+                    //the internal billing items have been loaded.
+                    for (var i = 0; i < responses.length; i++) {
+                        var response = responses[i];
+                        if (response != undefined)
+                            billDataService.setRawData(response.data);
                     }
                     ;
 
@@ -243,6 +305,27 @@
                     .then(me.loadExternalUserIds)
                     .then(me.getExternalBillItems)
                     .then(me.getInternalBillItems)
+                    .then(me.generateBillPDF).then(
+                    function (msg) {
+                        me.showPdfModal();
+                        alertService.showSuccess(msg);
+                    },
+                    function (msg) {
+                        alertService.showError(msg);
+                    }
+                );
+            }
+        };
+
+        this.generateBillTnova = function (user) {
+            if (!me.fromDate || !me.toDate) {
+                alertService.showError("No date span selected");
+            }
+            else {
+                var sessionId = sessionService.getSessionId();
+
+                me.loadTnovaUserId(user)
+                    .then(me.getTnovaBillItems)
                     .then(me.generateBillPDF).then(
                     function (msg) {
                         me.showPdfModal();

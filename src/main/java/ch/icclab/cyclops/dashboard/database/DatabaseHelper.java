@@ -210,7 +210,7 @@ public class DatabaseHelper {
             PreparedStatement stmt;
             String sql = "SELECT source, meterUserId FROM  meter_source LEFT JOIN (SELECT * FROM external_id WHERE userId = ?) ON meterSourceId = meter_source.ID" ;
             stmt = c.prepareStatement(sql);
-            for (String meter : meters) {
+            //for (String meter : meters) {
                 stmt.setString(1, userId);
                 logger.debug("Statement attempting to be executed: " + sql);
                 ResultSet resultSet = stmt.executeQuery();
@@ -218,8 +218,7 @@ public class DatabaseHelper {
                 while (resultSet.next()) {
                     result.add(new ExternalUserId(resultSet.getString(1), resultSet.getString(2)));
                 }
-            }
-
+            //}
             c.close();
         } catch (ClassNotFoundException e) {
             logger.error("Error while getting External IDs from the database: " + e.getMessage());
