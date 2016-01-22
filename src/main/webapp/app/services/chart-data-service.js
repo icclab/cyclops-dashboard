@@ -113,7 +113,7 @@
 
         this.getSampledGaugeMeterData = function(type, meterName) {
             var unsampledPoints = me.getGaugeMeterData(type, meterName);
-            var sampledData = me.doSampling(unsampledPoints, 100);
+            var sampledData = me.doSampling(unsampledPoints, 100);//TODO:MANU here is where we set the limit of the graph to do sampling.
             return sampledData;
         };
     }

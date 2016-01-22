@@ -20,7 +20,7 @@ import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
 import ch.icclab.cyclops.dashboard.gatekeeper.GatekeeperTokenGenerator;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -90,12 +90,12 @@ public class Registration extends ServerResource {
         jsonObject.put("password", password);
         jsonObject.put("isadmin", isAdmin);
         jsonObject.put("accesslist", "ALL");
-        ClientResource clientResource = new ClientResource(LoadConfiguration.configuration.get("GK_GET_UID"));
+        ClientResource clientResource = new ClientResource(Loader.getSettings().getCyclopsSettings().getGk_get_uid());
 
         try {
             logger.debug("Attempting to get the token to create the new user into Gatekeeper.");
-            String gatekeeperAdmin = LoadConfiguration.configuration.get("GK_ADMIN");
-            String gatekeeperPassword = LoadConfiguration.configuration.get("GK_PASSWORD");
+            String gatekeeperAdmin = Loader.getSettings().getCyclopsSettings().getGk_admin();
+            String gatekeeperPassword = Loader.getSettings().getCyclopsSettings().getGk_password();
             Representation representation = tokenGenerator.getGatekeeperToken(gatekeeperAdmin, gatekeeperPassword);
             JsonRepresentation jsonRepresentation = null;
             jsonRepresentation = new JsonRepresentation(representation);
@@ -116,8 +116,8 @@ public class Registration extends ServerResource {
     public void registerAdmin() {
         try {
             logger.debug("Attempting to create the Default Admin Account.");
-            String username = LoadConfiguration.configuration.get("DASHBOARD_ADMIN");
-            String password = LoadConfiguration.configuration.get("DASHBOARD_PASSWORD");
+            String username = Loader.getSettings().getCyclopsSettings().getDashboard_admin();
+            String password = Loader.getSettings().getCyclopsSettings().getDashboard_password();
             String name = "Admin";
             String surname = "Default Account";
             String email = "admin@default.ch";
@@ -153,12 +153,13 @@ public class Registration extends ServerResource {
         jsonObject.put("password", password);
         jsonObject.put("isadmin", "n");
         jsonObject.put("accesslist", "ALL");
-        ClientResource clientResource = new ClientResource(LoadConfiguration.configuration.get("GK_GET_UID"));
+        ClientResource clientResource = new ClientResource(Loader.getSettings().getCyclopsSettings().getGk_get_uid());
 
         try {
             logger.debug("Attempting to get the token to create the account into Gatekeeper.");
-            String gatekeeperAdmin = LoadConfiguration.configuration.get("GK_ADMIN");
-            String gatekeeperPassword = LoadConfiguration.configuration.get("GK_PASSWORD");
+            String gatekeeperAdmin = Loader.getSettings().getCyclopsSettings().getGk_admin();
+            String gatekeeperPassword = Loader.getSettings().getCyclopsSettings().getGk_password();
+            logger.debug("Username: "+gatekeeperAdmin+" Password: "+gatekeeperPassword);
             Representation representation = tokenGenerator.getGatekeeperToken(gatekeeperAdmin, gatekeeperPassword);
             JsonRepresentation jsonRepresentation = null;
             jsonRepresentation = new JsonRepresentation(representation);

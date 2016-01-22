@@ -16,7 +16,7 @@
  */
 package ch.icclab.cyclops.dashboard.errorreporting;
 
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import com.rabbitmq.client.*;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -55,17 +55,17 @@ public class ErrorReporter {
     }
 
     public static boolean isExceptionReportingEnabled() {
-        String enabled = LoadConfiguration.configuration.get("ERROR_REPORTER_ENABLED");
+        String enabled = Loader.getSettings().getCyclopsSettings().getError_reporter_enabled();
         return enabled.equals("true");
     }
 
     private static Connection getConnection() throws IOException, TimeoutException {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(LoadConfiguration.configuration.get("ERROR_REPORTER_HOST"));
-        factory.setPort(Integer.parseInt(LoadConfiguration.configuration.get("ERROR_REPORTER_PORT")));
-        factory.setVirtualHost(LoadConfiguration.configuration.get("ERROR_REPORTER_VIRTUAL_HOST"));
-        factory.setUsername(LoadConfiguration.configuration.get("ERROR_REPORTER_USERNAME"));
-        factory.setPassword(LoadConfiguration.configuration.get("ERROR_REPORTER_PASSWORD"));
+        factory.setHost(Loader.getSettings().getCyclopsSettings().getError_reporter_host());
+        factory.setPort(Integer.parseInt(Loader.getSettings().getCyclopsSettings().getError_reporter_port()));
+        factory.setVirtualHost(Loader.getSettings().getCyclopsSettings().getError_reporter_virtual_host());
+        factory.setUsername(Loader.getSettings().getCyclopsSettings().getError_reporter_username());
+        factory.setPassword(Loader.getSettings().getCyclopsSettings().getError_reporter_password());
         return factory.newConnection();
     }
 }

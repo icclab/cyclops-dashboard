@@ -15,16 +15,16 @@
  *     under the License.
  */
 
-(function() {
+(function () {
     /*
-        Module Setup
-    */
+     Module Setup
+     */
     angular.module('dashboard.services')
         .service('meterselectionDataService', MeterselectionDataService);
 
     /*
-        Controllers, Factories, Services, Directives
-    */
+     Controllers, Factories, Services, Directives
+     */
     function MeterselectionDataService() {
         var me = this;
         var formattedUdrData = {};
@@ -44,7 +44,7 @@
          *
          * @param {Object} data Raw response data
          */
-        this.setRawUdrData = function(data) {
+        this.setRawUdrData = function (data) {
             formattedUdrData = {};
             var meters = data.points || [];
             var columns = data.columns || [];
@@ -63,7 +63,8 @@
                     type: meter[indexType],
                     source: meter[indexSource]
                 };
-            };
+            }
+            ;
         };
 
         /**
@@ -80,35 +81,44 @@
          *
          * @param {Object} data Raw response data
          */
-        this.setRawOpenstackData = function(data) {
+        this.setRawOpenstackData = function (data) {
             formattedOpenstackData = {};
+            var meters = data.points;
+            var columns = data.columns;
+            var nameIndex = columns.indexOf("metername");
+            var enabledIndex = columns.indexOf("status");
+            var typeIndex = columns.indexOf("metertype");
+            var sourceIndex = columns.indexOf("source");
 
-            for(var i = 0; i < data.length; i++) {
-                var meter = data[i];
-                var meterName = meter.name;
+            for (var i = 0; i < meters.length; i++) {
+                var meter = meters[i];
+                var meterName = meter[nameIndex];
+
+                if (meter[typeIndex] == "")
+                    meter[typeIndex] = "gauge";
 
                 formattedOpenstackData[meterName] = {
                     name: meterName,
                     enabled: false,
-                    type: meter.type,
-                    source: meter.source
+                    type: meter[typeIndex],
+                    source: meter[sourceIndex]
                 };
             }
         };
 
-        this.getFormattedUdrData = function() {
+        this.getFormattedUdrData = function () {
             return formattedUdrData;
         };
 
-        this.getFormattedOpenstackData = function() {
+        this.getFormattedOpenstackData = function () {
             return formattedOpenstackData;
         };
 
-        this.getSelectedMeterNames = function() {
+        this.getSelectedMeterNames = function () {
             var selectedMeterNames = [];
 
-            for(var meterName in formattedUdrData) {
-                if(formattedUdrData[meterName].enabled) {
+            for (var meterName in formattedUdrData) {
+                if (formattedUdrData[meterName].enabled) {
                     selectedMeterNames.push(meterName);
                 }
             }

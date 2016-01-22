@@ -17,9 +17,9 @@
 
 package ch.icclab.cyclops.dashboard.rate;
 
+import ch.icclab.cyclops.dashboard.load.Loader;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthClientResource;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthServerResource;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.restlet.representation.Representation;
@@ -32,7 +32,7 @@ public class Rate extends OAuthServerResource {
         logger.debug("Attempting to get the Rate");
         String query = getRequest().getResourceRef().getQuery();
         String oauthToken = getOAuthTokenFromHeader();
-        String url = LoadConfiguration.configuration.get("RC_RATE_URL") + "?" + query;
+        String url = Loader.getSettings().getCyclopsSettings().getRc_rate_url() + "?" + query;
         OAuthClientResource clientResource = new OAuthClientResource(url, oauthToken);
         return clientResource.get();
     }

@@ -18,9 +18,9 @@
 package ch.icclab.cyclops.dashboard.rate;
 
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthClientResource;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthServerResource;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.restlet.ext.json.JsonRepresentation;
@@ -38,7 +38,7 @@ public class RateStatus extends OAuthServerResource {
         logger.debug("Attempting to get the Rate Status.");
         String query = getRequest().getResourceRef().getQuery();
         String oauthToken = getOAuthTokenFromHeader();
-        String url = LoadConfiguration.configuration.get("RC_RATE_STATUS_URL") + "?" + query;
+        String url = Loader.getSettings().getCyclopsSettings().getRc_rate_status_url() + "?" + query;
         OAuthClientResource clientResource = new OAuthClientResource(url, oauthToken);
         return clientResource.get();
     }
@@ -48,7 +48,7 @@ public class RateStatus extends OAuthServerResource {
         try {
             logger.debug("Attempting to update the Rate Status.");
             String oauthToken = getOAuthTokenFromHeader();
-            String url = LoadConfiguration.configuration.get("RC_RATE_URL");
+            String url = Loader.getSettings().getCyclopsSettings().getRc_rate_url();
             OAuthClientResource res = new OAuthClientResource(url, oauthToken);
             JsonRepresentation rep = new JsonRepresentation(entity);
             return res.post(rep);

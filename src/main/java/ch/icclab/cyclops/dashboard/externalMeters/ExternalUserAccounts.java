@@ -19,7 +19,7 @@ package ch.icclab.cyclops.dashboard.externalMeters;
 
 import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
@@ -42,7 +42,7 @@ public class ExternalUserAccounts extends ServerResource {
     @Get
     public Representation getExternalUserIds(Representation entity) {
         try {
-            ClientResource clientResource = new ClientResource(LoadConfiguration.configuration.get("UDR_METER_URL"));
+            ClientResource clientResource = new ClientResource(Loader.getSettings().getCyclopsSettings().getUdr_meter_url());
             logger.debug("Attempting to get the list of external user IDs.");
             Form query = getRequest().getResourceRef().getQueryAsForm();
             String userId = query.getFirstValue("user_id", "");

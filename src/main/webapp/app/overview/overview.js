@@ -97,6 +97,7 @@
 
         //https://docs.angularjs.org/guide/directive#creating-a-directive-that-wraps-other-elements
         this.onDateChanged = function(from, to) {
+            //TODO: Change date format here to add seconds
             var date = new Date();
             var minutes = date.getMinutes();
             var hours = date.getHours();

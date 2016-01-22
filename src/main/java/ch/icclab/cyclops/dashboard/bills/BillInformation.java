@@ -20,25 +20,21 @@ package ch.icclab.cyclops.dashboard.bills;
 import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 import ch.icclab.cyclops.dashboard.database.DatabaseInteractionException;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.restlet.data.Form;
-import org.restlet.data.MediaType;
 import org.restlet.ext.json.JsonRepresentation;
-import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
 import org.restlet.resource.ServerResource;
 
-import java.io.File;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 public class BillInformation extends ServerResource {
     final static Logger logger = LogManager.getLogger(BillInformation.class.getName());
@@ -53,8 +49,19 @@ public class BillInformation extends ServerResource {
 
         DatabaseHelper dbHelper = new DatabaseHelper();
         try {
-            logger.debug("Attempting to get the Bills from the database.");
-            List<Bill> bills = dbHelper.getBillsForUser(userId, allBills);
+            logger.debug("Attempting to get the BillInfos from the database.");
+            List<BillInfo> infos = dbHelper.getBillInfosForUser(userId, allBills);
+            List<Bill> bills = new ArrayList<Bill>();
+
+            for (BillInfo billInfo : infos) {
+                Bill bill = new Bill();
+                bill.setFromDate(billInfo.getFromDate());
+                bill.setToDate(billInfo.getToDate());
+                bill.setDueDate(billInfo.getDueDate());
+                bill.setApproved(billInfo.getApproved());
+                bill.setPaid(billInfo.getPaid());
+                bills.add(bill);
+            }
 
             for (Bill bill : bills) {
                 JSONObject billJson = new JSONObject();
@@ -69,11 +76,11 @@ public class BillInformation extends ServerResource {
             return result;
 
         } catch (DatabaseInteractionException e) {
-            logger.error("Error while trying to get bills from the DataBase: "+e.getMessage());
+            logger.error("Error while trying to get bills from the DataBase: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(404);
         } catch (Exception e) {
-            logger.error("Error while trying to get bills: "+e.getMessage());
+            logger.error("Error while trying to get bills: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(500);
         }
@@ -85,15 +92,15 @@ public class BillInformation extends ServerResource {
         String userId = query.getFirstValue("user_id", "");
         String from = query.getFirstValue("from", "");
         String to = query.getFirstValue("to", "");
-        String approvedString = query.getFirstValue("a","");
-        String paidString = query.getFirstValue("p","");
+        String approvedString = query.getFirstValue("a", "");
+        String paidString = query.getFirstValue("p", "");
         boolean approved;
         boolean paid;
-        if(approvedString.equals("true"))
+        if (approvedString.equals("true"))
             approved = true;
         else
             approved = false;
-        if(paidString.equals("true"))
+        if (paidString.equals("true"))
             paid = true;
         else
             paid = false;
@@ -105,11 +112,11 @@ public class BillInformation extends ServerResource {
             dbHelper.updateBillStatus(userId, from, to, approved, paid);
             return getBills();
         } catch (DatabaseInteractionException e) {
-            logger.error("Error while Updating the Bill information: "+e.getMessage());
+            logger.error("Error while Updating the Bill information: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(404);
         } catch (Exception e) {
-            logger.error("Error while Updating the Bill information: "+e.getMessage());
+            logger.error("Error while Updating the Bill information: " + e.getMessage());
             ErrorReporter.reportException(e);
             throw new ResourceException(500);
         }

@@ -50,6 +50,10 @@
             $state.go("keystone");
         };
 
+        this.showCloudstack = function() {
+            $state.go("cloudstack");
+        };
+
         this.updateExternalUserIds = function() {
             var userId = sessionService.getKeystoneId();
             restService.updateExternalUserIds(userId, me.externalUserIds)

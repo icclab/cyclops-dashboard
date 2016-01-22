@@ -15,16 +15,16 @@
  *     under the License.
  */
 
-(function() {
+(function () {
     /*
-        Module Setup
-    */
+     Module Setup
+     */
     angular.module('dashboard.services')
         .service('usageDataService', UsageDataService);
 
     /*
-        Controllers, Factories, Services, Directives
-    */
+     Controllers, Factories, Services, Directives
+     */
     function UsageDataService() {
         var me = this;
         var formattedData = {};
@@ -42,10 +42,10 @@
          *
          * @param  {Scope} $scope Scope on which the event is fired
          */
-        this.notifyChartDataReady = function($scope) {
+        this.notifyChartDataReady = function ($scope) {
             var chartNames = [];
 
-            for(var chartName in formattedData) {
+            for (var chartName in formattedData) {
                 var chart = formattedData[chartName];
 
                 chartNames.push({
@@ -74,42 +74,119 @@
          *
          * @param {Object} data Raw response data
          */
-        this.setRawData = function(data) {
-            if(data && data.usage && data.usage.OpenStack) {
-                dataArray = data.usage.OpenStack;
+        this.setRawData = function (data) {
+            if (data && data.usage) {
+                if (data.usage.OpenStack)  //TODO: In case we are having OpenStack Data. (Manu: Senseless, same representation for all?)
+                    this.representOpenstack(data);
+                else //TODO: Test, this will represent as if it was external.
+                    this.representExternal(data);
 
-                for(var i = 0; i < dataArray.length; i++) {
-                    currentData = dataArray[i];
-
-                    //Skip if data is null (no usage data available)
-                    if(!currentData) {
-                        continue;
-                    }
-
-                    //Get the first point to find out the meter type and unit
-                    var firstPoint = currentData.points[0] || [];
-                    var indexType = currentData.columns.indexOf("type");
-                    var indexUnit = currentData.columns.indexOf("unit");
-                    var type = firstPoint[indexType];
-                    var unit = firstPoint[indexUnit];
-
-                    var formattedColumns = me.getFormattedColumns();
-                    var formattedPoints = me.formatPoints(
-                        currentData.points,
-                        currentData.columns
-                    );
-
-                    formattedData[currentData.name] = {
-                        name: currentData.name,
-                        columns: formattedColumns,
-                        points: formattedPoints,
-                        enabled: true,
-                        type: type,
-                        unit: unit
-                    };
-                }
+            } else {
+                this.represent(data);
             }
         };
+
+        /**
+         * This method will represent a simple json format which contains objects with at least the following 3 fields:
+         * {
+         *  ...
+         *  "time": yyyy-MM-dd hh:mm:ss
+         *  "usage": n
+         *  "productType/meter": "metername"
+         *  ...
+         * }
+         * @param data
+         */
+        this.represent = function(data){
+            if(data.usages){
+                usagesArray = data.usages;
+                for(var i = 0; i< usagesArray.length; i++){
+                    formattedPoint[usagesArray[i].productType] = {
+                        name: usagesArray[i].productType,
+                        time: usagesArray[i].time,
+                        usage: usagesArray[i].usage,
+                        type: "gauge" //TODO: We set the meter type as gauge at the moment
+                    }
+                }
+            }
+        }
+
+
+        /**
+         * This method will represent the json data that comes in the old json format with "Openstack" header
+         *
+         * @param data
+         */
+        this.representOpenstack = function (data) {
+            dataArray = data.usage.OpenStack;
+
+            for (var i = 0; i < dataArray.length; i++) {
+                currentData = dataArray[i];
+
+                //Skip if data is null (no usage data available)
+                if (!currentData) {
+                    continue;
+                }
+
+                //Get the first point to find out the meter type and unit
+                var firstPoint = currentData.points[0] || [];
+                var indexType = currentData.columns.indexOf("type");
+                var indexUnit = currentData.columns.indexOf("unit");
+                var type = firstPoint[indexType];
+                var unit = firstPoint[indexUnit];
+
+                var formattedColumns = me.getFormattedColumns();
+                var formattedPoints = me.formatPoints(
+                    currentData.points,
+                    currentData.columns
+                );
+
+                formattedData[currentData.name] = {
+                    name: currentData.name,
+                    columns: formattedColumns,
+                    points: formattedPoints,
+                    enabled: true,
+                    type: type,
+                    unit: unit
+                };
+            }
+        }
+
+        /**
+         * This method will represent the json data that comes in the old json format with different header than "Openstack"
+         * repeated method from external-usage-data-service.js
+         * @param data
+         */
+        this.representExternal = function (data) {
+            dataArray = data.usage.External;
+
+            for (var i = 0; i < dataArray.length; i++) {
+                currentData = dataArray[i];
+
+                //Skip if data is null (no usage data available)
+                if (!currentData) {
+                    continue;
+                }
+
+                //Get the first point to find out the meter type and unit
+                var firstPoint = currentData.points[0] || [];
+
+                var formattedColumns = me.getFormattedColumns();
+                var formattedPoints = me.formatPoints(
+                    currentData.points,
+                    currentData.columns
+                );
+
+                formattedData[currentData.name] = {
+                    name: currentData.name,
+                    columns: formattedColumns,
+                    points: formattedPoints,
+                    enabled: true,
+                    type: "gauge",
+                    unit: ""
+                };
+            }
+        }
 
         /**
          * Transforms the raw points to the following format:
@@ -123,7 +200,7 @@
          * @param {Object} rawColumns Raw column data
          * @return {Array}
          */
-        this.formatPoints = function(rawPoints, rawColumns) {
+        this.formatPoints = function (rawPoints, rawColumns) {
             var formattedPoints = [];
             var indexTime = rawColumns.indexOf("time");
             var indexAvg = rawColumns.indexOf("avg");
@@ -134,15 +211,16 @@
                 var time = rawPoint[indexTime];
                 var value = 0;
 
-                if(indexAvg > -1) {
+                if (indexAvg > -1) {
                     value = rawPoint[indexAvg];
                 }
-                else if(indexUsage > -1) {
+                else if (indexUsage > -1) {
                     value = rawPoint[indexUsage];
                 }
 
                 formattedPoints.push([time, value]);
-            };
+            }
+            ;
 
             return formattedPoints;
         };
@@ -152,16 +230,16 @@
          *
          * @return {Array}
          */
-        this.getFormattedColumns = function(rawColumns) {
+        this.getFormattedColumns = function (rawColumns) {
             var formattedColumns = ["time", "value"];
             return formattedColumns;
         };
 
-        this.getFormattedData = function() {
+        this.getFormattedData = function () {
             return formattedData;
         };
 
-        this.clearData = function() {
+        this.clearData = function () {
             formattedData = {};
         };
     }

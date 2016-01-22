@@ -18,25 +18,32 @@
 package ch.icclab.cyclops.dashboard.udr;
 
 import ch.icclab.cyclops.dashboard.application.DashboardApplication;
-import ch.icclab.cyclops.dashboard.cache.CacheData;
 import ch.icclab.cyclops.dashboard.cache.TLBInput;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthClientResource;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthServerResource;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.json.JSONObject;
+import org.restlet.Client;
+import org.restlet.Request;
 import org.restlet.data.Form;
+import org.restlet.data.Header;
+import org.restlet.data.MediaType;
+import org.restlet.data.Protocol;
+import org.restlet.engine.header.HeaderConstants;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.ClientResource;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+import org.restlet.util.Series;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
@@ -73,11 +80,11 @@ public class Usage extends OAuthServerResource {
             form.add("to", to);
             if (!keystoneId.equals("undefined")) {
                 String oauthToken = getOAuthTokenFromHeader();
-                String url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                String url = Loader.getSettings().getCyclopsSettings().getUdr_usage_url() + keystoneId + "?" + form.getQueryString();
                 OAuthClientResource clientResource = new OAuthClientResource(url, oauthToken);
                 Representation representation;
                 StringRepresentation result = null;
-                if (LoadConfiguration.configuration.get("CACHE").equalsIgnoreCase("true")) {
+                if (Loader.getSettings().getCyclopsSettings().getCache().equalsIgnoreCase("true")) {
                     if (!hashMap.containsKey(keystoneId)) {
                         representation = clientResource.get();
                         logger.debug("Attempting to insert data in the <Userid,TLBInput> HashMap");
@@ -89,7 +96,7 @@ public class Usage extends OAuthServerResource {
                         if (stringToDate(from).getTime() < minInserted.getTime()) {
                             form.set("to", dateToString(minInserted));
 
-                            url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                            url = Loader.getSettings().getCyclopsSettings().getUdr_usage_url() + keystoneId + "?" + form.getQueryString();
                             clientResource = new OAuthClientResource(url, oauthToken);
                             representation = clientResource.get();
                             hashMap.get(keystoneId).addData(representation.getText(), stringToDate(from), minInserted);
@@ -97,7 +104,7 @@ public class Usage extends OAuthServerResource {
                         if (maxInserted.getTime() < stringToDate(to).getTime()) {
                             form.set("from", dateToString(maxInserted));
 
-                            url = LoadConfiguration.configuration.get("UDR_USAGE_URL") + keystoneId + "?" + form.getQueryString();
+                            url = Loader.getSettings().getCyclopsSettings().getUdr_usage_url() + keystoneId + "?" + form.getQueryString();
                             clientResource = new OAuthClientResource(url, oauthToken);
                             representation = clientResource.get();
                             hashMap.get(keystoneId).addData(representation.getText(), maxInserted, stringToDate(to));
@@ -108,12 +115,24 @@ public class Usage extends OAuthServerResource {
                     result = new StringRepresentation(hashMap.get(keystoneId).getData(stringToDate(from), stringToDate(to)));
                     return result;
                 } else {
-                    representation = clientResource.get();
-                    String data = new TLBInput().formatRawData(representation.getText(), stringToDate(from), stringToDate(to));
+                    String data = "";
+                    Date dateFrom = stringToDate(from);
+                    Date dateTo = stringToDate(to);
+                    try {
+                        representation = clientResource.get();
+                        data = representation.getText();
+//                        data = new TLBInput().formatRawData(representation.getText(), dateFrom, dateTo);
+                    } catch (Exception ignored) {
+                        //TODO this is here until better and more generic way how to work with different usecases is implemented
+                        String response = pullData(url);
+                        TLBInput input = new TLBInput();
+                        data = input.formatRawData(response, dateFrom, dateTo);
+                    }
                     if (data.equals(""))
                         return null;
                     else
                         return new StringRepresentation(data);
+
                 }
             }
         } catch (Exception e) {
@@ -122,6 +141,29 @@ public class Usage extends OAuthServerResource {
             throw new ResourceException(500);
         }
         return new StringRepresentation("[]");
+    }
+
+    private String pullData(String url) throws IOException {
+        logger.trace("Starting to pull data from provided URL");
+
+        // create connection
+        ClientResource cr = new ClientResource(url);
+        Request req = cr.getRequest();
+
+        // now header
+        Series<Header> headerValue = new Series<Header>(Header.class);
+        req.getAttributes().put(HeaderConstants.ATTRIBUTE_HEADERS, headerValue);
+        headerValue.add("Accept", "application/json");
+        headerValue.add("Content-Type", "application/json");
+
+        // fire it up
+        cr.get(MediaType.APPLICATION_JSON);
+        Representation output = cr.getResponseEntity();
+
+        logger.trace("Successfully pulled data from provided URL");
+
+        // and return response data
+        return output.getText();
     }
 
     /**

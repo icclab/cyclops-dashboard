@@ -103,7 +103,7 @@
                 {
                     area: true,
                     values: result,
-                    key: seriesName
+                    key: seriesName//TODO: Manu aqui es donde se pone nombre al grafico.
                 }
             ];
         };

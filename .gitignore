@@ -10,8 +10,9 @@
 .idea
 *.sublime-*
 out/
-target/
 
 # Dashboard test coverage information
-dashboard/web/app-test/coverage/
-src/main/webapp/WEB-INF/configuration.txt
+src/web/app-test/coverage/
+target
+.DS_Store
+

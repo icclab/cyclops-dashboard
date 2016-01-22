@@ -20,13 +20,11 @@ package ch.icclab.cyclops.dashboard.login;
 import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
 import ch.icclab.cyclops.dashboard.gatekeeper.GatekeeperTokenGenerator;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONObject;
-import org.restlet.data.ChallengeScheme;
-import org.restlet.data.Form;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.*;
@@ -52,7 +50,7 @@ public class Login extends ServerResource {
             JSONObject json = represent.getJsonObject();
             String user = json.getString("username");
             String password = json.getString("password");
-            return checkUser(user, password, LoadConfiguration.configuration.get("DASHBOARD_USER_TABLE"));
+            return checkUser(user, password, Loader.getSettings().getCyclopsSettings().getDashboard_user_table());
         } catch (Exception e) {
             logger.error("Error while Loging in: "+e.getMessage());
             ErrorReporter.reportException(e);

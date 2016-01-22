@@ -53,7 +53,8 @@ public class BillGenerator {
     private static final int ITEM_RATE_OFFSET_X = 50;
     private static final int ITEM_RATE_OFFSET_Y = 0;
 
-    private static final int ITEM_COST_OFFSET_X = 120;
+
+    private static final int ITEM_COST_OFFSET_X = 90;
     private static final int ITEM_COST_OFFSET_Y = 0;
 
     private static final int TABLE_WIDTH = 580;
@@ -241,13 +242,13 @@ public class BillGenerator {
         contentStream.drawString("Instance Id");
 
         contentStream.moveTextPositionByAmount(ITEM_USAGE_OFFSET_X, 0);
-        contentStream.drawString("Usage Value");
+        contentStream.drawString("Used Seconds");
 
         contentStream.moveTextPositionByAmount(ITEM_UNIT_OFFSET_X, 0);
         contentStream.drawString("Unit");
 
         contentStream.moveTextPositionByAmount(ITEM_RATE_OFFSET_X, 0);
-        contentStream.drawString("Price");
+        contentStream.drawString("Rate");
 
         contentStream.moveTextPositionByAmount(ITEM_COST_OFFSET_X, 0);
         contentStream.drawString("Usage Cost");
@@ -297,7 +298,8 @@ public class BillGenerator {
             contentStream.drawString(prettyPrintRate(resourceCost.get(key)));
             rowHeight += ITEM_RATE_OFFSET_Y;
 
-            double cost = resourceCost.get(key);//Math.round(usage.get(key) * rate.get(key) * 100.0) / 100.0; // rounds to 2 decimal places
+            double cost = resourceCost.get(key) * usage.get(key);
+            //Math.round(usage.get(key) * rate.get(key) * 100.0) / 100.0; // rounds to 2 decimal places
             itemCost.put(key, cost);
 
             font = PDType1Font.COURIER_BOLD_OBLIQUE;

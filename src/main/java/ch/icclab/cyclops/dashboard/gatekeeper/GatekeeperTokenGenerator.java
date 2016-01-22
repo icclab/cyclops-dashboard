@@ -18,7 +18,7 @@ package ch.icclab.cyclops.dashboard.gatekeeper;
 
 import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.restlet.data.Header;
@@ -46,13 +46,13 @@ public class GatekeeperTokenGenerator {
             DatabaseHelper databaseHelper = new DatabaseHelper();
             logger.trace("Attempting go get the userId from the database.");
             String userId;
-            if (username.equals(LoadConfiguration.configuration.get("GK_ADMIN"))) {
+            if (username.equals(Loader.getSettings().getCyclopsSettings().getGk_admin())) {
                 logger.debug("Asking for a token to authenticating the query");
                 userId = "1";
             } else
                 userId = databaseHelper.getUserId(username);
             logger.debug("Attempting to get the token from the Gatekeeper.");
-            ClientResource clientResource = new ClientResource(LoadConfiguration.configuration.get("GK_TOKEN_URL"));
+            ClientResource clientResource = new ClientResource(Loader.getSettings().getCyclopsSettings().getGk_token_url());
             Series<Header> headers = (Series<Header>) clientResource.getRequestAttributes().get("org.restlet.http.headers");
 
             if (headers == null) {
@@ -62,7 +62,7 @@ public class GatekeeperTokenGenerator {
 
             headers.set("X-Auth-Password", password);
             headers.set("X-Auth-Uid", userId);
-
+            logger.debug("Gatekeeper Token URL: "+Loader.getSettings().getCyclopsSettings().getGk_token_url());
             return clientResource.post(MediaType.APPLICATION_JSON);
         } catch (Exception e) {
             logger.error("Error while getting the token from the Gatekeeper: " + e.getMessage());

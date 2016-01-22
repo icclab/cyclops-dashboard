@@ -15,41 +15,42 @@
  *     under the License.
  */
 
-(function(){
+(function () {
     /*
-        Main Module Setup
-    */
+     Main Module Setup
+     */
     angular.module('dashboard', [
-      'ngAnimate',
-      'ui.router',
-      'ui.bootstrap',
-      'toasty',
-      'angular-loading-bar',
-      'dashboard.services',
-      'dashboard.utils',
-      'dashboard.navigation',
-      'dashboard.login',
-      'dashboard.overview',
-      'dashboard.rate',
-      'dashboard.charge',
-      'dashboard.keystone',
-      'dashboard.bills',
-      'dashboard.cloudservices',
-      'dashboard.admin.meters',
-      'dashboard.admin.users',
-      'dashboard.admin.rate',
-      'dashboard.admin.billing',
-      'dashboard.charts',
-      'dashboard.filter',
-      'dashboard.notifications',
-      'dashboard.directives',
-      'dashboard.modals',
-      'dashboard.registration',
+        'ngAnimate',
+        'ui.router',
+        'ui.bootstrap',
+        'toasty',
+        'angular-loading-bar',
+        'dashboard.services',
+        'dashboard.utils',
+        'dashboard.navigation',
+        'dashboard.login',
+        'dashboard.overview',
+        'dashboard.rate',
+        'dashboard.charge',
+        'dashboard.keystone',
+        'dashboard.cloudstack',
+        'dashboard.bills',
+        'dashboard.cloudservices',
+        'dashboard.admin.meters',
+        'dashboard.admin.users',
+        'dashboard.admin.rate',
+        'dashboard.admin.billing',
+        'dashboard.charts',
+        'dashboard.filter',
+        'dashboard.notifications',
+        'dashboard.directives',
+        'dashboard.modals',
+        'dashboard.registration',
 
     ]).config([
         '$urlRouterProvider',
         '$logProvider',
-        function($urlRouterProvider, $logProvider) {
+        function ($urlRouterProvider, $logProvider) {
             $urlRouterProvider.otherwise("/login");
             $logProvider.debugEnabled(true);
         }
@@ -58,7 +59,7 @@
         '$state',
         '$log',
         'sessionService',
-        function($rootScope, $state, $log, sessionService) {
+        function ($rootScope, $state, $log, sessionService) {
             /**
              * This function validates each redirect. It checks if a redirect
              * needs authentication or is specified as adminOnly and compares
@@ -66,14 +67,14 @@
              * is not permitted, the user will be redirected to the login
              * page instead.
              */
-            var validateRedirect = function(event, to, toArgs, from, fromArgs){
-                if(to.authenticate && !sessionService.isAuthenticated()){
+            var validateRedirect = function (event, to, toArgs, from, fromArgs) {
+                if (to.authenticate && !sessionService.isAuthenticated()) {
                     $log.debug("Access Violation: not authenticated");
                     $state.go("login");
                     event.preventDefault();
                 }
 
-                if(to.adminOnly && !sessionService.isAdmin()){
+                if (to.adminOnly && !sessionService.isAdmin()) {
                     $log.debug("Access Violation: no administrator");
                     $state.go("login");
                     event.preventDefault();
@@ -85,13 +86,13 @@
     ]);
 
     /*
-        Login Module Setup
-    */
+     Login Module Setup
+     */
     angular.module('dashboard.login', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('login', {
                 url: "/login",
                 authenticate: false,
@@ -111,13 +112,13 @@
     ]);
 
     /*
-        Registration Module Setup
+     Registration Module Setup
      */
     angular.module('dashboard.registration', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('registration', {
                 url: "/registration",
                 authenticate: false,
@@ -137,13 +138,13 @@
     ]);
 
     /*
-        Overview Module Setup
-    */
+     Overview Module Setup
+     */
     angular.module('dashboard.overview', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('overview', {
                 url: "/overview",
                 authenticate: true,
@@ -165,13 +166,13 @@
     ]);
 
     /*
-        Rate Module Setup
-    */
+     Rate Module Setup
+     */
     angular.module('dashboard.rate', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('rate', {
                 url: "/rate",
                 authenticate: true,
@@ -193,13 +194,13 @@
     ]);
 
     /*
-        Charge Module Setup
-    */
+     Charge Module Setup
+     */
     angular.module('dashboard.charge', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('charge', {
                 url: "/charge",
                 authenticate: true,
@@ -221,13 +222,13 @@
     ]);
 
     /*
-        Keystone Module Setup
-    */
+     Keystone Module Setup
+     */
     angular.module('dashboard.keystone', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('keystone', {
                 url: "/keystone",
                 authenticate: true,
@@ -249,13 +250,41 @@
     ]);
 
     /*
-        Bills Module Setup
-    */
+     Cloudstack Module Setup
+     */
+    angular.module('dashboard.cloudstack', [
+        'ui.router'
+    ]).config([
+        '$stateProvider',
+        function ($stateProvider) {
+            $stateProvider.state('cloudstack', {
+                url: "/cloudstack",
+                authenticate: true,
+                adminOnly: false,
+                views: {
+                    "navigation": {
+                        templateUrl: 'navigation/navigation.html',
+                        controller: 'NavigationController',
+                        controllerAs: 'navigationCtrl'
+                    },
+                    "content": {
+                        templateUrl: 'cloudstack/cloudstack.html',
+                        controller: 'CloudstackController',
+                        controllerAs: 'cloudstackCtrl'
+                    }
+                }
+            });
+        }
+    ]);
+
+    /*
+     Bills Module Setup
+     */
     angular.module('dashboard.bills', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('bills', {
                 url: "/bills",
                 authenticate: true,
@@ -277,13 +306,13 @@
     ]);
 
     /*
-        Admin Meter Configuration Module Setup
-    */
+     Admin Meter Configuration Module Setup
+     */
     angular.module('dashboard.admin.meters', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('admin-meters', {
                 url: "/admin/meters",
                 authenticate: true,
@@ -305,13 +334,13 @@
     ]);
 
     /*
-        Admin User Management Module Setup
-    */
+     Admin User Management Module Setup
+     */
     angular.module('dashboard.admin.users', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('admin-users', {
                 url: "/admin/users",
                 authenticate: true,
@@ -333,13 +362,13 @@
     ]);
 
     /*
-        Admin Rate Configuration Module Setup
-    */
+     Admin Rate Configuration Module Setup
+     */
     angular.module('dashboard.admin.rate', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('admin-rate', {
                 url: "/admin/rate",
                 authenticate: true,
@@ -361,13 +390,13 @@
     ]);
 
     /*
-        Admin Billing Configuration Module Setup
-    */
+     Admin Billing Configuration Module Setup
+     */
     angular.module('dashboard.admin.billing', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('admin-billing', {
                 url: "/admin/billing",
                 authenticate: true,
@@ -389,13 +418,13 @@
     ]);
 
     /*
-        Cloudservices Module Setup
-    */
+     Cloudservices Module Setup
+     */
     angular.module('dashboard.cloudservices', [
         'ui.router'
     ]).config([
         '$stateProvider',
-        function($stateProvider) {
+        function ($stateProvider) {
             $stateProvider.state('cloudservices', {
                 url: "/cloudservices",
                 authenticate: true,
@@ -417,47 +446,47 @@
     ]);
 
     /*
-        Navigation Module Setup
-    */
+     Navigation Module Setup
+     */
     angular.module('dashboard.navigation', []);
 
     /*
-        Service Module Setup
-    */
+     Service Module Setup
+     */
     angular.module('dashboard.services', []);
 
     /*
-        Util Module Setup
-    */
+     Util Module Setup
+     */
     angular.module('dashboard.utils', []);
 
     /*
-        Charts Module Setup
-    */
+     Charts Module Setup
+     */
     angular.module('dashboard.charts', ['nvd3']);
 
     /*
-        Filter Module Setup
-    */
+     Filter Module Setup
+     */
     angular.module('dashboard.filter', []);
 
     /*
-        Notifications Module Setup
-    */
+     Notifications Module Setup
+     */
     angular.module('dashboard.notifications', []);
 
     /*
-        Directives Module Setup
-    */
+     Directives Module Setup
+     */
     angular.module('dashboard.directives', []);
 
     /*
-        Modals Module Setup
-    */
+     Modals Module Setup
+     */
     angular.module('dashboard.modals', []);
 
     /*
-        Register Module Setup
-    */
+     Register Module Setup
+     */
     //angular.module('dashboard.registration',[]);
 })();

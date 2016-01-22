@@ -140,6 +140,21 @@
         };
 
         /**
+         * This method stores the cloudstack ID in the db.
+         *
+         * @param  {String} username Dashboard username
+         * @param  {String} cloudstackId Cloudstack ID
+         * @return {Promise}
+         */
+        this.storeCloudstackId = function (username, cloudstackId) {
+            var putData = {
+                'username': username,
+                'cloudstackId': cloudstackId
+            };
+            return $http.put('/dashboard/rest/cloudstack', putData);
+        };
+
+        /**
          * This method requests additional token information from OpenAM via
          * the dashboard backend. The REST call requires a valid access token.
          *

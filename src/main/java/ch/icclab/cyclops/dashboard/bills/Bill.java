@@ -17,15 +17,17 @@
 
 package ch.icclab.cyclops.dashboard.bills;
 
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 
-public class Bill {
+public class Bill{
     private HashMap<String, String> info;
     private HashMap<String, Long> usagePerMeter;
     private HashMap<String, Double> costPerMeter;
+    private HashMap<String, Double> ratePerMeter;
     private HashMap<String, String> unitPerMeter;
     private HashMap<String, Double> discounts;
 
@@ -33,6 +35,7 @@ public class Bill {
         info = new HashMap<String, String>();
         usagePerMeter = new HashMap<String, Long>();
         costPerMeter = new HashMap<String, Double>();
+        ratePerMeter = new HashMap<String, Double>();
         unitPerMeter = new HashMap<String, String>();
         discounts = new HashMap<String, Double>();
         discounts.put("overall", 0.0);
@@ -45,14 +48,14 @@ public class Bill {
         info.put("address-line2", "CH Winterthur - 8401");
     }
 
-    public void addItem(String meterName, Long usage, Double cost, String unit) {
+    public void addItem(String meterName, Long usage, Double rate, Double cost, String unit) {
         usagePerMeter.put(meterName, usage);
-        costPerMeter.put(meterName, cost);
+        costPerMeter.put(meterName, rate);
         unitPerMeter.put(meterName, unit);
     }
 
-    public void addItem(String meterName, Long usage, Double rate, String unit, Double discount) {
-        addItem(meterName, usage, rate, unit);
+    public void addItem(String meterName, Long usage, Double rate, Double cost, String unit, Double discount) {
+        addItem(meterName, usage, rate, cost, unit);
         discounts.put(meterName, discount);
     }
 

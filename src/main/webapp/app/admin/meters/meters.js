@@ -15,75 +15,79 @@
  *     under the License.
  */
 
-(function(){
+(function () {
     /*
-        Module Setup
-    */
+     Module Setup
+     */
     angular.module('dashboard.admin.meters')
         .controller('AdminMeterController', AdminMeterController);
 
     /*
-        Controllers, Factories, Services, Directives
-    */
+     Controllers, Factories, Services, Directives
+     */
     AdminMeterController.$inject = [
         'restService', 'meterselectionDataService', 'alertService', 'dateUtil'
     ];
-    function AdminMeterController(
-            restService, meterselectionDataService, alertService, dateUtil) {
+    function AdminMeterController(restService, meterselectionDataService, alertService, dateUtil) {
         var me = this;
         this.meterMap = {};
 
-        var loadKeystoneMeterSuccess = function(response) {
+        var loadKeystoneMeterSuccess = function (response) {
             meterselectionDataService.setRawOpenstackData(response.data);
             return restService.getUdrMeters();
+            //
+            //meterselectionDataService.setRawUdrData(response.data);
+            //me.meterMap = meterselectionDataService.getFormattedOpenstackData();
+            //me.addExternalMetersToMap();
+            //me.preselectMeters();
         };
 
-        var loadUdrMeterSuccess = function(response) {
+        var loadUdrMeterSuccess = function (response) {
             meterselectionDataService.setRawUdrData(response.data);
             me.meterMap = meterselectionDataService.getFormattedOpenstackData();
             me.addExternalMetersToMap();
             me.preselectMeters();
         };
 
-        var loadMeterError = function() {
+        var loadMeterError = function () {
             alertService.showError("Error loading list of meters");
         };
 
-        var updateMeterSuccess = function(response) {
+        var updateMeterSuccess = function (response) {
             alertService.showSuccess("Meters successfully updated");
         };
 
-        var updateMeterError = function() {
+        var updateMeterError = function () {
             alertService.showError("Updating meters failed");
         };
 
-        var onAddMeterSourceSuccess = function(response) {
+        var onAddMeterSourceSuccess = function (response) {
             //...
         };
 
-        var onAddMeterSourceError = function() {
+        var onAddMeterSourceError = function () {
             alertService.showError("Could not add meter source to database");
         };
 
-        this.preselectMeters = function() {
+        this.preselectMeters = function () {
             var udrMeters = meterselectionDataService.getFormattedUdrData();
 
-            for(var meterName in udrMeters) {
+            for (var meterName in udrMeters) {
                 var meter = udrMeters[meterName];
 
-                if(meterName in me.meterMap) {
+                if (meterName in me.meterMap) {
                     me.meterMap[meterName].enabled = meter.enabled;
                 }
             }
         };
 
-        this.addExternalMetersToMap = function() {
+        this.addExternalMetersToMap = function () {
             var udrMeters = meterselectionDataService.getFormattedUdrData();
 
-            for(var meterName in udrMeters) {
+            for (var meterName in udrMeters) {
                 var meter = udrMeters[meterName];
 
-                if(me.isExternalMeter(meter)) {
+                if (me.isExternalMeter(meter)) {
                     me.meterMap[meterName] = meter;
                 }
             }
@@ -95,7 +99,7 @@
          *
          * @param  {String} meterName Name of the meter to toggle
          */
-        this.toggleMeter = function(meterName) {
+        this.toggleMeter = function (meterName) {
             var meterMap = this.meterMap;
             meterMap[meterName].enabled = !meterMap[meterName].enabled;
         };
@@ -106,7 +110,7 @@
          *
          * @return {Object} POST request body as JSON
          */
-        this.buildUdrRequest = function() {
+        this.buildUdrRequest = function () {
             var timestamp = dateUtil.getTimestamp();
             var name = "meterselection";
             var appSource = "cyclops-ui";
@@ -116,7 +120,7 @@
             ];
             points = [];
 
-            for(var meterName in me.meterMap) {
+            for (var meterName in me.meterMap) {
                 var meter = me.meterMap[meterName];
 
                 points.push([
@@ -136,18 +140,18 @@
             };
         };
 
-        this.updateUdrMeters = function() {
+        this.updateUdrMeters = function () {
             restService.updateUdrMeters(me.buildUdrRequest())
                 .then(updateMeterSuccess, updateMeterError);
         };
 
-        this.loadMeterData = function() {
+        this.loadMeterData = function () {
             restService.getKeystoneMeters()
                 .then(loadKeystoneMeterSuccess)
                 .then(loadUdrMeterSuccess, loadMeterError);
         };
 
-        this.addExternalMeter = function(newMeterName, newMeterSource) {
+        this.addExternalMeter = function (newMeterName, newMeterSource) {
             me.meterMap[newMeterName] = {
                 name: newMeterName,
                 enabled: true,
@@ -159,7 +163,7 @@
                 .then(onAddMeterSourceSuccess, onAddMeterSourceError);
         };
 
-        this.isExternalMeter = function(meter) {
+        this.isExternalMeter = function (meter) {
             return meter.type == "external";
         };
 

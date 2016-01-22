@@ -19,7 +19,7 @@ package ch.icclab.cyclops.dashboard.login;
 
 import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,7 +75,7 @@ public class Session extends ServerResource {
         DatabaseHelper databaseHelper = new DatabaseHelper();
         String userId = databaseHelper.getUserId(username);
         logger.debug("Attempting to get authorization from the Gatekeeper.");
-        ClientResource res = new ClientResource(LoadConfiguration.configuration.get("GK_AUTH_URL") + userId);
+        ClientResource res = new ClientResource(Loader.getSettings().getCyclopsSettings().getGk_auth_url() + userId);
         Series<Header> headers = (Series<Header>) res.getRequestAttributes().get("org.restlet.http.headers");
 
         if (headers == null) {

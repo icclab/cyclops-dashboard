@@ -1,40 +1,11 @@
-# cyclops-support
+<a href="http://icclab.github.io/cyclops" target="_blank"><img align="middle" src="http://icclab.github.io/cyclops/assets/images/logo_big.png"></img></a>
 
-The **Cyclops Dashboard** is one of the support services as part of CYCLOPS - A Rating, Charging  & Billing solution for cloud being developed by <a href="http://blog.zhaw.ch/icclab/">InIT Cloud Computing Lab</a> at <a href="http://www.zhaw.ch">ZHAW</a>
-
-It is the place for users to check their usage data, connect to cloud providers and manage bills. Admins can use it to configure the different microservices and maintain user accounts.
-
-The dashboard interacts with the different micro service of <a href="http://icclab.github.io/cyclops">CYCLOPS</a>. The data for resource consumption visualization is gathered by the interaction with <a href="https://github.com/icclab/cyclops-udr">Usage Data Records Micro Service</a>. The coonfiguration of rate policy and generated charge for a user is accessed by the dashboard through that APIs of <a href="https://github.com/icclab/cyclops-rc">Rate & Charge Micro Service</a>.   
-
-![](https://github.com/icclab/cyclops-support/blob/master/dashboard/doc/images/dashboard_menu.png)
-
-### Architecture
-#### * CYCLOPS Rating Charging & Billing Framework
-<img align="middle" src="http://blog.zhaw.ch/icclab/files/2013/05/overall_architecture.png" alt="CYCLOPS Architecture" height="500" width="600"></img>
-
-### Installation
-1. Check out this repository
-1. Switch to the installation directory: `cd path/to/repository/dashboard/installation`
-1. Make sure the hosts-file contains a route to localhost, otherwise OpenAM setup will fail
-  1. execute `cat /etc/hosts | grep $HOSTNAME`
-  1. it should output a line similar to `127.0.0.1 localhost myhostname`
-  1. If it doesn't, run this as root: `echo "127.0.0.1 myhostname" >> /etc/hosts` 
-1. Make the installation script executable: `sudo chmod +x install.sh`
-1. Run the installation script as root: `sudo ./install.sh`
-1. Follow the script instructions
-1. Wait for the setup to complete
-1. Follow the [configuration guide](https://github.com/icclab/cyclops-support/wiki/OpenAM-Configuration) to finish setting up OpenAM
-
-For more in-depth documentation, see:
-* [Installing OpenAM](https://github.com/icclab/cyclops-support/wiki/Dashboard-Installation)
-* [Configuring OpenAM](https://github.com/icclab/cyclops-support/wiki/OpenAM-Configuration)
-* [Communication Flow](https://github.com/icclab/cyclops-support/wiki/Communication-Flow)
-* [Javadoc](https://icclab.github.io/cyclops/javadoc/dashboard/)
-* [Development Environment](https://github.com/icclab/cyclops-support/wiki/Setting-Up-Development-Environment)
-* [Directory Structure](https://github.com/icclab/cyclops-support/wiki/Directory-Structure)
+## Dashboard
+The **Cyclops Dashboard** is one of the support services as part of CYCLOPS - A Rating, Charging  & Billing solution for Cloud being developed by <a href="http://blog.zhaw.ch/icclab/">InIT Cloud Computing Lab</a> at <a href="http://www.zhaw.ch">ZHAW</a>. It is the place for users to check their usage data, connect to cloud providers and manage bills. Admins can use it to configure the different microservices and maintain user accounts. Dashboard interacts with the different micro service of <a href="http://icclab.github.io/cyclops">CYCLOPS</a>. The data for resource consumption visualisation is gathered by the interaction with <a href="https://github.com/icclab/cyclops-udr">UDR microservice</a>. The configuration of rate policy and generated charge for a user is accessed by the Dashboard through that APIs of <a href="https://github.com/icclab/cyclops-rc">RC microservice</a>.
 
 ### Features
 Currently, the following features are implemented:
+
   * [User] Authentication / Authorisation via OpenAM
   * [User] Linking an account to OpenStack
   * [User] Dynamically created charts for usage data
@@ -51,25 +22,57 @@ Currently, the following features are implemented:
   * [Admin] Create bills for users
   * [Admin] Add external meters
 
-### Components & Libraries
-  * <a href="https://angularjs.org">AngularJS</a>
-  * <a href="https://github.com/angular-ui/ui-router">AngularJS ui-router</a>
-  * <a href="https://github.com/Salakar/angular-toasty">angular-toasty</a>
-  * <a href="https://github.com/chieffancypants/angular-loading-bar">angular-loading-bar</a>
-  * <a href="https://angular-ui.github.io/bootstrap/">angular-ui bootstrap</a>
-  * <a href="https://github.com/datejs/Datejs">DateJS</a>
-  * <a href="http://d3js.org/">D3</a>
-  * <a href="http://nvd3.org/">NVD3</a>
-  * <a href="https://krispo.github.io/angular-nvd3/">angular-NVD3</a>
-  * <a href="https://jasmine.github.io">Jasmine</a>
-  * <a href="http://getbootstrap.com">Bootstrap</a>
-  * <a href="http://startbootstrap.com/template-overviews/sb-admin-2">SB Admin 2 (Bootstrap Theme)</a>
-  * <a href="https://tomcat.apache.org">Tomcat7</a>
-  * <a href="https://restlet.com">RESTLET</a> 
+### Screenshot
+<img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard_menu.png" alt="Dashboard screenshot" height="331" width="900"></img>
 
+### Download
+     $ git clone https://github.com/icclab/cyclops-dashboard.git
+
+### Installation
+Make sure you've already installed <a href="https://github.com/icclab/cyclops-udr" target="_blank">UDR</a>, <a href="https://github.com/icclab/cyclops-rc" target="_blank">RC</a> and <a href="https://github.com/icclab/cyclops-billing" target="_blank">Billing</a> microservices, as Dashboard requires the same prerequisites. If you want to run these microservices on different machines, then just install UDR's prerequisites, without deploying others again. Then continue with commands below:
+
+     $ cd cyclops-dashboard/install
+     $ chmod +x ./*
+
+#### Gatekeeper
+First, will need to configure <a href="https://github.com/icclab/gatekeeper" target="_blank">Gatekeeper</a>, start with following command and **provide admin credentials** you want to use with your new Dashboard deployment.
+
+     $ bash setup_gatekeeper.sh
+
+Once Gatekeeper is fully installed and properly configured, it will automatically start listening. At any time in future, you can access it yourself via <code>auth_utils</code> command.
+
+#### Dashboard
+Then continue with Dashboard installation using following command, where you provide the same credentials as with Gatekeeper:
+
+##### For OpenStack
+     $ bash setup_for_openstack.sh
+##### For CloudStack
+     $ bash setup_for_cloudstack.sh
+
+<b>Note</b>: Currently, it's not possible to have Dashboard deployment of OpenStack and CloudStack at the same time, please select just one of them.
+
+#### Configuration
+ * At the end of the installation process you will be asked for your deployment credentials and to modify any configuration parameters, **please do not ignore this step.**
+ * If there is a need to update your configuration, you can find it stored here cyclops-dashboard/src/main/webapp/WEB-INF/configuration.txt
+
+### Deployment
+     $ bash deploy_dashboard.sh
+
+In order to log in make sure Gatekeeper is running, then you can access Dashboard Web GUI over <code>http://vm-ip:8080/dashboard/app</code>
+
+### Documentation
+  Visit the <a href="https://github.com/icclab/cyclops-dashboard/wiki">Wiki</a> for detailed installation steps, how to tutorials, as well as OpenAM guide.
+  
+### Cyclops architecture
+<img align="middle" src="http://blog.zhaw.ch/icclab/files/2013/05/overall_architecture.png" alt="CYCLOPS Architecture" height="500" width="600"></img>
+
+### Bugs and issues
+  To report any bugs or issues, please use <a href="https://github.com/icclab/cyclops-dashboard/issues">Github Issues</a>
+  
 ### Communication
-  * Issues/Ideas/Suggestions : <a href="https://github.com/icclab/cyclops-support/issues">GitHub Issue</a>
-  * Website : http://blog.zhaw.ch/icclab/ 
+  * Email: icclab-rcb-cyclops[at]dornbirn[dot]zhaw[dot]ch
+  * Website: <a href="http://icclab.github.io/cyclops" target="_blank">icclab.github.io/cyclops</a>
+  * Blog: <a href="http://blog.zhaw.ch/icclab" target="_blank">http://blog.zhaw.ch/icclab</a>
   * Tweet us @<a href="https://twitter.com/ICC_Lab">ICC_Lab</a>
    
 ### Developed @

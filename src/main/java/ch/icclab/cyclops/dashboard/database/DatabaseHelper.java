@@ -17,8 +17,9 @@
 package ch.icclab.cyclops.dashboard.database;
 
 import ch.icclab.cyclops.dashboard.bills.Bill;
+import ch.icclab.cyclops.dashboard.bills.BillInfo;
 import ch.icclab.cyclops.dashboard.externalMeters.ExternalUserId;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.json.JSONException;
@@ -31,6 +32,8 @@ import java.sql.*;
 import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 public class DatabaseHelper {
@@ -74,7 +77,7 @@ public class DatabaseHelper {
 
     private Connection openConnection() throws ClassNotFoundException, SQLException {
         Class.forName("org.sqlite.JDBC");
-        String dbPath = LoadConfiguration.configuration.get("DASHBOARD_DB_PATH");
+        String dbPath = Loader.getSettings().getCyclopsSettings().getDashboard_db_path();
         return DriverManager.getConnection("jdbc:sqlite:" + dbPath);
     }
 
@@ -109,10 +112,10 @@ public class DatabaseHelper {
      *
      * @param userId
      * @param pdfPath
-     * @param bill
+     * @param info
      * @throws DatabaseInteractionException
      */
-    public void addBill(String userId, String pdfPath, Bill bill) throws DatabaseInteractionException {
+    public void addBill(String userId, String pdfPath, BillInfo info) throws DatabaseInteractionException {
         try {
             logger.trace("Attempting to add the bill to the database.");
             Connection c = openConnection();
@@ -120,9 +123,9 @@ public class DatabaseHelper {
             PreparedStatement stmt = c.prepareStatement(sql);
             stmt.setString(1, userId);
             stmt.setString(2, pdfPath);
-            stmt.setString(3, bill.getFromDate());
-            stmt.setString(4, bill.getToDate());
-            stmt.setString(5, bill.getDueDate());
+            stmt.setString(3, info.getFromDate());
+            stmt.setString(4, info.getToDate());
+            stmt.setString(5, info.getDueDate());
             logger.debug("Statement attempting to be executed: " + sql);
             stmt.executeUpdate();
             c.close();
@@ -144,8 +147,8 @@ public class DatabaseHelper {
      * @return List<Bill>
      * @throws DatabaseInteractionException
      */
-    public List<Bill> getBillsForUser(String userId, String allBills) throws DatabaseInteractionException {
-        List<Bill> bills = new ArrayList<Bill>();
+    public List<BillInfo> getBillInfosForUser(String userId, String allBills) throws DatabaseInteractionException {
+        List<BillInfo> infos = new LinkedList<BillInfo>();
         boolean showAllbills;
         try {
             logger.trace("Attempting to get the Bills for a User.");
@@ -169,25 +172,22 @@ public class DatabaseHelper {
             ResultSet resultSet = stmt.executeQuery();
 
             while (resultSet.next()) {
-                Bill bill = new Bill();
-                bill.setFromDate(resultSet.getString("fromDate"));
-                bill.setToDate(resultSet.getString("toDate"));
-                bill.setDueDate(resultSet.getString("dueDate"));
-                bill.setApproved(resultSet.getInt("approved") != 0);
-                bill.setPaid(resultSet.getInt("paid") != 0);
-                bills.add(bill);
+                BillInfo info = new BillInfo();
+                info.setFromDate(resultSet.getString("fromDate"));
+                info.setToDate(resultSet.getString("toDate"));
+                info.setDueDate(resultSet.getString("dueDate"));
+                info.setApproved(resultSet.getInt("approved") != 0);
+                info.setPaid(resultSet.getInt("paid") != 0);
+                infos.add(info);
             }
 
             c.close();
 
-            return bills;
+            return infos;
         } catch (ClassNotFoundException e) {
             logger.error("Error while getting Bill's from the database: " + e.getMessage());
             throw new DatabaseInteractionException(e.getMessage(), e);
         } catch (SQLException e) {
-            logger.error("Error while getting Bill's from the database: " + e.getMessage());
-            throw new DatabaseInteractionException(e.getMessage(), e);
-        } catch (ParseException e) {
             logger.error("Error while getting Bill's from the database: " + e.getMessage());
             throw new DatabaseInteractionException(e.getMessage(), e);
         }
@@ -319,19 +319,19 @@ public class DatabaseHelper {
      * This method checks if there is some bill like @bill for a user with username @userId
      *
      * @param userId
-     * @param bill
+     * @param info
      * @return boolean
      * @throws DatabaseInteractionException
      */
-    public boolean existsBill(String userId, Bill bill) throws DatabaseInteractionException {
+    public boolean existsBill(String userId, BillInfo info) throws DatabaseInteractionException {
         try {
             logger.trace("Attempting to check if a bill exists the database.");
             Connection c = openConnection();
             String sql = "SELECT * FROM bills WHERE userId = ? AND fromDate = ? AND toDate = ?";
             PreparedStatement stmt = c.prepareStatement(sql);
             stmt.setString(1, userId);
-            stmt.setString(2, bill.getFromDate());
-            stmt.setString(3, bill.getToDate());
+            stmt.setString(2, info.getFromDate());
+            stmt.setString(3, info.getToDate());
             logger.debug("Statement attempting to be executed: " + sql);
             ResultSet resultSet = stmt.executeQuery();
             boolean hasBills = resultSet.isBeforeFirst();
@@ -350,19 +350,20 @@ public class DatabaseHelper {
      * This method gets the bill path from the database.
      *
      * @param userId
-     * @param bill
+     * @param fromDate
+     * @param toDate
      * @return String
      * @throws DatabaseInteractionException
      */
-    public String getBillPath(String userId, Bill bill) throws DatabaseInteractionException {
+    public String getBillPath(String userId, String fromDate, String toDate) throws DatabaseInteractionException {
         try {
             logger.trace("Attempting to get the bill's path from the database.");
             Connection c = openConnection();
             String sql = "SELECT billPDF FROM bills WHERE userId = ? AND fromDate = ? AND toDate = ?";
             PreparedStatement stmt = c.prepareStatement(sql);
             stmt.setString(1, userId);
-            stmt.setString(2, bill.getFromDate());
-            stmt.setString(3, bill.getToDate());
+            stmt.setString(2, fromDate);
+            stmt.setString(3, toDate);
             logger.debug("Statement attempting to be executed: " + sql);
             ResultSet resultSet = stmt.executeQuery();
 
@@ -833,5 +834,25 @@ public class DatabaseHelper {
 
     public void removeUser(String username) {
 
+    }
+
+    public void addCloudstackId(String username, String cloudstackId) throws DatabaseInteractionException{
+        try {
+            logger.trace("Attempting to add a Keystone ID in the database.");
+            Connection connection = openConnection();
+            String sql = "UPDATE dashboard_users SET keystoneId = ? WHERE username = ?";
+            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm.setString(1, cloudstackId);
+            pstm.setString(2, username.toUpperCase());
+            logger.debug("Statement attempting to be executed: " + sql);
+            pstm.execute();
+            connection.close();
+        } catch (SQLException e) {
+            logger.error("Error while adding a Keystone Id in the database: " + e.getMessage());
+            throw new DatabaseInteractionException(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            logger.error("Error while adding a Keystone Id in the database: " + e.getMessage());
+            throw new DatabaseInteractionException(e.getMessage(), e);
+        }
     }
 }

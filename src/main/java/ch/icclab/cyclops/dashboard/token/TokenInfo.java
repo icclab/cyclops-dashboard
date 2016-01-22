@@ -17,7 +17,7 @@
 
 package ch.icclab.cyclops.dashboard.token;
 
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.restlet.data.Form;
@@ -51,7 +51,7 @@ public class TokenInfo extends ServerResource {
         String token = stringQuery.split("=")[1];
         Series<Header> requestHeaders = getRequest().getHeaders();
 
-        ClientResource clientResource = new ClientResource(LoadConfiguration.configuration.get("GK_AUTH_TOKEN_INFO_URL") + token);
+        ClientResource clientResource = new ClientResource(Loader.getSettings().getCyclopsSettings().getGk_auth_token_info_url() + token);
         Series<Header> headers = (Series<Header>) clientResource.getRequestAttributes().get("org.restlet.http.headers");
 
         if (headers == null) {

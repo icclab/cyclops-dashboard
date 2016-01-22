@@ -18,9 +18,9 @@
 package ch.icclab.cyclops.dashboard.udr;
 
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthClientResource;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthServerResource;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.restlet.ext.json.JsonRepresentation;
@@ -50,7 +50,7 @@ public class UdrMeter extends OAuthServerResource {
         try {
             logger.debug("Attempting to Update the UDR Meters.");
             String oauthToken = getOAuthTokenFromHeader();
-            String url = LoadConfiguration.configuration.get("UDR_METER_URL");
+            String url = Loader.getSettings().getCyclopsSettings().getUdr_meter_url();
             OAuthClientResource res = new OAuthClientResource(url, oauthToken);
             Representation rep = new JsonRepresentation(entity);
             return res.post(rep);
@@ -71,7 +71,7 @@ public class UdrMeter extends OAuthServerResource {
     public Representation getUdrMeters() {
         logger.debug("Attempting to Get the UDR Meters.");
         String oauthToken = getOAuthTokenFromHeader();
-        String url = LoadConfiguration.configuration.get("UDR_METER_URL");
+        String url = Loader.getSettings().getCyclopsSettings().getUdr_meter_url();
         OAuthClientResource res = new OAuthClientResource(url, oauthToken);
         return res.get();
     }

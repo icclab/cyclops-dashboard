@@ -17,9 +17,9 @@
 
 package ch.icclab.cyclops.dashboard.charge;
 
+import ch.icclab.cyclops.dashboard.load.Loader;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthClientResource;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthServerResource;
-import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.restlet.representation.Representation;
@@ -32,7 +32,7 @@ public class Charge extends OAuthServerResource {
     public Representation getCharge() {
         String query = getRequest().getResourceRef().getQuery();
         String oauthToken = getOAuthTokenFromHeader();
-        String url = LoadConfiguration.configuration.get("RC_CHARGE_URL") + "?" + query;
+        String url = Loader.getSettings().getCyclopsSettings().getRc_charge_url() + "?" + query;
         OAuthClientResource clientResource = new OAuthClientResource(url, oauthToken);
         logger.debug("Attempting to get the Charges.");
         return clientResource.get();

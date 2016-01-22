@@ -20,6 +20,7 @@ package ch.icclab.cyclops.dashboard.bills;
 import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 import ch.icclab.cyclops.dashboard.database.DatabaseInteractionException;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
+import ch.icclab.cyclops.dashboard.load.Loader;
 import ch.icclab.cyclops.dashboard.util.LoadConfiguration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,10 @@ import org.restlet.data.MediaType;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.FileRepresentation;
 import org.restlet.representation.Representation;
-import org.restlet.resource.*;
+import org.restlet.resource.Get;
+import org.restlet.resource.Post;
+import org.restlet.resource.ResourceException;
+import org.restlet.resource.ServerResource;
 
 import java.io.File;
 import java.util.Iterator;
@@ -52,7 +56,7 @@ public class BillPDF extends ServerResource {
             bill.setFromDate(from);
             bill.setToDate(to);
             logger.debug("Attempting to get the needed information for generating bill's PDF");
-            String dbPdfPath = dbHelper.getBillPath(userId, bill);
+            String dbPdfPath = dbHelper.getBillPath(userId, bill.getFromDate(), bill.getToDate());
             return new FileRepresentation(new File(dbPdfPath), MediaType.APPLICATION_PDF, 0);
         } catch (DatabaseInteractionException e) {
             logger.error("Error while getting the bills from the DataBase"+e.getMessage());
@@ -84,11 +88,14 @@ public class BillPDF extends ServerResource {
             bill.setToDate(to);
             bill.setDueDate(due);
             bill.setRecipientName(firstName, lastName);
+            bill.setApproved(false);
+            bill.setPaid(false);
 
             logger.trace("Checking if the bill exists");
-            if (!dbHelper.existsBill(userId, bill)) {
+            BillInfo billInfo = new BillInfo(bill.getFromDate(),bill.getToDate(),bill.getDueDate(), bill.isApproved(), bill.isPaid());
+            if (!dbHelper.existsBill(userId, billInfo)) {
                 logger.trace("Bill does not exist yet, starting to create it.");
-                String basePath = LoadConfiguration.configuration.get("BILLING_PDF_PATH");
+                String basePath = Loader.getSettings().getCyclopsSettings().getBilling_pdf_path();
                 String filename = UUID.randomUUID() + ".pdf";
                 String path = basePath + "/" + filename;
                 File pdfFile = new File(path);
@@ -100,22 +107,23 @@ public class BillPDF extends ServerResource {
                     JSONObject billItem = (JSONObject) billDetails.get(key);
                     Long usage = billItem.getLong("usage");
                     Double cost = billItem.getDouble("price");
-                    //String unit = billItem.getString("unit");
+                    Double rate = billItem.getDouble("rate");
+                    String unit = billItem.getString("unit");
                     Double discount = billItem.getDouble("discount");
-                    //bill.addItem(key, usage, rate, unit, discount);
+                    bill.addItem(key, usage, rate, cost, unit, discount);
                     //TODO just testing workflow
-                    bill.addItem(key, usage, cost, "CHF", discount);
+//                    bill.addItem(key, usage, cost, unit, discount);
                 }
 
-                String logoPath = LoadConfiguration.configuration.get("WEB-INF") + "/images/icclab-logo-small.png";
+                String logoPath = Loader.getSettings().getBillImagePath() + "/images/icclab-logo-small.png";
                 File logoFile = new File(logoPath);
                 logger.debug("Attempting to create the Bill.");
                 BillGenerator billGen = new BillGenerator();
                 billGen.createPDF(path, bill, logoFile);
-                dbHelper.addBill(userId, path, bill);
+                dbHelper.addBill(userId, path, billInfo);
                 return new FileRepresentation(pdfFile, MediaType.APPLICATION_PDF, 0);
             } else {
-                String dbPdfPath = dbHelper.getBillPath(userId, bill);
+                String dbPdfPath = dbHelper.getBillPath(userId, bill.getFromDate(), bill.getToDate());
                 return new FileRepresentation(new File(dbPdfPath), MediaType.APPLICATION_PDF, 0);
             }
         } catch (DatabaseInteractionException e) {
