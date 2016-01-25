@@ -3,8 +3,8 @@
 GK_ADMIN=admin
 GK_PASSWORD=pass1234
 
-# This admin account will be created during installation automatically
-DASHBOARD_ADMIN=admin
+# This admin account will be created during installation automatically (has to be different from Gatekeeper)
+DASHBOARD_ADMIN=dashboardadmin
 DASHBOARD_PASSWORD=pass1234
 
 # Provide paths for accessing SQLite database and saving PDFs
