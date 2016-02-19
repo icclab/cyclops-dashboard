@@ -33,9 +33,10 @@
         this.meterMap = {};
 
         var loadKeystoneMeterSuccess = function (response) {
+            //me.meterMap =
             meterselectionDataService.setRawOpenstackData(response.data);
             return restService.getUdrMeters();
-            //
+
             //meterselectionDataService.setRawUdrData(response.data);
             //me.meterMap = meterselectionDataService.getFormattedOpenstackData();
             //me.addExternalMetersToMap();

@@ -26,7 +26,7 @@ describe('ExternalChargeDataService', function() {
     var fakeChartData = {
         charge: {
             columns: [
-                "time","sequence_number","resource","userid","usage","rate","price"
+                "time","sequence_number","resource","userId","usage","rate","price"
             ],
             points: [
                 [1427284499563,2,"network.incoming.bytes","a",2.0395754E7,3,611.87262],

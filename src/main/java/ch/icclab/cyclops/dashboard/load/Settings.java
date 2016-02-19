@@ -55,6 +55,7 @@ public class Settings {
 
     private CyclopsSettings loadCyclopsSettings() {
         CyclopsSettings settings = new CyclopsSettings();
+        settings.setPrediction_url(properties.getProperty("PREDICTION_URL"));
         settings.setDashboard_admin(properties.getProperty("DASHBOARD_ADMIN"));
         settings.setDashboard_password(properties.getProperty("DASHBOARD_PASSWORD"));
         settings.setDashboard_db_path(properties.getProperty("DASHBOARD_DB_PATH"));

@@ -429,13 +429,14 @@ public class DatabaseHelper {
         try {
             logger.trace("Attempting to register a new user in the database.");
             Connection connection = openConnection();
-            String sql = "INSERT INTO dashboard_users(username, password, name, surname, email, isadmin) VALUES(?,?,?,?,?,?)";
+            String sql = "INSERT INTO dashboard_users(username, password, name, surname, email, isadmin, keystoneId) VALUES(?,?,?,?,?,?,?)";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, username.toUpperCase());
             statement.setString(2, password);
             statement.setString(3, name);
             statement.setString(4, surname);
             statement.setString(5, email);
+            statement.setString(7, username.toUpperCase());
 
             if (isAdmin.equalsIgnoreCase("y"))
                 statement.setBoolean(6, true);

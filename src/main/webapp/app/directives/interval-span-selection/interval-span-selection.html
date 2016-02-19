@@ -1,0 +1,48 @@
+<div data-ng-controller="UsagePredictionController">
+    <div class="row alert alert-warning">
+        <div class="col-md-4">
+            <label>Use: </label>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default">{{selectedUse}}</button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" data-ng-repeat="use in useOptions">
+                    <li data-ng-repeat="use in useOptions"><a ng-click="dropdownUseSelected(use)">{{use}}</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label>Predict:</label>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default">{{selectedPrediction}}</button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" data-ng-repeat="prediction in predictionOptions">
+                    <li data-ng-repeat="prediction in predictionOptions"><a ng-click="dropdownPredictionSelected(prediction)">{{prediction}}</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <label>Meter: </label>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default">{{selectedMeter}}</button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" data-ng-repeat="meter in meters">
+                    <li data-ng-repeat="meter in meters"><a ng-click="dropdownMeterSelected(meter)">{{meter}}</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

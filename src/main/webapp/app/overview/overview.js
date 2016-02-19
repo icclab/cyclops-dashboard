@@ -41,6 +41,7 @@
         this.externalUserIds = [];
 
         var loadUdrDataSuccess = function(response) {
+            drawChart(response.data);
             usageDataService.setRawData(response.data);
             usageDataService.notifyChartDataReady($scope);
         };
@@ -50,6 +51,7 @@
         };
 
         var loadExternalDataSuccess = function(response) {
+            drawChart(response.data);
             externalUsageDataService.setRawData(response.data);
             externalUsageDataService.notifyChartDataReady($scope);
         };

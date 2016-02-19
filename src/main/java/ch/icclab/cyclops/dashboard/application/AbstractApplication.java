@@ -4,6 +4,7 @@ import ch.icclab.cyclops.dashboard.database.DatabaseHelper;
 import ch.icclab.cyclops.dashboard.database.DatabaseInteractionException;
 import ch.icclab.cyclops.dashboard.errorreporting.ErrorReporter;
 import ch.icclab.cyclops.dashboard.login.Login;
+import ch.icclab.cyclops.dashboard.prediction.UsagePrediction;
 import ch.icclab.cyclops.dashboard.registration.Registration;
 import ch.icclab.cyclops.dashboard.token.TokenInfo;
 import org.apache.logging.log4j.LogManager;
@@ -31,6 +32,7 @@ public abstract class AbstractApplication extends Application{
         router.attach("/tokeninfo", TokenInfo.class);
         router.attach("/registration", Registration.class);
         router.attach("/adminRegistration", Registration.class);
+        router.attach("/prediction", UsagePrediction.class);
         logger.debug("Attempting to create the specific routes");
         createRoutes();
         return router;

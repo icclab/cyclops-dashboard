@@ -49,6 +49,16 @@ public class CyclopsSettings {
     private String data_period;
     private String cache;
 
+    public String getPrediction_url() {
+        return prediction_url;
+    }
+
+    public void setPrediction_url(String prediction_url) {
+        this.prediction_url = prediction_url;
+    }
+
+    private String prediction_url;
+
     public void setDashboard_admin(String dashboard_admin) {
         this.dashboard_admin = dashboard_admin;
     }

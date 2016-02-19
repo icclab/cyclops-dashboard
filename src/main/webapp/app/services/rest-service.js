@@ -248,7 +248,7 @@
          */
         this.getChargeForUser = function (userId, from, to) {
             var config = me.getOAuthHeaderConfig();
-            var query = "?userid=" + userId + "&from=" + from + "&to=" + to;
+            var query = "?userId=" + userId + "&from=" + from + "&to=" + to;
             return $http.get('/dashboard/rest/charge' + query, config);
         };
 
@@ -354,7 +354,7 @@
          */
         this.getBillingInformation = function (userId, from, to) {
             var config = me.getOAuthHeaderConfig();
-            var queryString = "?userid=" + userId + "&from=" + from + "&to=" + to;
+            var queryString = "?userId=" + userId + "&from=" + from + "&to=" + to;
             return $http.get('/dashboard/rest/billing' + queryString, config);
         };
 
@@ -416,6 +416,17 @@
         this.updateBillStatus = function (userId, from, to, approved, paid) {
             var queryString = "?user_id=" + userId + "&from=" + from + "&to=" + to + "&a=" + approved + "&p=" + paid;
             return $http.post('/dashboard/rest/billing/bills' + queryString, {responseType: 'arraybuffer'});
+        };
+
+        /**
+         * This method will trigger the request to the prediction engine.
+         * @param selectedUse
+         * @param selectedPrediction
+         * @param meter
+         */
+        this.getPredictions = function (userId, selectedUse, selectedPrediction, meter){
+            var queryString = "?userId="+userId+"&meterName="+meter+"&use="+selectedUse+"&forecast="+selectedPrediction;
+            return $http.get('/dashboard/rest/prediction'+queryString);
         };
     }
 

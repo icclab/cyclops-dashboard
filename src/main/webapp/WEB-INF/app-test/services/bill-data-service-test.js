@@ -25,7 +25,7 @@ describe('BillDataService', function() {
     var fakeChargeResponse = {
         charge: {
             columns: [
-                "time","sequence_number","resource","userid","usage","rate","price"
+                "time","sequence_number","resource","userId","usage","rate","price"
             ],
             points: [
                 [123,2,"network.incoming.bytes","a",5.7,3,1.25],

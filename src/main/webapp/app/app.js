@@ -46,6 +46,7 @@
         'dashboard.directives',
         'dashboard.modals',
         'dashboard.registration',
+        'dashboard.usagePrediction',
 
     ]).config([
         '$urlRouterProvider',
@@ -411,6 +412,34 @@
                         templateUrl: 'admin/billing/billing.html',
                         controller: 'AdminBillingController',
                         controllerAs: 'adminBillingCtrl'
+                    }
+                }
+            });
+        }
+    ]);
+
+    /*
+     Usage Prediction Module Setup
+     */
+    angular.module('dashboard.usagePrediction', [
+        'ui.router'
+    ]).config([
+        '$stateProvider',
+        function ($stateProvider) {
+            $stateProvider.state('usagePrediction', {
+                url: "/usagePrediction",
+                authenticate: true,
+                adminOnly: false,
+                views: {
+                    "navigation": {
+                        templateUrl: 'navigation/navigation.html',
+                        controller: 'NavigationController',
+                        controllerAs: 'navigationCtrl'
+                    },
+                    "content": {
+                        templateUrl: 'usage-prediction/usage-prediction.html',
+                        controller: 'UsagePredictionController',
+                        controllerAs: 'usagePredictionCtrl'
                     }
                 }
             });

@@ -23,11 +23,14 @@ import ch.icclab.cyclops.dashboard.oauth2.OAuthClientResource;
 import ch.icclab.cyclops.dashboard.oauth2.OAuthServerResource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 import org.restlet.ext.json.JsonRepresentation;
 import org.restlet.representation.Representation;
 import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ResourceException;
+
+import java.util.Map;
 
 /**
  * This class handles all requests associated with UDR meters. The class can load existing meter configuration and
@@ -53,6 +56,8 @@ public class UdrMeter extends OAuthServerResource {
             String url = Loader.getSettings().getCyclopsSettings().getUdr_meter_url();
             OAuthClientResource res = new OAuthClientResource(url, oauthToken);
             Representation rep = new JsonRepresentation(entity);
+            Map<String, Object> map = res.getRequestAttributes();
+
             return res.post(rep);
         } catch (Exception e) {
             logger.error("Error while updating the UDR Meters: " + e.getMessage());

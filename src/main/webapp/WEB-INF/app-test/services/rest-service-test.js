@@ -32,7 +32,7 @@ describe('RestService', function() {
     var fakeFrom = "2015-01-01 12:00:00";
     var fakeTo = "2015-01-02 12:00:00";
     var fakeRateQuery = "?resourcename="+fakeMeterName+"&from="+fakeFrom+"&to="+fakeTo;
-    var fakeChargeQuery = "?userid="+fakeUser+"&from="+fakeFrom+"&to="+fakeTo;
+    var fakeChargeQuery = "?userId="+fakeUser+"&from="+fakeFrom+"&to="+fakeTo;
     var fakeAccessQuery = "?access_token=" + fakeAccessToken;
     var fakeSessionQuery = "?session_id=" + fakeSessionId;
     var fakeUserIdQuery = "?user_id=" + fakeUser;

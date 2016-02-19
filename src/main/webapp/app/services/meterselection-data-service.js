@@ -83,25 +83,41 @@
          */
         this.setRawOpenstackData = function (data) {
             formattedOpenstackData = {};
-            var meters = data.points;
-            var columns = data.columns;
-            var nameIndex = columns.indexOf("metername");
-            var enabledIndex = columns.indexOf("status");
-            var typeIndex = columns.indexOf("metertype");
-            var sourceIndex = columns.indexOf("source");
+            //var meters = data.points;
+            //var columns = data.columns;
+            //var nameIndex = columns.indexOf("metername");
+            //var enabledIndex = columns.indexOf("status");
+            //var typeIndex = columns.indexOf("metertype");
+            //var sourceIndex = columns.indexOf("source");
+            //
+            //for (var i = 0; i < meters.length; i++) {
+            //    var meter = meters[i];
+            //    var meterName = meter[nameIndex];
+            //
+            //    if (meter[typeIndex] == "")
+            //        meter[typeIndex] = "gauge";
+            //
+            //    formattedOpenstackData[meterName] = {
+            //        name: meterName,
+            //        enabled: false,
+            //        type: meter[typeIndex],
+            //        source: meter[sourceIndex]
+            //    };
+            //}
 
-            for (var i = 0; i < meters.length; i++) {
-                var meter = meters[i];
-                var meterName = meter[nameIndex];
+            for (var i = 0; i< data.length; i++){
+                var meter = data[i];
+                var meterName = meter.name;
 
-                if (meter[typeIndex] == "")
-                    meter[typeIndex] = "gauge";
+                if(meter.type == ""){
+                    meter.type = "gauge";
+                }
 
                 formattedOpenstackData[meterName] = {
                     name: meterName,
                     enabled: false,
-                    type: meter[typeIndex],
-                    source: meter[sourceIndex]
+                    type: meter.type,
+                    source: meter.source
                 };
             }
         };
