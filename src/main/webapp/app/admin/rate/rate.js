@@ -176,7 +176,7 @@
             restService.getActiveRatePolicy()
                 .then(function(response) {
                     me.prepareGuiByActivePolicy(response.data);
-                    return restService.getUdrMeters();
+                    return restService.getUdrExternalMeters();
                 })
                 .then(me.filterEnabledMeters, onGetActivePolicyError);
         };

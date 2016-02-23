@@ -206,10 +206,10 @@ describe('RestService', function() {
         });
     });
 
-    describe('getUdrMeters', function() {
+    describe('getUdrExternalMeters', function() {
         it('should send complete GET request', function() {
             $httpBackend.expectGET("/dashboard/rest/udrmeters");
-            restService.getUdrMeters();
+            restService.getUdrExternalMeters();
             $httpBackend.flush();
         });
     });

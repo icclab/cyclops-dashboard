@@ -195,9 +195,21 @@
          *
          * @return {Promise}
          */
-        this.getUdrMeters = function () {
+
+        this.getUdrExternalMeters = function () {
             var config = me.getOAuthHeaderConfig();
             return $http.get('/dashboard/rest/udrmeters', config);
+        };
+
+        /**
+         * This method requests the list of selected meters from the UDR
+         * microservice via the dashboard backend.
+         *
+         * @return {Promise}
+         */
+        this.getUdrMeters = function () {
+            var config = me.getOAuthHeaderConfig();
+            return $http.get('/dashboard/rest/meters', config);
         };
 
         /**

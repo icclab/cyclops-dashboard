@@ -19,7 +19,7 @@ var restServiceMock = jasmine.createSpyObj(
     [
         'getUdrData', 'sendKeystoneAuthRequest', 'sendLoginRequest',
         'requestSessionToken', 'storeKeystoneId', 'getTokenInfo',
-        'updateUdrMeters', 'getKeystoneMeters', 'getUdrMeters',
+        'updateUdrMeters', 'getKeystoneMeters', 'getUdrExternalMeters',
         'getAdminGroupInfo', 'getUsers', 'getRateForMeter',
         'getChargeForUser', 'getActiveRatePolicy', 'setActiveRatePolicy',
         'updateAdmins', 'createBillPDF', 'getUserInfo', 'getBills', 'getBillPDF',

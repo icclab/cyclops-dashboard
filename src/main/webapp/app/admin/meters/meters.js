@@ -31,22 +31,23 @@
     function AdminMeterController(restService, meterselectionDataService, alertService, dateUtil) {
         var me = this;
         this.meterMap = {};
+        this.meters = [];
 
         var loadKeystoneMeterSuccess = function (response) {
             //me.meterMap =
-            meterselectionDataService.setRawOpenstackData(response.data);
-            return restService.getUdrMeters();
-
-            //meterselectionDataService.setRawUdrData(response.data);
-            //me.meterMap = meterselectionDataService.getFormattedOpenstackData();
+            this.meters = response.data;
+            meterselectionDataService.setRawData(meters);
+            me.meterMap = meterselectionDataService.getFormattedData();
             //me.addExternalMetersToMap();
-            //me.preselectMeters();
+            me.preselectMeters();
+            return restService.getUdrExternalMeters();
         };
 
         var loadUdrMeterSuccess = function (response) {
+            restService.getUdrExternalMeters();
             meterselectionDataService.setRawUdrData(response.data);
-            me.meterMap = meterselectionDataService.getFormattedOpenstackData();
-            me.addExternalMetersToMap();
+            meterselectionDataService.getFormattedUdrData();
+            me.addExternalMetersToMap(response);
             me.preselectMeters();
         };
 
@@ -71,6 +72,7 @@
         };
 
         this.preselectMeters = function () {
+            //var udrMeters = meterselectionDataService.getFormattedUdrData();
             var udrMeters = meterselectionDataService.getFormattedUdrData();
 
             for (var meterName in udrMeters) {
@@ -82,7 +84,8 @@
             }
         };
 
-        this.addExternalMetersToMap = function () {
+        this.addExternalMetersToMap = function (response) {
+            //var udrMeters = meterselectionDataService.formatInfluxDBData(response.data);
             var udrMeters = meterselectionDataService.getFormattedUdrData();
 
             for (var meterName in udrMeters) {
@@ -147,7 +150,7 @@
         };
 
         this.loadMeterData = function () {
-            restService.getKeystoneMeters()
+            restService.getUdrMeters()
                 .then(loadKeystoneMeterSuccess)
                 .then(loadUdrMeterSuccess, loadMeterError);
         };

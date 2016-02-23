@@ -91,7 +91,7 @@
         };
 
         this.loadMeterSelection = function() {
-            restService.getUdrMeters()
+            restService.getUdrExternalMeters()
                 .then(onLoadMeterSelectionSuccess, onLoadMeterSelectionError);
         }
 

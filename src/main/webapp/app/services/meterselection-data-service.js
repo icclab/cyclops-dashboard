@@ -29,6 +29,7 @@
         var me = this;
         var formattedUdrData = {};
         var formattedOpenstackData = {};
+        var formattedData = {};
 
         /**
          * Transforms the raw UDR response data to the following format:
@@ -83,31 +84,19 @@
          */
         this.setRawOpenstackData = function (data) {
             formattedOpenstackData = {};
-            //var meters = data.points;
-            //var columns = data.columns;
-            //var nameIndex = columns.indexOf("metername");
-            //var enabledIndex = columns.indexOf("status");
-            //var typeIndex = columns.indexOf("metertype");
-            //var sourceIndex = columns.indexOf("source");
-            //
-            //for (var i = 0; i < meters.length; i++) {
-            //    var meter = meters[i];
-            //    var meterName = meter[nameIndex];
-            //
-            //    if (meter[typeIndex] == "")
-            //        meter[typeIndex] = "gauge";
-            //
-            //    formattedOpenstackData[meterName] = {
-            //        name: meterName,
-            //        enabled: false,
-            //        type: meter[typeIndex],
-            //        source: meter[sourceIndex]
-            //    };
-            //}
+            var meters = data.points;
+            var columns = data.columns;
+            var nameIndex = columns.indexOf("metername");
+            var enabledIndex = columns.indexOf("status");
+            var typeIndex = columns.indexOf("metertype");
+            var sourceIndex = columns.indexOf("source");
 
-            for (var i = 0; i< data.length; i++){
-                var meter = data[i];
-                var meterName = meter.name;
+            for (var i = 0; i < meters.length; i++) {
+                var meter = meters[i];
+                var meterName = meter[nameIndex];
+
+                if (meter[typeIndex] == "")
+                    meter[typeIndex] = "gauge";
 
                 if(meter.type == ""){
                     meter.type = "gauge";
@@ -116,10 +105,58 @@
                 formattedOpenstackData[meterName] = {
                     name: meterName,
                     enabled: false,
-                    type: meter.type,
+                    type: meter[typeIndex],
+                    source: meter[sourceIndex]
+                };
+            }
+        };
+
+        this.setRawData = function (data){
+            formattedData = {};
+
+            for (var i = 0; i< data.length; i++){
+                var meter = data[i];
+                var meterName = meter.counter_name;
+
+                if(meter.counter_type == ""){
+                    meter.counter_type = "gauge";
+                }
+
+                formattedData[meterName] = {
+                    name: meterName,
+                    enabled: false,
+                    type: meter.counter_type,
                     source: meter.source
                 };
             }
+        };
+        this.formatInfluxDBData = function (data){
+            var result = [];
+            var meters = data.points;
+            var columns = data.columns;
+            var nameIndex = columns.indexOf("metername");
+            var enabledIndex = columns.indexOf("status");
+            var typeIndex = columns.indexOf("metertype");
+            var sourceIndex = columns.indexOf("source");
+
+            for (var i = 0; i < meters.length; i++) {
+                var meter = meters[i];
+                var meterName = meter[nameIndex];
+
+                if (meter[typeIndex] == "")
+                    meter[typeIndex] = "gauge";
+
+                result[meterName] = {
+                    name: meterName,
+                    enabled: meter[enabledIndex],
+                    type: meter[typeIndex],
+                    source: meter[sourceIndex]
+                };
+            }
+        };
+
+        this.getFormattedData = function () {
+            return formattedData;
         };
 
         this.getFormattedUdrData = function () {

@@ -62,7 +62,7 @@ describe('RateController', function() {
             meterselectionDataServiceMock.getFormattedUdrData.and.returnValue(fakeFormattedMeters);
             meterselectionDataServiceMock.getSelectedMeterNames.and.returnValue(fakeSelectedMeterNames);
             restServiceMock.getRateForMeter.and.returnValue(promise);
-            restServiceMock.getUdrMeters.and.returnValue(promise);
+            restServiceMock.getUdrExternalMeters.and.returnValue(promise);
             dateUtilMock.getFormattedDateToday.and.returnValue(fakeDateToday);
             spyOn($scope, '$broadcast');
 
@@ -115,9 +115,9 @@ describe('RateController', function() {
     });
 
     describe('loadMeterSelection', function() {
-        it('should correctly call restService.getUdrMeters', function() {
+        it('should correctly call restService.getUdrExternalMeters', function() {
             controller.loadMeterSelection();
-            expect(restServiceMock.getUdrMeters).toHaveBeenCalled();
+            expect(restServiceMock.getUdrExternalMeters).toHaveBeenCalled();
         });
 
         it('should execute success callback on deferred.resolve', function() {

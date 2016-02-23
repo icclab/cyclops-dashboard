@@ -62,6 +62,7 @@ public class Settings {
         settings.setDashboard_user_table(properties.getProperty("DASHBOARD_USER_TABLE"));
         settings.setUdr_usage_url(properties.getProperty("UDR_USAGE_URL"));
         settings.setUdr_meter_url(properties.getProperty("UDR_METER_URL"));
+        settings.setUdr_envirionment_meter_url(properties.getProperty("UDR_ENVIRONMENT_METER_URL"));
         settings.setRc_rate_url(properties.getProperty("RC_RATE_URL"));
         settings.setRc_rate_status_url(properties.getProperty("RC_RATE_STATUS_URL"));
         settings.setRc_charge_url(properties.getProperty("RC_CHARGE_URL"));

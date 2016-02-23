@@ -122,7 +122,7 @@ describe('AdminMeterController', function() {
             udrPromise = udrDeferred.promise;
 
             restServiceMock.getKeystoneMeters.and.returnValue(keystonePromise);
-            restServiceMock.getUdrMeters.and.returnValue(udrPromise);
+            restServiceMock.getUdrExternalMeters.and.returnValue(udrPromise);
             restServiceMock.updateUdrMeters.and.returnValue(udrPromise);
             restServiceMock.addExternalMeterSource.and.returnValue(udrPromise);
             meterselectionDataServiceMock.getFormattedUdrData.and.returnValue(fakeFormattedUdrData);
@@ -156,7 +156,7 @@ describe('AdminMeterController', function() {
             expect(meterselectionDataServiceMock.setRawOpenstackData)
                 .toHaveBeenCalledWith(fakeResponse.data);
 
-            expect(restServiceMock.getUdrMeters).toHaveBeenCalled();
+            expect(restServiceMock.getUdrExternalMeters).toHaveBeenCalled();
         });
 
         it('should execute loadUdrMeterSuccess on udrDeferred.resolve', function() {

@@ -45,19 +45,16 @@ public class KeystoneMeter extends ServerResource {
     @Get
     public Representation getKeystoneMeters() {
         try {
+            logger.debug("Attempting to get the meters from Keystone.");
             String meterUrl = Loader.getSettings().getOpenstackSettings().getKEYSTONE_METERS_URL();
-
             ClientResource meterResource = new ClientResource(meterUrl);
-
 
             Series<Header> requestHeaders =
                     (Series<Header>) meterResource.getRequestAttributes().get("org.restlet.http.headers");
-
             if (requestHeaders == null) {
                 requestHeaders = new Series<Header>(Header.class);
                 meterResource.getRequestAttributes().put("org.restlet.http.headers", requestHeaders);
             }
-
             KeystoneClient keystoneClient = new KeystoneClient();
             logger.trace("Attempting to create the token");
             String subjectToken = keystoneClient.generateToken();

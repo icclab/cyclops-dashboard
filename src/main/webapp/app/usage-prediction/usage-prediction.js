@@ -64,7 +64,7 @@
          * Loads the meters from UDR
          */
         this.loadMeterSelection = function () {
-            restService.getUdrMeters()
+            restService.getUdrExternalMeters()
                 .then(onLoadMeterSelectionSuccess, onLoadMeterSelectionError);
         }
 

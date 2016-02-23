@@ -110,7 +110,7 @@ describe('AdminRateController', function() {
             policyPromise = policyDeferred.promise;
             udrPromise = udrDeferred.promise;
 
-            restServiceMock.getUdrMeters.and.returnValue(udrPromise);
+            restServiceMock.getUdrExternalMeters.and.returnValue(udrPromise);
             restServiceMock.setActiveRatePolicy.and.returnValue(policyPromise);
             restServiceMock.getActiveRatePolicy.and.returnValue(policyPromise);
             responseParserMock.getStaticRatingListFromResponse.and.returnValue(fakeMeters);
@@ -243,7 +243,7 @@ describe('AdminRateController', function() {
             controller.onLoad();
             policyDeferred.resolve(fakeResponseDynamic);
             $scope.$digest();
-            expect(restServiceMock.getUdrMeters).toHaveBeenCalled();
+            expect(restServiceMock.getUdrExternalMeters).toHaveBeenCalled();
             expect(controller.prepareGuiByActivePolicy)
                 .toHaveBeenCalledWith(fakeDynamicRateConfig);
         });

@@ -27,6 +27,7 @@ public class CyclopsSettings {
     private String dashboard_user_table;
     private String udr_usage_url;
     private String udr_meter_url;
+    private String udr_envirionment_meter_url;
     private String rc_rate_url;
     private String rc_rate_status_url;
     private String rc_charge_url;
@@ -49,6 +50,16 @@ public class CyclopsSettings {
     private String data_period;
     private String cache;
 
+    private String prediction_url;
+
+    public String getUdr_envirionment_meter_url() {
+        return udr_envirionment_meter_url;
+    }
+
+    public void setUdr_envirionment_meter_url(String udr_envirionment_meter_url) {
+        this.udr_envirionment_meter_url = udr_envirionment_meter_url;
+    }
+
     public String getPrediction_url() {
         return prediction_url;
     }
@@ -56,8 +67,6 @@ public class CyclopsSettings {
     public void setPrediction_url(String prediction_url) {
         this.prediction_url = prediction_url;
     }
-
-    private String prediction_url;
 
     public void setDashboard_admin(String dashboard_admin) {
         this.dashboard_admin = dashboard_admin;
