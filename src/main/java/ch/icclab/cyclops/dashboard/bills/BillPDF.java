@@ -105,7 +105,8 @@ public class BillPDF extends ServerResource {
                 while (keys.hasNext()) {
                     String key = (String) keys.next();
                     JSONObject billItem = (JSONObject) billDetails.get(key);
-                    Long usage = billItem.getLong("usage");
+                    Double usage = billItem.getDouble("usage");
+//                    Long usage = us.longValue();
                     Double cost = billItem.getDouble("price");
                     Double rate = billItem.getDouble("rate");
                     String unit = billItem.getString("unit");

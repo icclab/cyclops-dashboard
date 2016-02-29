@@ -211,7 +211,7 @@ public class BillGenerator {
      * @param unit (required) dictionary containing the unit symbol for the corresponding meters in usage dictionary, all meters entry must be present
      * @param discount (required) dictionary containing the individual volume based discount for the corresponding meters in usage dictionary, all meters entry must be present
      */
-    static void drawItemizedDetail(PDPageContentStream contentStream, HashMap<String, Long> usage, HashMap<String, Double> cost, HashMap<String, String> unit, HashMap<String, Double> discount) {
+    static void drawItemizedDetail(PDPageContentStream contentStream, HashMap<String, Double> usage, HashMap<String, Double> cost, HashMap<String, String> unit, HashMap<String, Double> discount) {
         try {
             final int TABLE_X = 40;
             final int TABLE_Y = 605;
@@ -261,7 +261,7 @@ public class BillGenerator {
         return HEADER_HEIGHT;
     }
 
-    private static int drawItemizedDetailTable(PDPageContentStream contentStream, int x, int y, HashMap<String, Long> usage, HashMap<String, Double> resourceCost, HashMap<String, String> unit, HashMap<String, Double> itemCost) throws IOException {
+    private static int drawItemizedDetailTable(PDPageContentStream contentStream, int x, int y, HashMap<String, Double> usage, HashMap<String, Double> resourceCost, HashMap<String, String> unit, HashMap<String, Double> itemCost) throws IOException {
         final int FONT_SIZE = 10;
         final int DELIMITER_PADDING = 8;
         final int INITIAL_FONT_OFFSET = 12;
@@ -283,7 +283,7 @@ public class BillGenerator {
             font = PDType1Font.COURIER_OBLIQUE;
             contentStream.setFont(font, FONT_SIZE);
             contentStream.moveTextPositionByAmount(ITEM_USAGE_OFFSET_X, -1 * ITEM_USAGE_OFFSET_Y);
-            contentStream.drawString(Long.toString(usage.get(key)));
+            contentStream.drawString(Double.toString(usage.get(key)));
             rowHeight += ITEM_USAGE_OFFSET_Y;
 
             font = PDType1Font.COURIER;

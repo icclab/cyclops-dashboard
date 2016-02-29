@@ -35,10 +35,12 @@ GK_LIST_USERS_URL=http://localhost:8000/admin/user/
 # Cyclops RCB Endpoints
 UDR_USAGE_URL=http://localhost:8080/udr/usage/users/
 UDR_METER_URL=http://localhost:8080/udr/meters
+UDR_ENVIRONMENT_METER_URL=http://localhost:8080/udr/environment/meters
 RC_RATE_URL=http://localhost:8080/rc/rate
 RC_RATE_STATUS_URL=http://localhost:8080/rc/rate/status
 RC_CHARGE_URL=http://localhost:8080/rc/charge
 BILLING_INVOICE_URL=http://localhost:8080/billing/invoice
+PREDICTION_URL=http://localhost:8080/prediction
 
 # Error Reporter settings
 DASHBOARD_USER_TABLE=dashboard_users

@@ -40,7 +40,7 @@ public class EmptyKeystoneMeter extends ServerResource {
     @Get
     public Representation getKeystoneMeters() {
         logger.debug("Attempting to Get the UDR Meters.");
-        String url = Loader.getSettings().getCyclopsSettings().getUdr_meter_url();
+        String url = Loader.getSettings().getCyclopsSettings().getUdr_meter_url()+"/v2/";
         ClientResource clientResource = new ClientResource(url);
         return clientResource.get();
     }

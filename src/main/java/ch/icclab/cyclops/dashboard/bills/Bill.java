@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 public class Bill{
     private HashMap<String, String> info;
-    private HashMap<String, Long> usagePerMeter;
+    private HashMap<String, Double> usagePerMeter;
     private HashMap<String, Double> costPerMeter;
     private HashMap<String, Double> ratePerMeter;
     private HashMap<String, String> unitPerMeter;
@@ -33,7 +33,7 @@ public class Bill{
 
     public Bill() {
         info = new HashMap<String, String>();
-        usagePerMeter = new HashMap<String, Long>();
+        usagePerMeter = new HashMap<String, Double>();
         costPerMeter = new HashMap<String, Double>();
         ratePerMeter = new HashMap<String, Double>();
         unitPerMeter = new HashMap<String, String>();
@@ -48,13 +48,13 @@ public class Bill{
         info.put("address-line2", "CH Winterthur - 8401");
     }
 
-    public void addItem(String meterName, Long usage, Double rate, Double cost, String unit) {
+    public void addItem(String meterName, Double usage, Double rate, Double cost, String unit) {
         usagePerMeter.put(meterName, usage);
         costPerMeter.put(meterName, rate);
         unitPerMeter.put(meterName, unit);
     }
 
-    public void addItem(String meterName, Long usage, Double rate, Double cost, String unit, Double discount) {
+    public void addItem(String meterName, Double usage, Double rate, Double cost, String unit, Double discount) {
         addItem(meterName, usage, rate, cost, unit);
         discounts.put(meterName, discount);
     }
@@ -67,7 +67,7 @@ public class Bill{
         return info;
     }
 
-    public HashMap<String, Long> getUsage() {
+    public HashMap<String, Double> getUsage() {
         return usagePerMeter;
     }
 

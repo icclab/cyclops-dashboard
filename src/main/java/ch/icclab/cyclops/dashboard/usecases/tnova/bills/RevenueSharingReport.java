@@ -106,7 +106,7 @@ public class RevenueSharingReport extends ServerResource {
                 while (keys.hasNext()) {
                     String key = (String) keys.next();
                     JSONObject billItem = (JSONObject) billDetails.get(key);
-                    Long usage = billItem.getLong("usage");
+                    Double usage = billItem.getDouble("usage");
                     Double cost = billItem.getDouble("price");
                     Double discount = billItem.getDouble("discount");
                     String priceUnit = billItem.getString("unit");

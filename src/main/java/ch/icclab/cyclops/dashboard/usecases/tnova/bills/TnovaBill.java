@@ -25,14 +25,14 @@ import java.util.HashMap;
 
 public class TnovaBill extends ch.icclab.cyclops.dashboard.bills.Bill {
     private HashMap<String, String> info;
-    private HashMap<String, Long> usagePerMeter;
+    private HashMap<String, Double> usagePerMeter;
     private HashMap<String, Double> costPerMeter;
     private HashMap<String, String> unitPerMeter;
     private HashMap<String, Double> discounts;
 
     public TnovaBill() {
         info = new HashMap<String, String>();
-        usagePerMeter = new HashMap<String, Long>();
+        usagePerMeter = new HashMap<String, Double>();
         costPerMeter = new HashMap<String, Double>();
         unitPerMeter = new HashMap<String, String>();
         discounts = new HashMap<String, Double>();
@@ -46,13 +46,13 @@ public class TnovaBill extends ch.icclab.cyclops.dashboard.bills.Bill {
         info.put("address-line2", "CH Winterthur - 8401");
     }
 
-    public void addItem(String meterName, Long usage, Double cost, String unit) {
+    public void addItem(String meterName, Double usage, Double cost, String unit) {
         usagePerMeter.put(meterName, usage);
         costPerMeter.put(meterName, cost);
         unitPerMeter.put(meterName, unit);
     }
 
-    public void addItem(String meterName, Long usage, Double rate, String unit, Double discount) {
+    public void addItem(String meterName, Double usage, Double rate, String unit, Double discount) {
         addItem(meterName, usage, rate, unit);
         discounts.put(meterName, discount);
     }
@@ -65,7 +65,7 @@ public class TnovaBill extends ch.icclab.cyclops.dashboard.bills.Bill {
         return info;
     }
 
-    public HashMap<String, Long> getUsage() {
+    public HashMap<String, Double> getUsage() {
         return usagePerMeter;
     }
 

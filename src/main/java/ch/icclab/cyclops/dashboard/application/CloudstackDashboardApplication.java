@@ -46,7 +46,7 @@ public class CloudstackDashboardApplication extends AbstractApplication{
         router.attach("/rate", Rate.class);
         router.attach("/rate/status", RateStatus.class);
         router.attach("/charge", Charge.class);
-        router.attach("/keystonemeters", EmptyKeystoneMeter.class);
+        router.attach("/meters", EmptyKeystoneMeter.class);
         router.attach("/udrmeters", UdrMeter.class);
         router.attach("/udrmeters/externalids", ExternalUserAccounts.class);
         router.attach("/udrmeters/externalsources", ExternalMeterSources.class);
