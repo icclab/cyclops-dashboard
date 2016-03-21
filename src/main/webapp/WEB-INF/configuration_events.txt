@@ -13,7 +13,7 @@ BILLING_PDF_PATH=/home/ubuntu/bills
 
 ######################## ADVANCED SETTINGS ######################
 # Environment variable
-Environment=Mcn
+Environment=Event
 
 # GateKeeper endpoints
 GK_GET_UID=http://localhost:8000/admin/user/
@@ -34,7 +34,7 @@ UDR_ENVIRONMENT_METER_URL=http://localhost:8080/udr/environment/meters
 
 # Error Reporter settings
 DASHBOARD_USER_TABLE=dashboard_users
-ERROR_REPORTER_ENABLED=true
+ERROR_REPORTER_ENABLED=false
 ERROR_REPORTER_HOST=somehost
 ERROR_REPORTER_PORT=15672
 ERROR_REPORTER_VIRTUAL_HOST=/
