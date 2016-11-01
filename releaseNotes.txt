@@ -1,3 +1,14 @@
+Version 0.2.0
+Date 1/Nov/2016
+Notes
+1. Initial support for Dashboard 2.0 release
+2. Installation Scripts
+3. Deployment Scripts
+4. Documentation
+
+
+*************************************************************
+
 Version 0.1.1
 Date 19/Jun/2015
 Notes

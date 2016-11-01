@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Usage Data Record Charts | Cyclops</title>
+
+    <!-- Bootstrap -->
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
+    <!-- iCheck -->
+    <link href="vendors/iCheck/skins/flat/green.css" rel="stylesheet">
+    </link>
+    <!-- Custom Theme Style -->
+    <link href="../build/css/custom.min.css" rel="stylesheet">
+</head>
+
+<body class="nav-md">
+<form id="linkUsage" method="post" action="/usage">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+</form>
+<form id="linkCharge" method="post" action="/charge">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+</form>
+<form id="linkOverview" method="post" action="/">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+</form>
+<form id="linkTenantSelection" method="post" action="/tenants">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+    <input type="hidden" name="selectedUser" th:value="${username}">
+</form>
+<div class="container body">
+    <div class="main_container">
+        <div class="col-md-3 left_col">
+            <div class="left_col scroll-view">
+                <div class="navbar nav_title" style="border: 0;">
+                    <a href="javascript:void(0);" onclick="document.getElementById('linkOverview').submit();"><img src="images/logo_white.png" height="100%"></a>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div class="profile">
+                    <div class="profile_pic">
+                        <img src="images/user.png" alt="..." class="img-circle profile_img">
+                    </div>
+                    <div class="profile_info">
+                        <span>Welcome,</span>
+                        <h2 th:text="${username}"></h2>
+                    </div>
+                </div>
+                <!-- /menu profile quick info -->
+
+                <br/>
+
+                <!-- sidebar menu -->
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                    <div class="menu_section">
+                        <h3>Usage</h3>
+                        <ul class="nav side-menu">
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();"><i class="fa fa-area-chart"></i> Usage
+                                <!--<span class="fa fa-chevron-down"></span>-->
+                            </a>
+                                <!--<ul class="nav child_menu">-->
+                                <!--&lt;!&ndash;<li><a th:href="@{/usage?username=} + ${username}">Usage Data Visualization</a></li>&ndash;&gt;-->
+                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();">Usage Data Visualization</a></li>-->
+                                <!--</ul>-->
+                            </li>
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();"><i class="fa fa-money"></i> Charge
+                                <!--<span class="fa fa-chevron-down"></span>-->
+                            </a>
+                                <!--<ul class="nav child_menu">-->
+                                <!--&lt;!&ndash;<li><a th:href="@{/charge?username=} + ${username}">Charge Data Visualization</a></li>&ndash;&gt;-->
+                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();">Charge Data Visualization</a></li>-->
+                                <!--</ul>-->
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="menu_section">
+                        <h3>Billing</h3>
+                        <ul class="nav side-menu">
+                            <li>
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkTenantSelection').submit();"><i class="fa fa-credit-card"></i> Invoice</a></li>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /sidebar menu -->
+
+                <!-- /menu footer buttons -->
+                <div class="sidebar-footer hidden-small">
+                    <a data-toggle="tooltip" data-placement="top" title="Settings">
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                        <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Lock">
+                        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Logout">
+                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                    </a>
+                </div>
+                <!-- /menu footer buttons -->
+            </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+            <div class="nav_menu">
+                <nav>
+                    <div class="nav toggle">
+                        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                    </div>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="">
+                            <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+                               aria-expanded="false">
+                                <img src="images/user.png" alt=""><b th:text="${username}"></b>
+                                <span class=" fa fa-angle-down"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                <li><a href="javascript:;"> Profile</a></li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="badge bg-red pull-right">50%</span>
+                                        <span>Settings</span>
+                                    </a>
+                                </li>
+                                <li><a href="javascript:;">Help</a></li>
+                                <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                            </ul>
+                        </li>
+
+                        <li role="presentation" class="dropdown">
+                            <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="fa fa-envelope-o"></i>
+                                <span class="badge bg-green">6</span>
+                            </a>
+                            <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="text-center">
+                                        <a>
+                                            <strong>See All Alerts</strong>
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>Usage Charts
+                            <small>Usage data representation</small>
+                        </h3>
+                    </div>
+
+                    <div class="title_right">
+                        <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search for...">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2>Graph Display Selection</h2>
+                                <ul class="nav navbar-right panel_toolbox">
+                                    <li><a class="collapse-link-collapsed"><i id="drop" class="fa fa-chevron-down"></i></a>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                           aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li><a href="#">Settings 1</a>
+                                            </li>
+                                            <li><a href="#">Settings 2</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content" style="display: none">
+                                <form name="graphSelection" method="post" th:action="@{/usage}">
+                                    <input type="hidden" name="username" th:value="${username}">
+                                    <input type="hidden" name="password" th:value="${password}">
+                                    <!--<div>-->
+                                    <!--<p>Select Measurements to display:</p>-->
+                                    <!--<br>-->
+                                    <!--<table id="graphSelection" width="100%" height="100%">-->
+                                    <!--<tbody>-->
+                                    <!--<tr>-->
+                                    <!--<td>-->
+                                    <!--<p>-->
+                                    <!--<input type="checkbox" class="flat"> Sample checkbox-->
+                                    <!--</p>-->
+                                    <!--</td>-->
+                                    <!--</tr>-->
+                                    <!--</tbody>-->
+                                    <!--</table>-->
+                                    <!--<br>-->
+                                    <!--<table>-->
+                                    <!--<tr>-->
+                                    <!--<td>-->
+                                    <!--<p>Select Tenant to display: </p>-->
+                                    <!--</td>-->
+                                    <!--</tr>-->
+                                    <!--</table>-->
+
+                                    <!--</div>-->
+                                    <br><br>
+                                    <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
+                                        <button id="graphButton" class="btn btn-default submit" disabled>Get
+                                            Selected
+                                            Graphs
+                                        </button>
+                                        <!--<div class="col-md-2 center-block center">-->
+                                        <!--<select name="tenant" id="tenantSelection"-->
+                                        <!--class="center-block select2_group form-control select2-hidden-accessible"-->
+                                        <!--tabindex="-1" aria-hidden="true">-->
+                                        <!--<option>Sample Option</option>-->
+                                        <!--</select>-->
+                                        <!--</div>-->
+                                        <div id="reportrange" class="col-sm-4"
+                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                            <span>Select a Date Range</span> <b class="caret"></b>
+                                            <input type="hidden" id="from" name="from">
+                                            <input type="hidden" id="to" name="to">
+                                        </div>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="chartContainer" class="col-md-12 col-sm-12 col-xs-12">
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="row">
+
+                </div>
+                <div class="clearfix"></div>
+                <div class="row">
+                </div>
+            </div>
+
+            <div class="modal fade" id="modChart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title" id="myModalLabel">measurement Detail</h4></div>
+                        <div class="modal-body">
+                            <div id="histogramContainer">
+                                <div class="modal_chart" id="echart_line" style="height:350px;"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="../vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="../vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../vendors/nprogress/nprogress.js"></script>
+<!-- Chart.js -->
+<script src="../vendors/Chart.js/dist/Chart.min.js"></script>
+<!-- iCheck -->
+<script src="../vendors/iCheck/icheck.min.js"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../build/js/custom.js"></script>
+
+<!-- ECharts -->
+<script src="../vendors/echarts/dist/echarts.js"></script>
+<script src="../vendors/echarts/map/js/world.js"></script>
+
+<script th:inline="javascript">
+
+    /** Creates and configures the graphs coming from the graph selection.
+     *
+     */
+    $(document).ready(function () {
+
+        var graphSelection = [[${graphSelection}]];
+        var chartTypes = [[${measurementCharts}]];
+        var units = [[${measurementUnits}]];
+        var theme = {
+            color: [
+                '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+                '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+            ],
+
+            title: {
+                itemGap: 8,
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#408829'
+                }
+            },
+
+            dataRange: {
+                color: ['#1f610a', '#97b58d']
+            },
+
+            toolbox: {
+                color: ['#408829', '#408829', '#408829', '#408829']
+            },
+
+            tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                axisPointer: {
+                    type: 'line',
+                    lineStyle: {
+                        color: '#408829',
+                        type: 'dashed'
+                    },
+                    crossStyle: {
+                        color: '#408829'
+                    },
+                    shadowStyle: {
+                        color: 'rgba(200,200,200,0.3)'
+                    }
+                }
+            },
+
+            dataZoom: {
+                dataBackgroundColor: '#eee',
+                fillerColor: 'rgba(64,136,41,0.2)',
+                handleColor: '#408829'
+            },
+            grid: {
+                borderWidth: 0
+            },
+
+            categoryAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+
+            valueAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitArea: {
+                    show: true,
+                    areaStyle: {
+                        color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+            timeline: {
+                lineStyle: {
+                    color: '#408829'
+                },
+                controlStyle: {
+                    normal: {color: '#408829'},
+                    emphasis: {color: '#408829'}
+                }
+            },
+
+            k: {
+                itemStyle: {
+                    normal: {
+                        color: '#68a54a',
+                        color0: '#a9cba2',
+                        lineStyle: {
+                            width: 1,
+                            color: '#408829',
+                            color0: '#86b379'
+                        }
+                    }
+                }
+            },
+            map: {
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            color: '#ddd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        areaStyle: {
+                            color: '#99d2dd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    }
+                }
+            },
+            force: {
+                itemStyle: {
+                    normal: {
+                        linkStyle: {
+                            strokeColor: '#408829'
+                        }
+                    }
+                }
+            },
+            chord: {
+                padding: 4,
+                itemStyle: {
+                    normal: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    }
+                }
+            },
+            gauge: {
+                startAngle: 225,
+                endAngle: -45,
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
+                        width: 8
+                    }
+                },
+                axisTick: {
+                    splitNumber: 10,
+                    length: 12,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                axisLabel: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                },
+                splitLine: {
+                    length: 18,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                pointer: {
+                    length: '90%',
+                    color: 'auto'
+                },
+                title: {
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                detail: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                }
+            },
+            textStyle: {
+                fontFamily: 'Arial, Verdana, sans-serif'
+            }
+        };
+
+
+        if (graphSelection) {
+            // Create a container for each Measurement depending on its chartType
+            for (var i = 0; i < graphSelection.length; i++) {
+                //The chartType parameter is a pie/doughnut chart
+                var measurement = graphSelection[i];
+                var pieData = getPieData(graphSelection[i]);
+                var pieColors = getRandomColors(pieData.length);
+                var pieLabels = getPieLabels(graphSelection[i]);
+                var totalUsage = [[${totalUsage}]];
+                var pieLegendHtml = "";
+                var meterUnit = units[measurement];
+//                    if(meterUnit === 'bytes' || meterUnit === 'B'){
+//                        var newData = formatBytes(pieData);
+//                        var newUsage = newData[0];
+//                        meterUnit = newData[1];
+//                        totalUsage = formatBytes(totalUsage)[0];
+//                    }
+                for (var o = 0; o < pieLabels.length; o++) {
+                    pieLegendHtml = pieLegendHtml + '<tr><td><p><i style="background-color: ' + pieColors[o] + '">&nbsp;&nbsp;&nbsp;&nbsp;</i>' + pieLabels[o] + ' </p></td></tr>'
+                }
+                $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>' + measurement + '</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Usage: ' + totalUsage[measurement] + ' ' + meterUnit + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="pie' + i + '"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + i + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table><div class="x_content"><button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Details"><span data-toggle="modal" data-target="#modChart" data-source=' + measurement + '><i class="fa fa-bar-chart"></span></i></button></div></div></div> </div>');
+                var pieChart = document.getElementById('pie' + i);
+                if (pieChart) {
+                    var options = {
+                        legend: false,
+                        responsive: false
+                    };
+
+                    new Chart(pieChart, {
+                        type: 'doughnut',
+                        tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+                        data: {
+                            labels: pieLabels,
+                            datasets: [{
+                                data: pieData,//newUsage
+                                backgroundColor: pieColors,
+                                hoverBackgroundColor: pieColors
+                            }]
+                        },
+                        options: options
+                    });
+                }
+            }
+        }
+    });
+
+    function getPieLabels(measurementName) {
+        var metadataList = Object.keys(pairs[measurementName]);
+        return metadataList;
+    }
+
+    function getPieData(measurementName) {
+        var slices = [];
+        var metadataList = Object.keys(pairs[measurementName]);
+        for (var o = 0; o < metadataList.length; o++) {
+            var meterData = pairs[measurementName];
+            var dataArray = meterData[metadataList[o]];
+            var data = 0;
+            for (var x = 0; x < dataArray.length; x++) {
+                data = data + dataArray[x];
+            }
+            slices[o] = data;
+        }
+        return slices;
+    }
+
+    /**
+     * This function generates an array of a parameter-specified length of random generated HEX Colors.
+     *
+     */
+    function getRandomColors(length) {
+        var colors = [];
+        for (var i = 0; i < length; i++) {
+            colors[i] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+        }
+        return colors;
+    }
+
+
+    /**
+     * This Method returns the formatted dates for a specified timestamp
+     */
+    function getDates(timestamps) {
+        var dates = [];
+        var options = {
+            weekday: "long", year: "numeric", month: "short",
+            day: "numeric", hour: "2-digit", minute: "2-digit"
+        };
+        for (var i = 0; i < timestamps.length; i++) {
+            var date = new Date(timestamps[i] * 1000);
+            dates[i] = date.toLocaleTimeString("en-us", options);
+//            dates[i] = date;
+        }
+        return dates;
+    }
+
+    /**
+     * This Method Returns an Individual Graph for a Specified Measurement
+     *
+     * @param measurementName
+     * @returns {{name: *, type: string, smooth: boolean, itemStyle: {normal: {areaStyle: {type: string}}}, data: *}|*}
+     */
+    function getGraph(measurementName) {
+        var graphs = [];
+        var sliceMap = [[${sliceMap}]];
+        var slices = slicePairs;
+        var metadataList = Object.keys(pairs[measurementName]);
+        //Create one data for each metadata in the list
+        for (var o = 0; o < metadataList.length; o++) {
+            var meterData = sliceMap[measurementName];
+            var data = meterData[metadataList[o]];
+            if (data[o] == null)
+                data[o] = undefined;
+            graphs[o] = {
+                name: metadataList[o],
+                type: 'bar',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: data
+            }
+        }
+        return graphs;
+    }
+
+    /**
+     * This Method Returns a Graph with all the Selected Measurements together.
+     *
+     * @returns {Array}
+     */
+    function getGroupGraph() {
+
+        var graphSelection = [[${graphSelection}]];
+
+        var graphs = [];
+        for (var i = 0; i < graphSelection.length; i++) {
+            graphs[i] = {
+                name: graphSelection[i],
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: pairs[graphSelection[i]]
+            }
+        }
+        return graphs;
+    }
+
+    /**
+     * This Method formats the ns into Hours
+     */
+    function getHours(ns) {
+        var tempTime = moment.duration(ns);
+        var time = tempTime.hours() + tempTime.minutes();
+        return time;
+    }
+
+    /**
+     * This Method formats Bytes into a human readable unit
+     */
+    function formatBytes(bytes, decimals) {
+        for (var x = 0; x < bytes.length; x++) {
+            if (bytes[x] == 0) return '0 Byte';
+            var k = 1000; // or 1024 for binary
+            var dm = decimals + 1 || 3;
+            var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+            var i = Math.floor(Math.log(bytes[x]) / Math.log(k));
+            var resultTable = [];
+            resultTable[0] = parseFloat((bytes[x] / Math.pow(k, i)).toFixed(dm));
+            resultTable[1] = sizes[i];
+        }
+        return resultTable;
+    }
+
+</script>
+
+<script th:inline="javascript">
+
+    $('#modChart').on('shown.bs.modal', function (event) {
+        var units = [[${measurementUnits}]];
+        var legend = [[${legendValues}]];
+        var timestamps = [[${timestamps}]];
+        var link = $(event.relatedTarget);
+        // get data source (Measurement name)
+        var source = link.attr('data-source');
+        // get title
+        var title = source;
+        // get labels
+        var table = link.parents('table');
+        var labels = [];
+        $('#' + table.attr('id') + '>thead>tr>th').each(function (index, value) {
+            // without first column
+            if (index > 0) {
+                labels.push($(value).html());
+            }
+        });
+        // get target source
+        var target = [];
+        $.each(labels, function (index, value) {
+            target.push(link.attr('data-target-source'));
+        });
+        // Chart initialisieren
+        var modal = $(this);
+        var canvas = modal.find('.modal-body canvas');
+        modal.find('.modal-title').html(title);
+
+        var theme = {
+            color: [
+                '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+                '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+            ],
+
+            title: {
+                itemGap: 8,
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#408829'
+                }
+            },
+
+            dataRange: {
+                color: ['#1f610a', '#97b58d']
+            },
+
+            toolbox: {
+                color: ['#408829', '#408829', '#408829', '#408829']
+            },
+
+            tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                axisPointer: {
+                    type: 'line',
+                    lineStyle: {
+                        color: '#408829',
+                        type: 'dashed'
+                    },
+                    crossStyle: {
+                        color: '#408829'
+                    },
+                    shadowStyle: {
+                        color: 'rgba(200,200,200,0.3)'
+                    }
+                }
+            },
+
+            dataZoom: {
+                dataBackgroundColor: '#eee',
+                fillerColor: 'rgba(64,136,41,0.2)',
+                handleColor: '#408829'
+            },
+            grid: {
+                borderWidth: 0
+            },
+
+            categoryAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+
+            valueAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitArea: {
+                    show: true,
+                    areaStyle: {
+                        color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+            timeline: {
+                lineStyle: {
+                    color: '#408829'
+                },
+                controlStyle: {
+                    normal: {color: '#408829'},
+                    emphasis: {color: '#408829'}
+                }
+            },
+
+            k: {
+                itemStyle: {
+                    normal: {
+                        color: '#68a54a',
+                        color0: '#a9cba2',
+                        lineStyle: {
+                            width: 1,
+                            color: '#408829',
+                            color0: '#86b379'
+                        }
+                    }
+                }
+            },
+            map: {
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            color: '#ddd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        areaStyle: {
+                            color: '#99d2dd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    }
+                }
+            },
+            force: {
+                itemStyle: {
+                    normal: {
+                        linkStyle: {
+                            strokeColor: '#408829'
+                        }
+                    }
+                }
+            },
+            chord: {
+                padding: 4,
+                itemStyle: {
+                    normal: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    }
+                }
+            },
+            gauge: {
+                startAngle: 225,
+                endAngle: -45,
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
+                        width: 8
+                    }
+                },
+                axisTick: {
+                    splitNumber: 10,
+                    length: 12,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                axisLabel: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                },
+                splitLine: {
+                    length: 18,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                pointer: {
+                    length: '90%',
+                    color: 'auto'
+                },
+                title: {
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                detail: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                }
+            },
+            textStyle: {
+                fontFamily: 'Arial, Verdana, sans-serif'
+            }
+        };
+
+        // ECHART LINE CONF
+        var echart = document.getElementById('echart_line');
+        if (echart) {
+            var echartLine = echarts.init(echart, theme);
+
+            echartLine.setOption({
+                title: {
+                    text: "Unit: " + units[title],
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    x: 220,
+                    y: 40,
+                    data: legend
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        magicType: {
+                            show: true,
+                            title: {
+                                line: 'Line',
+                                bar: 'Bar',
+                                stack: 'Stack',
+                                tiled: 'Tiled'
+                            },
+                            type: ['line', 'bar', 'stack', 'tiled']
+                        },
+                        restore: {
+                            show: true,
+                            title: "Restore"
+                        },
+                        saveAsImage: {
+                            show: true,
+                            title: "Save Image"
+                        }
+                    }
+                },
+                calculable: true,
+                xAxis: [{
+                    type: 'category',
+                    boundaryGap: false,
+                    data: getDates(timestamps)
+                }],
+                yAxis: [{
+                    type: 'value'
+                }],
+                series: getGraph(title)
+            });
+        }
+    }).on('hidden.bs.modal', function (event) {
+        // reset canvas size
+        var modal = $(this);
+        var canvas = modal.find('.modal-body canvas');
+        canvas.attr('width', '568px').attr('height', '300px');
+        // destroy modal
+        $(this).data('bs.modal', null);
+    });
+</script>
+
+<!-- Chart.js -->
+<script th:inline="javascript">
+    var theme = {
+        color: [
+            '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+            '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+        ],
+
+        title: {
+            itemGap: 8,
+            textStyle: {
+                fontWeight: 'normal',
+                color: '#408829'
+            }
+        },
+
+        dataRange: {
+            color: ['#1f610a', '#97b58d']
+        },
+
+        toolbox: {
+            color: ['#408829', '#408829', '#408829', '#408829']
+        },
+
+        tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            axisPointer: {
+                type: 'line',
+                lineStyle: {
+                    color: '#408829',
+                    type: 'dashed'
+                },
+                crossStyle: {
+                    color: '#408829'
+                },
+                shadowStyle: {
+                    color: 'rgba(200,200,200,0.3)'
+                }
+            }
+        },
+
+        dataZoom: {
+            dataBackgroundColor: '#eee',
+            fillerColor: 'rgba(64,136,41,0.2)',
+            handleColor: '#408829'
+        },
+        grid: {
+            borderWidth: 0
+        },
+
+        categoryAxis: {
+            axisLine: {
+                lineStyle: {
+                    color: '#408829'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: ['#eee']
+                }
+            }
+        },
+
+        valueAxis: {
+            axisLine: {
+                lineStyle: {
+                    color: '#408829'
+                }
+            },
+            splitArea: {
+                show: true,
+                areaStyle: {
+                    color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: ['#eee']
+                }
+            }
+        },
+        timeline: {
+            lineStyle: {
+                color: '#408829'
+            },
+            controlStyle: {
+                normal: {color: '#408829'},
+                emphasis: {color: '#408829'}
+            }
+        },
+
+        k: {
+            itemStyle: {
+                normal: {
+                    color: '#68a54a',
+                    color0: '#a9cba2',
+                    lineStyle: {
+                        width: 1,
+                        color: '#408829',
+                        color0: '#86b379'
+                    }
+                }
+            }
+        },
+        map: {
+            itemStyle: {
+                normal: {
+                    areaStyle: {
+                        color: '#ddd'
+                    },
+                    label: {
+                        textStyle: {
+                            color: '#c12e34'
+                        }
+                    }
+                },
+                emphasis: {
+                    areaStyle: {
+                        color: '#99d2dd'
+                    },
+                    label: {
+                        textStyle: {
+                            color: '#c12e34'
+                        }
+                    }
+                }
+            }
+        },
+        force: {
+            itemStyle: {
+                normal: {
+                    linkStyle: {
+                        strokeColor: '#408829'
+                    }
+                }
+            }
+        },
+        chord: {
+            padding: 4,
+            itemStyle: {
+                normal: {
+                    lineStyle: {
+                        width: 1,
+                        color: 'rgba(128, 128, 128, 0.5)'
+                    },
+                    chordStyle: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        }
+                    }
+                },
+                emphasis: {
+                    lineStyle: {
+                        width: 1,
+                        color: 'rgba(128, 128, 128, 0.5)'
+                    },
+                    chordStyle: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        }
+                    }
+                }
+            }
+        },
+        gauge: {
+            startAngle: 225,
+            endAngle: -45,
+            axisLine: {
+                show: true,
+                lineStyle: {
+                    color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
+                    width: 8
+                }
+            },
+            axisTick: {
+                splitNumber: 10,
+                length: 12,
+                lineStyle: {
+                    color: 'auto'
+                }
+            },
+            axisLabel: {
+                textStyle: {
+                    color: 'auto'
+                }
+            },
+            splitLine: {
+                length: 18,
+                lineStyle: {
+                    color: 'auto'
+                }
+            },
+            pointer: {
+                length: '90%',
+                color: 'auto'
+            },
+            title: {
+                textStyle: {
+                    color: '#333'
+                }
+            },
+            detail: {
+                textStyle: {
+                    color: 'auto'
+                }
+            }
+        },
+        textStyle: {
+            fontFamily: 'Arial, Verdana, sans-serif'
+        }
+    };
+
+    // Variables added by Manu
+    var username = [[${username}]];
+    var legend = [[${legendValues}]];
+    var pairs = [[${pairs}]];
+    var slicePairs = [[${slicePairs}]];
+    var graphSelection = [[${graphSelection}]];
+    var metadataTest = Object.keys(pairs[graphSelection[0]]);
+
+    // ECHART LINE CONF
+    var echart = document.getElementById('echart_line');
+    if (echart) {
+        var echartLine = echarts.init(document.getElementById('echart_line'), theme);
+
+        echartLine.setOption({
+            title: {
+                text: 'Line Graph',
+                subtext: 'Subtitle'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                x: 220,
+                y: 40,
+                data: legend
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        title: {
+                            line: 'Line',
+                            bar: 'Bar',
+                            stack: 'Stack',
+                            tiled: 'Tiled'
+                        },
+                        type: ['line', 'bar', 'stack', 'tiled']
+                    },
+                    restore: {
+                        show: true,
+                        title: "Restore"
+                    },
+                    saveAsImage: {
+                        show: true,
+                        title: "Save Image"
+                    }
+                }
+            },
+            calculable: true,
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            }],
+            yAxis: [{
+                type: 'value'
+            }],
+            series: getGraphs()
+        });
+    }
+
+    function getGraphs() {
+        var graphs = [];
+        for (var i = 0; i < graphSelection.length; i++) {
+            graphs[i] = {
+                name: graphSelection[i],
+                type: 'line',
+                smooth: true,
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            type: 'default'
+                        }
+                    }
+                },
+                data: pairs[graphSelection[i]]
+            }
+        }
+
+        return graphs;
+    }
+
+</script>
+<!-- /Chart.js -->
+
+<!-- bootstrap-daterangepicker -->
+<script src="js/moment/moment.min.js"></script>
+<script src="js/datepicker/daterangepicker.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        var cb = function (start, end, label) {
+            console.log(start.toISOString(), end.toISOString(), label);
+            $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+            //Reporting date to thymeleaf by manu
+            document.getElementById("from").value = start;
+            document.getElementById("to").value = end;
+            document.getElementById("graphButton").disabled = false;
+        };
+
+        var optionSet1 = {
+            startDate: moment().subtract(29, 'days'),
+            endDate: moment(),
+            minDate: '01/01/2012',
+            maxDate: '12/31/2016',
+//            dateLimit: {
+//                days: 60
+//            },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            opens: 'left',
+            buttonClasses: ['btn btn-default'],
+            applyClass: 'btn-small btn-primary',
+            cancelClass: 'btn-small',
+            format: 'MM/DD/YYYY',
+            separator: ' to ',
+            locale: {
+                applyLabel: 'Submit',
+                cancelLabel: 'Clear',
+                fromLabel: 'From',
+                toLabel: 'To',
+                customRangeLabel: 'Custom',
+                daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                firstDay: 1
+            }
+        };
+        //$('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+
+        $('#reportrange').daterangepicker(optionSet1, cb);
+        $('#reportrange').on('show.daterangepicker', function () {
+            console.log("show event fired");
+        });
+        $('#reportrange').on('hide.daterangepicker', function () {
+            console.log("hide event fired");
+        });
+        $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+            console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+        });
+        $('#reportrange').on('cancel.daterangepicker', function (ev, picker) {
+            console.log("cancel event fired");
+        });
+        $('#options1').click(function () {
+            $('#reportrange').data('daterangepicker').setOptions(optionSet1, cb);
+        });
+        $('#options2').click(function () {
+            $('#reportrange').data('daterangepicker').setOptions(optionSet2, cb);
+        });
+        $('#destroy').click(function () {
+            $('#reportrange').data('daterangepicker').remove();
+        });
+    });
+</script>
+<!-- /datepicker -->
+
+<!-- Graph Selection Script by Manu -->
+<script th:inline="javascript">
+    // Prepare all the needed variables.
+    var legend = [[${legendValues}]];
+    var tenants = [[${userIdList}]];
+    var tenantNameList = [[${tenantNameList}]];
+
+    //Trigger the function once the document is ready.
+    $(document).ready(function () {
+        loadGraphSelection();
+        loadTenantSelection();
+    });
+
+    function loadTenantSelection() {
+        for (var i = 0; i < tenants.length; i++) {
+            var value = tenants[i];
+            var name = tenantNameList[i];
+            if (i == 0)
+                $('#tenantSelection').html('<option value="' + value + '">' + name + '</option>');
+            else
+                $('#tenantSelection').append('<option value="' + value + '">' + name + '</option>');
+        }
+    }
+
+    function loadGraphSelection() {
+        for (var i = 0; i < legend.length; i++) {
+            var value = legend[i];
+            if (legend.length / 2 >= 1) {
+                var nextVal = legend[i + 1];
+                if (legend[i + 1]) {
+                    if (i == 0) {
+                        $('#graphSelection').html('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] +
+                                '</p></td><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + nextVal + '">' + legend[i + 1] + '</p></td></tr>');
+                        i++;
+                    } else
+                        $('#graphSelection').append('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] +
+                                '</p></td><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + nextVal + '">' + legend[i + 1] + '</p></td></tr>');
+                } else {
+                    if (i == 0)
+                        $('#graphSelection').html('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] + '</p></td></tr>');
+                    else
+                        $('#graphSelection').append('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] + '</p></td></tr>');
+                }
+            } else {
+                $('#graphSelection').html('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] + '</p></td></tr>');
+            }
+        }
+    }
+</script>
+<!-- / Graph Selection Script -->
+</body>
+</html>

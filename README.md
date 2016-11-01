@@ -6,65 +6,57 @@ The **Cyclops Dashboard** is one of the support services as part of CYCLOPS - A 
 ### Features
 Currently, the following features are implemented:
 
-  * [User] Authentication / Authorisation via OpenAM
-  * [User] Linking an account to OpenStack
-  * [User] Dynamically created charts for usage data
-  * [User] Dynamically created charts for rate data
-  * [User] Dynamically created charts for charge data
-  * [User] Alert Messages
-  * [User] Charts for external meters
-  * [User] View billing information and bill PDFs
-  * [Admin] Listing users and admins
-  * [Admin] Displaying list of all available meters
-  * [Admin] Configuring UDR Microservice to use different set of meters
-  * [Admin] User Management
-  * [Admin] Configure Rate Microservice
-  * [Admin] Create bills for users
-  * [Admin] Add external meters
+  * Authentication / Authorisation via Keystone
+  * Dynamically created charts for usage data
+  * Usage data over time details
+  * Dynamically created charts for charge data
+  * Charge data over time details
+  * View billing information
+  * Create bills for Tenants
+  * Cyclops with OpenStack Event Collector
+  * Cyclops with OpenStack Ceilometer Collector
+
+### Limitations
+Currently Cyclops Dashboard has the following limitations:
+
+  * No Generic Authentication / Authorisation implemented
+  * No support for Cyclops with CloudStack collector
+  * No support for Cyclops with self-developed collectors
+  * User information displayed in the landing page as well as in the bill are placeholders.
 
 ### Screenshot
-<img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard_menu.png" alt="Dashboard screenshot" height="331" width="900"></img>
+<img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard-2-overview.png" alt="Dashboard screenshot" height="331" width="900"></img>
 
 ### Download
      $ git clone https://github.com/icclab/cyclops-dashboard.git
 
 ### Installation
-Make sure you've already installed <a href="https://github.com/icclab/cyclops-udr" target="_blank">UDR</a>, <a href="https://github.com/icclab/cyclops-rc" target="_blank">RC</a> and <a href="https://github.com/icclab/cyclops-billing" target="_blank">Billing</a> microservices, as Dashboard requires the same prerequisites. If you want to run these microservices on different machines, then just install UDR's prerequisites, without deploying others again. Then continue with commands below:
+In order to install the Dashboard you will only have to run the commands bellow:
 
      $ cd cyclops-dashboard/install
      $ chmod +x ./*
 
-#### Gatekeeper
-First, will need to configure <a href="https://github.com/icclab/gatekeeper" target="_blank">Gatekeeper</a>, start with following command and **provide admin credentials** you want to use with your new Dashboard deployment.
-
-     $ bash setup_gatekeeper.sh
-
-Once Gatekeeper is fully installed and properly configured, it will automatically start listening. At any time in future, you can access it yourself via <code>auth_utils</code> command.
-
 #### Dashboard
 Then continue with Dashboard installation using following command, where you provide the same credentials as with Gatekeeper:
 
-##### For OpenStack
-     $ bash setup_for_openstack.sh
-##### For CloudStack
-     $ bash setup_for_cloudstack.sh
-
-<b>Note</b>: Currently, it's not possible to have Dashboard deployment of OpenStack and CloudStack at the same time, please select just one of them.
-
 #### Configuration
- * At the end of the installation process you will be asked for your deployment credentials and to modify any configuration parameters, **please do not ignore this step.**
- * If there is a need to update your configuration, you can find it stored here cyclops-dashboard/src/main/webapp/WEB-INF/configuration.txt
+ * Make sure you configure the Dashboard properly with the needed fields in the configuration file stored in cyclops-dashboard/conf/dashboard.conf
 
 ### Deployment
-     $ bash deploy_dashboard.sh
+To start the Dashboard simply run the following command from the root folder:
 
-In order to log in make sure Gatekeeper is running, then you can access Dashboard Web GUI over <code>http://vm-ip:8080/dashboard/app</code>
+     $ ./start.sh
+
+All the output will be stored in cyclops-dashboard/nohup.out and whenever you want to stop the Dashboard the only needed command is:
+
+	$ ./stop.sh
+
 
 ### Documentation
   Visit the <a href="https://github.com/icclab/cyclops-dashboard/wiki">Wiki</a> for detailed installation steps, how to tutorials, as well as OpenAM guide.
   
 ### Cyclops architecture
-<img align="middle" src="http://blog.zhaw.ch/icclab/files/2013/05/overall_architecture.png" alt="CYCLOPS Architecture" height="500" width="600"></img>
+<img align="middle" src="http://icclab.github.io/cyclops/assets/images/architecture/arch_new.png" alt="CYCLOPS Architecture" height="500" width="600"></img>
 
 ### Bugs and issues
   To report any bugs or issues, please use <a href="https://github.com/icclab/cyclops-dashboard/issues">Github Issues</a>

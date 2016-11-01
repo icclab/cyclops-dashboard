@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>User Bill | Cyclops</title>
+
+    <!-- Bootstrap -->
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- NProgress -->
+    <link href="../vendors/nprogress/nprogress.css" rel="stylesheet">
+
+    <!-- Custom styling plus plugins -->
+    <link href="../build/css/custom.min.css" rel="stylesheet">
+</head>
+
+<body class="nav-md">
+<form id="linkUsage" method="post" action="/usage">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+</form>
+<form id="linkCharge" method="post" action="/charge">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+</form>
+<form id="linkOverview" method="post" action="/">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+</form>
+<div class="container body">
+    <div class="main_container">
+        <div class="col-md-3 left_col">
+            <div class="left_col scroll-view">
+                <div class="navbar nav_title" style="border: 0;">
+                    <a href="javascript:void(0);" onclick="document.getElementById('linkOverview').submit();"><img src="images/logo_white.png" height="100%"></a>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <!-- menu profile quick info -->
+                <div class="profile">
+                    <div class="profile_pic">
+                        <img src="images/user.png" alt="..." class="img-circle profile_img">
+                    </div>
+                    <div class="profile_info">
+                        <span>Welcome,</span>
+                        <h2 th:text="${username}"></h2>
+                    </div>
+                </div>
+                <!-- /menu profile quick info -->
+
+                <br/>
+
+                <!-- sidebar menu -->
+                <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+                    <div class="menu_section">
+                        <h3>Usage</h3>
+                        <ul class="nav side-menu">
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();"><i class="fa fa-area-chart"></i> Usage
+                                <!--<span class="fa fa-chevron-down"></span>-->
+                            </a>
+                                <!--<ul class="nav child_menu">-->
+                                <!--&lt;!&ndash;<li><a th:href="@{/usage?username=} + ${username}">Usage Data Visualization</a></li>&ndash;&gt;-->
+                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();">Usage Data Visualization</a></li>-->
+                                <!--</ul>-->
+                            </li>
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();"><i class="fa fa-money"></i> Charge
+                                <!--<span class="fa fa-chevron-down"></span>-->
+                            </a>
+                                <!--<ul class="nav child_menu">-->
+                                <!--&lt;!&ndash;<li><a th:href="@{/charge?username=} + ${username}">Charge Data Visualization</a></li>&ndash;&gt;-->
+                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();">Charge Data Visualization</a></li>-->
+                                <!--</ul>-->
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="menu_section">
+                        <h3>Billing</h3>
+                        <ul class="nav side-menu">
+                            <li>
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkTenantSelection').submit();"><i class="fa fa-credit-card"></i> Invoice</a></li>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /sidebar menu -->
+
+                <!-- /menu footer buttons -->
+                <div class="sidebar-footer hidden-small">
+                    <a data-toggle="tooltip" data-placement="top" title="Settings">
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                        <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Lock">
+                        <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+                    </a>
+                    <a data-toggle="tooltip" data-placement="top" title="Logout">
+                        <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                    </a>
+                </div>
+                <!-- /menu footer buttons -->
+            </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav hidden-print">
+            <div class="nav_menu">
+                <nav>
+                    <div class="nav toggle">
+                        <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+                    </div>
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="">
+                            <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown"
+                               aria-expanded="false">
+                                <img src="images/user.png" alt=""><b th:text="${username}"></b>
+                                <span class=" fa fa-angle-down"></span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-usermenu pull-right">
+                                <li><a href="javascript:;"> Profile</a></li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="badge bg-red pull-right">50%</span>
+                                        <span>Settings</span>
+                                    </a>
+                                </li>
+                                <li><a href="javascript:;">Help</a></li>
+                                <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                            </ul>
+                        </li>
+
+                        <li role="presentation" class="dropdown">
+                            <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown"
+                               aria-expanded="false">
+                                <i class="fa fa-envelope-o"></i>
+                                <span class="badge bg-green">6</span>
+                            </a>
+                            <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a>
+                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <div class="text-center">
+                                        <a>
+                                            <strong>See All Alerts</strong>
+                                            <i class="fa fa-angle-right"></i>
+                                        </a>
+                                    </div>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+            <div class="">
+                <div class="page-title">
+                    <div class="title_left">
+                        <h3>Invoice
+                            <small>Some examples to get you started</small>
+                        </h3>
+                    </div>
+
+                    <div class="title_right hidden-print">
+                        <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Search for...">
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" type="button">Go!</button>
+                    </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="x_panel">
+                            <div class="x_title">
+                                <h2>Cyclops Invoice
+                                    <small>Sample user invoice design</small>
+                                </h2>
+                                <ul class="nav navbar-right panel_toolbox hidden-print">
+                                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                                    </li>
+                                    <li class="dropdown">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                                           aria-expanded="false"><i class="fa fa-wrench"></i></a>
+                                        <ul class="dropdown-menu" role="menu">
+                                            <li><a href="#">Settings 1</a>
+                                            </li>
+                                            <li><a href="#">Settings 2</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                                    </li>
+                                </ul>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="x_content">
+
+                                <section class="content invoice">
+                                    <!-- title row -->
+                                    <div class="row">
+                                        <div class="col-xs-12 invoice-header">
+                                            <h1>
+                                                <i class="fa fa-globe"></i> Invoice.
+                                                <small class="pull-right">Date: 16/08/2016</small>
+                                            </h1>
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                    <!-- info row -->
+                                    <div class="row invoice-info">
+                                        <div class="col-sm-4 invoice-col">
+                                            From
+                                            <address>
+                                                <strong>Iron Admin, Inc.</strong>
+                                                <br>795 Freedom Ave, Suite 600
+                                                <br>New York, CA 94107
+                                                <br>Phone: 1 (804) 123-9876
+                                                <br>Email: ironadmin.com
+                                            </address>
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-sm-4 invoice-col">
+                                            To
+                                            <address>
+                                                <strong>John Doe</strong>
+                                                <br>795 Freedom Ave, Suite 600
+                                                <br>New York, CA 94107
+                                                <br>Phone: 1 (804) 123-9876
+                                                <br>Email: jon@ironadmin.com
+                                            </address>
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-sm-4 invoice-col">
+                                            <b>Invoice #007612</b>
+                                            <br>
+                                            <br>
+                                            <b>Order ID:</b> 4F3S8J
+                                            <br>
+                                            <b>Payment Due:</b> 2/22/2014
+                                            <br>
+                                            <b>Account:</b> 968-34567
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+
+                                    <!-- Table row -->
+                                    <div class="row">
+                                        <div class="col-xs-12 table">
+                                            <table id="invoicesTable" class="table table-striped">
+                                                <thead>
+                                                <tr>
+                                                    <th>Account</th>
+                                                    <th>Date From</th>
+                                                    <th>Date to</th>
+                                                    <th>Projects</th>
+                                                    <th>Subtotal</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                <tr th:each="bill : ${bills}">
+                                                    <td th:text="${bill.account}">account</td>
+                                                    <td th:text="${bill.utcFrom}" style="vertical-align:center;">from
+                                                    </td>
+                                                    <td th:text="${bill.utcTo}">to</td>
+                                                    <td th:text="${tenants}">tenants</td>
+                                                    <!--<td th:text="${bill.projectNames}">projectNames</td>-->
+                                                    <td th:text="${bill.charge}" class="amount">amount</td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+
+                                    <div class="row">
+                                        <!-- accepted payments column -->
+                                        <div class="col-xs-6">
+                                            <p class="lead">Payment Methods:</p>
+                                            <img src="images/visa.png" alt="Visa">
+                                            <img src="images/mastercard.png" alt="Mastercard">
+                                            <img src="images/american-express.png" alt="American Express">
+                                            <img src="images/paypal.png" alt="Paypal">
+                                            <p class="text-muted well well-sm no-shadow" style="margin-top: 10px;">
+                                                Etsy doostang zoodles disqus groupon greplin oooj voxy zoodles, weeblyning heekya handango imeem plugg dopplr jibjab, movity jajah plickers sifteo
+                                                edmodo ifttt zimbra.
+                                            </p>
+                                        </div>
+                                        <!-- /.col -->
+                                        <div class="col-xs-6">
+                                            <p class="lead">Amount Due 2/22/2014</p>
+                                            <div class="table-responsive">
+                                                <table id="totalTable" class="table">
+                                                    <tbody>
+                                                    <tr>
+                                                        <th style="width:50%">Subtotal:</th>
+                                                        <td class="subtotal">250.30</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Tax (9.3%)</th>
+                                                        <td class="tax">10.34</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Discount:</th>
+                                                        <td class="fieldX">0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Total:</th>
+                                                        <td class="total"></td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <!-- /.col -->
+                                    </div>
+                                    <!-- /.row -->
+
+                                    <!-- this row will not appear when printing -->
+                                    <div class="row no-print hidden-print">
+                                        <div class="col-xs-12">
+                                            <button class="btn btn-default" onclick="window.print();"><i class="fa fa-print"></i> Print</button>
+                                            <button class="btn btn-success pull-right"><i class="fa fa-credit-card"></i> Submit Payment</button>
+                                            <button class="btn btn-primary pull-right" onclick="window.print();" style="margin-right: 5px;"><i class="fa fa-download"></i> Generate PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <!--<footer>-->
+            <!--<div class="pull-right">-->
+                <!--Gentelella - Bootstrap Admin Template by <a href="https://colorlib.com">Colorlib</a>-->
+            <!--</div>-->
+            <!--<div class="clearfix"></div>-->
+        <!--</footer>-->
+        <!-- /footer content -->
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="../vendors/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- FastClick -->
+<script src="../vendors/fastclick/lib/fastclick.js"></script>
+<!-- NProgress -->
+<script src="../vendors/nprogress/nprogress.js"></script>
+
+<!-- Custom Theme Scripts -->
+<script src="../build/js/custom.min.js"></script>
+
+<!-- Aggregation Script by Manu -->
+<script>
+    // Prepare all the needed variables. Obtaining html values by name with $('.name).html()
+    var total = 0;
+    var subtotal = 0;
+    var tax = parseFloat($('.tax').html());//TODO: replace, currently using a placeholder
+    var fieldX = parseFloat($('.fieldX').html());//TODO: replace, currently using a placeholder
+
+    //Trigger the function once the document is ready.
+    $(document).ready(function () {
+        //Sum all the amounts to the subtotal
+        var $dataRows = $("#invoicesTable tr.amount");
+        $('.amount').each(function () {
+            var amount = parseFloat($(this).html());
+            subtotal = subtotal + amount;
+        });
+        //Add the subtotal, taxes and whatever field we need to the total.
+        tax = subtotal * 0.093;//TODO: replace, currently using a placeholder
+        total = total + subtotal + tax + fieldX;
+
+        //Finally set the html fields that we need with the information we want.
+        $("#totalTable td.total").each(function () {
+            $(this).html(total);
+        });
+        $("#totalTable td.tax").each(function () {
+            $(this).html(tax);
+        });
+        $("#totalTable td.subtotal").each(function () {
+            $(this).html(subtotal);
+        });
+    });
+</script>
+</body>
+</html>
