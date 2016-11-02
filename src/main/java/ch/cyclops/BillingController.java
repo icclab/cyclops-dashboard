@@ -113,7 +113,7 @@ public class BillingController {
      */
     @RequestMapping(value = "/tenants", method = RequestMethod.POST)
     public String indexSubmitGet(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("selectedUser") String selectedUser, Model model) {
-        LinkedList<OpenStackUser> tenantList = getTenantList(selectedUser);
+        LinkedList<OpenStackUser> tenantList = getTenantList(selectedUser, password);
 
         model.addAttribute("tenants", tenantList);
         model.addAttribute("tenantName", selectedUser);
@@ -129,14 +129,15 @@ public class BillingController {
      * @param username
      * @return
      */
-    private LinkedList<OpenStackUser> getTenantList(String username) {
-        OSClient os = buildAuthorizedOSClient();
-        ArrayList<OpenStackTenant> tenants = getOpenStackTenants(os);
+    private LinkedList<OpenStackUser> getTenantList(String username, String password) {
+        OSClient authorizedOSClient = buildAuthorizedOSClient();
+        OSClient userOSClient = buildOSClient(username, password);
+        ArrayList<OpenStackTenant> tenants = getOpenStackTenants(userOSClient);
         LinkedList<OpenStackUser> tenantList = new LinkedList<>();
 
         for (int i = 0; i < tenants.size(); i++) {
             OpenStackTenant tenant = tenants.get(i);
-            ArrayList<OpenStackTenantUser> tenantUsers = getOpenStackTenantUserList(os, tenant);
+            ArrayList<OpenStackTenantUser> tenantUsers = getOpenStackTenantUserList(authorizedOSClient, tenant);
             for (int j = 0; j < tenantUsers.size(); j++) {
                     OpenStackTenantUser temp = tenantUsers.get(j);
                 if (temp.getName().equalsIgnoreCase(username)) {
@@ -377,7 +378,7 @@ public class BillingController {
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
         HashMap<String, HashMap<String, Double[]>> sliceMap = new HashMap<>();
         List<String> measurements = new ArrayList<>();
-        LinkedList<OpenStackUser> tenantList = getTenantList(username);
+        LinkedList<OpenStackUser> tenantList = getTenantList(username, password);
         List<String> tenantNameList = new ArrayList<>();
         HashMap<String, String> measurementCharts = new HashMap<>();
         HashMap<String, String> measurementUnits = new HashMap<>();
@@ -435,7 +436,7 @@ public class BillingController {
 //        String cdrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getCdrMeasurementsUrl();
         String cdrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getCdrDataUrl();
         List<String> measurements = new ArrayList<>();
-        LinkedList<OpenStackUser> tenantList = getTenantList(username);
+        LinkedList<OpenStackUser> tenantList = getTenantList(username, password);
         List<String> tenantNameList = new ArrayList<>();
         for (OpenStackUser user : tenantList)
             tenantNameList.add(user.getTenantName());
@@ -479,7 +480,7 @@ public class BillingController {
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
         HashMap<String, HashMap<String, Double[]>> sliceMap = new HashMap<>();
         List<String> measurements = new ArrayList<>();
-        LinkedList<OpenStackUser> tenantList = getTenantList(username);
+        LinkedList<OpenStackUser> tenantList = getTenantList(username, password);
         List<String> tenantNameList = new ArrayList<>();
         HashMap<String, String> measurementCharts = new HashMap<>();
         HashMap<String, Double> measurementCharges = new HashMap<>();
@@ -677,8 +678,8 @@ public class BillingController {
             os = OSFactory.builder()
                     .endpoint(keystoneUrl)
                     .credentials(username, password)
-                    .tenantName(keystoneTenant)
-                    .perspective(Facing.ADMIN)
+//                    .tenantName(keystoneTenant)
+//                    .perspective(Facing.ADMIN)
                     .authenticate();
         } catch (Exception e) {
             os = null;
