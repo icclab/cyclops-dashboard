@@ -56,7 +56,7 @@ All the output will be stored in cyclops-dashboard/nohup.out and whenever you wa
   Visit the <a href="https://github.com/icclab/cyclops-dashboard/wiki">Wiki</a> for detailed installation steps, how to tutorials, as well as OpenAM guide.
   
 ### Cyclops architecture
-<img align="middle" src="http://icclab.github.io/cyclops/assets/images/architecture/arch_new.png" alt="CYCLOPS Architecture" height="500" width="600"></img>
+<img align="middle" src="http://icclab.github.io/cyclops/assets/images/architecture/arch_new.png" alt="CYCLOPS Architecture" height="500" width="900"></img>
 
 ### Bugs and issues
   To report any bugs or issues, please use <a href="https://github.com/icclab/cyclops-dashboard/issues">Github Issues</a>

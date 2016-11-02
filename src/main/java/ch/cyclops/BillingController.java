@@ -162,7 +162,6 @@ public class BillingController {
             Gson gson = new Gson();
             String url = Loader.getSettings().getOpenStackCredentials().getKeystoneAdminUrl() + "/tenants/"+tenant.getId()+"/users";
 
-            Client client = new Client(Protocol.HTTP);
             ClientResource cr = new ClientResource(url);
             Request req = cr.getRequest();
 
@@ -196,7 +195,6 @@ public class BillingController {
             Gson gson = new Gson();
             String url = Loader.getSettings().getOpenStackCredentials().getKeystoneUrl() + "/tenants";
 
-            Client client = new Client(Protocol.HTTP);
             ClientResource cr = new ClientResource(url);
             Request req = cr.getRequest();
 
