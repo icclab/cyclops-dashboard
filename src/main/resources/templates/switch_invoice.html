@@ -33,6 +33,11 @@
     <input type="hidden" name="username" th:value="${username}">
     <input type="hidden" name="password" th:value="${password}">
 </form>
+<form id="linkTenantSelection" method="post" action="/tenants">
+    <input type="hidden" name="username" th:value="${username}">
+    <input type="hidden" name="password" th:value="${password}">
+    <input type="hidden" name="selectedUser" th:value="${username}">
+</form>
 <div class="container body">
     <div class="main_container">
         <div class="col-md-3 left_col">
