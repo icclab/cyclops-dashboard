@@ -22,11 +22,16 @@ import java.util.Map;
  */
 
 public class GenericChargeData {
+    private final String sourceField = "source";
     private String _class;
     private Double usage;
     private String account;
     private Double charge;
     private Map metadata;
+
+    public String getSourceField(){
+        return this.sourceField;
+    }
 
     public String get_class() {
         return _class;

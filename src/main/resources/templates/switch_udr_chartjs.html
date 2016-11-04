@@ -72,18 +72,9 @@
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();"><i class="fa fa-area-chart"></i> Usage
                                 <!--<span class="fa fa-chevron-down"></span>-->
                             </a>
-                                <!--<ul class="nav child_menu">-->
-                                <!--&lt;!&ndash;<li><a th:href="@{/usage?username=} + ${username}">Usage Data Visualization</a></li>&ndash;&gt;-->
-                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();">Usage Data Visualization</a></li>-->
-                                <!--</ul>-->
                             </li>
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();"><i class="fa fa-money"></i> Charge
-                                <!--<span class="fa fa-chevron-down"></span>-->
                             </a>
-                                <!--<ul class="nav child_menu">-->
-                                <!--&lt;!&ndash;<li><a th:href="@{/charge?username=} + ${username}">Charge Data Visualization</a></li>&ndash;&gt;-->
-                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();">Charge Data Visualization</a></li>-->
-                                <!--</ul>-->
                             </li>
                         </ul>
                     </div>
@@ -267,43 +258,12 @@
                                 <form name="graphSelection" method="post" th:action="@{/usage}">
                                     <input type="hidden" name="username" th:value="${username}">
                                     <input type="hidden" name="password" th:value="${password}">
-                                    <!--<div>-->
-                                    <!--<p>Select Measurements to display:</p>-->
-                                    <!--<br>-->
-                                    <!--<table id="graphSelection" width="100%" height="100%">-->
-                                    <!--<tbody>-->
-                                    <!--<tr>-->
-                                    <!--<td>-->
-                                    <!--<p>-->
-                                    <!--<input type="checkbox" class="flat"> Sample checkbox-->
-                                    <!--</p>-->
-                                    <!--</td>-->
-                                    <!--</tr>-->
-                                    <!--</tbody>-->
-                                    <!--</table>-->
-                                    <!--<br>-->
-                                    <!--<table>-->
-                                    <!--<tr>-->
-                                    <!--<td>-->
-                                    <!--<p>Select Tenant to display: </p>-->
-                                    <!--</td>-->
-                                    <!--</tr>-->
-                                    <!--</table>-->
-
-                                    <!--</div>-->
                                     <br><br>
                                     <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
                                         <button id="graphButton" class="btn btn-default submit" disabled>Get
                                             Selected
                                             Graphs
                                         </button>
-                                        <!--<div class="col-md-2 center-block center">-->
-                                        <!--<select name="tenant" id="tenantSelection"-->
-                                        <!--class="center-block select2_group form-control select2-hidden-accessible"-->
-                                        <!--tabindex="-1" aria-hidden="true">-->
-                                        <!--<option>Sample Option</option>-->
-                                        <!--</select>-->
-                                        <!--</div>-->
                                         <div id="reportrange" class="col-sm-4"
                                              style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
                                             <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
@@ -348,7 +308,6 @@
             </div>
         </div>
         <!-- /page content -->
-
     </div>
 </div>
 
@@ -380,219 +339,7 @@
     $(document).ready(function () {
 
         var graphSelection = [[${graphSelection}]];
-        var chartTypes = [[${measurementCharts}]];
         var units = [[${measurementUnits}]];
-        var theme = {
-            color: [
-                '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
-                '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
-            ],
-
-            title: {
-                itemGap: 8,
-                textStyle: {
-                    fontWeight: 'normal',
-                    color: '#408829'
-                }
-            },
-
-            dataRange: {
-                color: ['#1f610a', '#97b58d']
-            },
-
-            toolbox: {
-                color: ['#408829', '#408829', '#408829', '#408829']
-            },
-
-            tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                axisPointer: {
-                    type: 'line',
-                    lineStyle: {
-                        color: '#408829',
-                        type: 'dashed'
-                    },
-                    crossStyle: {
-                        color: '#408829'
-                    },
-                    shadowStyle: {
-                        color: 'rgba(200,200,200,0.3)'
-                    }
-                }
-            },
-
-            dataZoom: {
-                dataBackgroundColor: '#eee',
-                fillerColor: 'rgba(64,136,41,0.2)',
-                handleColor: '#408829'
-            },
-            grid: {
-                borderWidth: 0
-            },
-
-            categoryAxis: {
-                axisLine: {
-                    lineStyle: {
-                        color: '#408829'
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: ['#eee']
-                    }
-                }
-            },
-
-            valueAxis: {
-                axisLine: {
-                    lineStyle: {
-                        color: '#408829'
-                    }
-                },
-                splitArea: {
-                    show: true,
-                    areaStyle: {
-                        color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: ['#eee']
-                    }
-                }
-            },
-            timeline: {
-                lineStyle: {
-                    color: '#408829'
-                },
-                controlStyle: {
-                    normal: {color: '#408829'},
-                    emphasis: {color: '#408829'}
-                }
-            },
-
-            k: {
-                itemStyle: {
-                    normal: {
-                        color: '#68a54a',
-                        color0: '#a9cba2',
-                        lineStyle: {
-                            width: 1,
-                            color: '#408829',
-                            color0: '#86b379'
-                        }
-                    }
-                }
-            },
-            map: {
-                itemStyle: {
-                    normal: {
-                        areaStyle: {
-                            color: '#ddd'
-                        },
-                        label: {
-                            textStyle: {
-                                color: '#c12e34'
-                            }
-                        }
-                    },
-                    emphasis: {
-                        areaStyle: {
-                            color: '#99d2dd'
-                        },
-                        label: {
-                            textStyle: {
-                                color: '#c12e34'
-                            }
-                        }
-                    }
-                }
-            },
-            force: {
-                itemStyle: {
-                    normal: {
-                        linkStyle: {
-                            strokeColor: '#408829'
-                        }
-                    }
-                }
-            },
-            chord: {
-                padding: 4,
-                itemStyle: {
-                    normal: {
-                        lineStyle: {
-                            width: 1,
-                            color: 'rgba(128, 128, 128, 0.5)'
-                        },
-                        chordStyle: {
-                            lineStyle: {
-                                width: 1,
-                                color: 'rgba(128, 128, 128, 0.5)'
-                            }
-                        }
-                    },
-                    emphasis: {
-                        lineStyle: {
-                            width: 1,
-                            color: 'rgba(128, 128, 128, 0.5)'
-                        },
-                        chordStyle: {
-                            lineStyle: {
-                                width: 1,
-                                color: 'rgba(128, 128, 128, 0.5)'
-                            }
-                        }
-                    }
-                }
-            },
-            gauge: {
-                startAngle: 225,
-                endAngle: -45,
-                axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
-                        width: 8
-                    }
-                },
-                axisTick: {
-                    splitNumber: 10,
-                    length: 12,
-                    lineStyle: {
-                        color: 'auto'
-                    }
-                },
-                axisLabel: {
-                    textStyle: {
-                        color: 'auto'
-                    }
-                },
-                splitLine: {
-                    length: 18,
-                    lineStyle: {
-                        color: 'auto'
-                    }
-                },
-                pointer: {
-                    length: '90%',
-                    color: 'auto'
-                },
-                title: {
-                    textStyle: {
-                        color: '#333'
-                    }
-                },
-                detail: {
-                    textStyle: {
-                        color: 'auto'
-                    }
-                }
-            },
-            textStyle: {
-                fontFamily: 'Arial, Verdana, sans-serif'
-            }
-        };
 
 
         if (graphSelection) {
@@ -686,7 +433,6 @@
         for (var i = 0; i < timestamps.length; i++) {
             var date = new Date(timestamps[i] * 1000);
             dates[i] = date.toLocaleTimeString("en-us", options);
-//            dates[i] = date;
         }
         return dates;
     }
@@ -700,7 +446,6 @@
     function getGraph(measurementName) {
         var graphs = [];
         var sliceMap = [[${sliceMap}]];
-        var slices = slicePairs;
         var metadataList = Object.keys(pairs[measurementName]);
         //Create one data for each metadata in the list
         for (var o = 0; o < metadataList.length; o++) {
@@ -720,34 +465,6 @@
                     }
                 },
                 data: data
-            }
-        }
-        return graphs;
-    }
-
-    /**
-     * This Method Returns a Graph with all the Selected Measurements together.
-     *
-     * @returns {Array}
-     */
-    function getGroupGraph() {
-
-        var graphSelection = [[${graphSelection}]];
-
-        var graphs = [];
-        for (var i = 0; i < graphSelection.length; i++) {
-            graphs[i] = {
-                name: graphSelection[i],
-                type: 'line',
-                smooth: true,
-                itemStyle: {
-                    normal: {
-                        areaStyle: {
-                            type: 'default'
-                        }
-                    }
-                },
-                data: pairs[graphSelection[i]]
             }
         }
         return graphs;

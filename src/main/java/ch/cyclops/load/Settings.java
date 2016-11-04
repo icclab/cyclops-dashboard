@@ -131,7 +131,6 @@ public class Settings {
         RepresentationSettings representationSettings = new RepresentationSettings();
 
         representationSettings.setTimeSlices(Integer.parseInt(properties.getProperty("timeSlices")));
-        representationSettings.setNameField(properties.getProperty("nameField"));
 
         return representationSettings;
     }

@@ -22,12 +22,17 @@ import java.util.Map;
  */
 
 public class GenericUsageData {
+    private final String sourceField = "source";
     private String _class;
     private String account;
     private String unit;
     private Long time;
     private Double usage;
     private Map metadata;
+
+    public String getSourceField() {
+        return sourceField;
+    }
 
     public String get_class() {
         return _class;

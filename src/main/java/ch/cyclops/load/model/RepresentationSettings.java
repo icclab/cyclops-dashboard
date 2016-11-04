@@ -21,15 +21,6 @@ package ch.cyclops.load.model;
 
 public class RepresentationSettings {
     private int timeSlices;
-    private String nameField;
-
-    public String getNameField() {
-        return nameField;
-    }
-
-    public void setNameField(String nameField) {
-        this.nameField = nameField;
-    }
 
     public int getTimeSlices() {
         return timeSlices;

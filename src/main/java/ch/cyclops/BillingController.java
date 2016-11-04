@@ -87,12 +87,10 @@ public class BillingController {
 
             for (int i = 0; i < users.size(); i++) {
                 org.openstack4j.model.identity.User temp = users.get(i);
-//                if (!temp.isEnabled()) { // Not necessary on generic usecase
                 OSData test = new OSData();
                 test.id = temp.getId();
                 test.name = temp.getUsername();
                 billingUsers.add(test);
-//                }
             }
             model.addAttribute("username", username);
             model.addAttribute("password", password);
@@ -270,7 +268,6 @@ public class BillingController {
      */
     @RequestMapping(value = "/bill", method = RequestMethod.POST)
     public String generateBill(@RequestParam("tenants") String[] tenants, @RequestParam("tenantName") String tenantName, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("from") String from, @RequestParam("to") String to, Model model) {
-        //tenantName = selectedUser to bill.
         String billingUrl = Loader.getSettings().getCyclopsSettings().getBillingUrl();
         Long timeFrom = formatDate(from);
         Long timeTo = formatDate(to);
@@ -321,39 +318,6 @@ public class BillingController {
     }
 
     /**
-     * Returns to the front end the usage measurements that can be represented as graphs.
-     *
-     * @param username
-     * @param model
-     * @return
-     */
-    public String getUsagePage(String username, String password, Model model) {
-//        String udrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getUdrMeasurementsUrl();
-        String udrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getUdrDataUrl();
-        List<String> measurements = new ArrayList<>();
-        LinkedList<OpenStackUser> userList = getUserList(username);
-        List<String> userIdList = new ArrayList<>();
-        List<String> tenantNameList = new ArrayList<>();
-        for (OpenStackUser user : userList) {
-            userIdList.add(user.getUserId());
-            tenantNameList.add(user.getTenantName());
-        }
-        try {
-            APICaller.Response response = new APICaller().get(new URL(udrMeasurementsUrl));
-            measurements = response.getAsList();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        model.addAttribute("username", username);
-        model.addAttribute("password", password);
-        model.addAttribute("legendValues", measurements.toArray());
-        model.addAttribute("userIdList", userIdList);
-        model.addAttribute("tenantNameList", tenantNameList);
-
-        return "switch_udr_chartjs";
-    }
-
-    /**
      * This method obtains the graph selection and the time frame for it from the front end,
      * requests the usage information to Cyclops' back end and returns it to the front end to represent it.
      *
@@ -363,16 +327,10 @@ public class BillingController {
      */
     @RequestMapping(value = "/usage", method = RequestMethod.POST)
     public String generateUsageGraph(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String tenant, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
-        //Check if we are Redirecting from the menu
-//        if (graphSelection == null || tenant == null) {
-//            return getUsagePage(username, password, model);
-//        }
-        //Otherwise perform as expected
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
         int slices = Loader.getSettings().getRepresentationSettings().getTimeSlices();
         long sliceDuration = (long) ((double) ((timeTo - timeFrom) / slices));
-        Double[] slicesData = new Double[Loader.getSettings().getRepresentationSettings().getTimeSlices()];
         List<Long> timestamps = getTimestamps(timeFrom, slices, sliceDuration);
         HashMap<String, HashMap<String, Object>> pairs = new HashMap<>();
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
@@ -385,7 +343,6 @@ public class BillingController {
         ArrayList<String> graphSelectionValues = new ArrayList<>();
         HashMap<String, Double> totalUsage = new HashMap<>();
         String tenantId = "";
-        String nameField = Loader.getSettings().getRepresentationSettings().getNameField();
         for (OpenStackUser user : tenantList) {
             try {
                 UdrMeasurement udrMeasurement = getUdrMeasurement(user.getUserId(), timeFrom, timeTo);
@@ -399,9 +356,9 @@ public class BillingController {
                         for (UDR udr : udrMeasurement.getData()) {
                             //Iterate through every Usage Data inside the UDR and add the usage to it's place in the slices
                             for (GenericUsageData data : udr.getData()) {
-                                String resource = data.getMetadata().get(nameField).toString();
+                                String resource = (String) data.getMetadata().get(data.getSourceField());
                                 addUsageToSlicesDataHistogram(sliceMap, data, resource, udr.getTime(), timestamps, timeFrom, sliceDuration, data.get_class());
-                                fillUsageData(data, measurementUnits, timestamps, pairs, sliceMap.get(udr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalUsage, nameField, tenantId);
+                                fillUsageData(data, measurementUnits, timestamps, pairs, sliceMap.get(udr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalUsage, data.getSourceField(), tenantId);
                             }
                         }
                     }
@@ -409,8 +366,6 @@ public class BillingController {
                 System.out.print("Error while getting data from the tenant: " + e.getMessage());
             }
         }
-//        if (pairs.isEmpty())
-//            return getUsagePage(username, password, model);
         addUsageModel(model, measurementCharts, measurementUnits, pairs, sliceMap, slicePairs, timestamps, timeFrom, username, password, measurements, graphSelectionValues, tenantNameList, totalUsage);
 
 
@@ -433,7 +388,6 @@ public class BillingController {
      * @return
      */
     public String getChargePage(String username, String password, Model model) {
-//        String cdrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getCdrMeasurementsUrl();
         String cdrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getCdrDataUrl();
         List<String> measurements = new ArrayList<>();
         LinkedList<OpenStackUser> tenantList = getTenantList(username, password);
@@ -465,16 +419,10 @@ public class BillingController {
      */
     @RequestMapping(value = "/charge", method = RequestMethod.POST)
     public String generateCharge(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String tenant, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
-        //Check if we are Redirecting from the menu
-//        if (graphSelection == null || tenant == null) {
-//            return getUsagePage(username, password, model);
-//        }
-        //Otherwise perform as expected
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
         int slices = Loader.getSettings().getRepresentationSettings().getTimeSlices();
         long sliceDuration = (long) ((double) ((timeTo - timeFrom) / slices));
-        Double[] slicesData = new Double[Loader.getSettings().getRepresentationSettings().getTimeSlices()];
         List<Long> timestamps = getTimestamps(timeFrom, slices, sliceDuration);
         HashMap<String, HashMap<String, Object>> pairs = new HashMap<>();
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
@@ -487,7 +435,6 @@ public class BillingController {
         ArrayList<String> graphSelectionValues = new ArrayList<>();
         String tenantId = "";
         HashMap<String, Double> totalCharge = new HashMap<>();
-        String nameField = Loader.getSettings().getRepresentationSettings().getNameField();
         for (OpenStackUser user : tenantList) {
             try {
                 CdrMeasurement cdrMeasurement = getCdrMeasurement(user.getUserId(), timeFrom, timeTo);
@@ -500,9 +447,9 @@ public class BillingController {
                     for (CDR cdr : cdrMeasurement.getData()) {
                         //Iterate through every Charge Data inside the CDR
                         for (GenericChargeData data : cdr.getData()) {
-                            String resource = data.getMetadata().get(nameField).toString();
+                            String resource = (String) data.getMetadata().get(data.getSourceField());
                             addChargeToSlicesDataHistogram(sliceMap, data, resource, cdr.getTime(), timestamps, timeFrom, sliceDuration, data.get_class());
-                            fillChargeData(data, timestamps, pairs, sliceMap.get(cdr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalCharge, nameField, tenantId);
+                            fillChargeData(data, timestamps, pairs, sliceMap.get(cdr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalCharge, data.getSourceField(), tenantId);
                         }
                     }
                 }
@@ -510,8 +457,6 @@ public class BillingController {
                 System.out.print("Error: " + e.getMessage());
             }
         }
-//        if (pairs.isEmpty())
-//            return getChargePage(username, password, model);
         addChargeModel(model, measurementCharts, measurementCharges, pairs, sliceMap, slicePairs, timestamps, username, password, measurements, graphSelectionValues, tenantNameList, totalCharge);
 
         return "switch_cdr_chartjs_modals";
@@ -538,7 +483,6 @@ public class BillingController {
         }
         Double charge = data.getCharge();
         values.add(charge);
-//        timestamps.add(time);
 
         if (metadata != null) {
             metaHash.put(metadata.get(nameField).toString(), values);
@@ -596,30 +540,8 @@ public class BillingController {
         }
     }
 
-    private Double[] mergeArrays(Double[] array1, Double[] array2) {
-        Double[] result = new Double[Loader.getSettings().getRepresentationSettings().getTimeSlices()];
-        if (array1 != null && array2 != null)
-            for (int i = 0; i < result.length; i++) {
-                if (array1[i] != null && array2[i] != null)
-                    result[i] = array1[i] + array2[i];
-                else if (array1[i] != null && array2[i] == null)
-                    result[i] = array1[i];
-                else if (array1[i] == null && array2[i] != null)
-                    result[i] = array2[i];
-
-            }
-        else if (array1 == null) {
-            if (array2 == null)
-                return null;
-            else
-                return array2;
-        } else return array1;
-        return result;
-    }
-
     private void fillUsageData(GenericUsageData data, HashMap<String, String> measurementUnits, List<Long> timestamps, HashMap<String, HashMap<String, Object>> pairs, HashMap<String, Double[]> slicesData, HashMap<String, HashMap<String, Object>> slicePairs, HashMap<String, String> measurementCharts, ArrayList<String> graphSelectionValues, HashMap<String, Double> totalUsage, String nameField, String tenantId) {
         String pieRepresentation = "number";
-        String histogramRepresentation = "histogram";
         List<Double> values;
         HashMap<String, Object> metaHash = pairs.get(data.get_class());
         HashMap<String, Object> sliceMetaHash = slicePairs.get(data.get_class());
@@ -631,7 +553,7 @@ public class BillingController {
         //Using pie representation for all of them in the overview page
         //If the data is identified by metadata we can know who is the consumer
         if (metadata != null)
-            values = (List<Double>) metaHash.get(metadata.get(nameField).toString());
+            values = (List<Double>) metaHash.get(data.getSourceField());
         else
             values = (List<Double>) metaHash.get(tenantId);
         if (values == null) {
@@ -671,15 +593,12 @@ public class BillingController {
     private OSClient buildOSClient(String username, String password) {
         OSClient os;
         String keystoneUrl = Loader.getSettings().getOpenStackCredentials().getKeystoneUrl();
-        String keystoneTenant = Loader.getSettings().getOpenStackCredentials().getKeystoneTenant();
 
         OSFactory.enableLegacyEndpointHandling(true);
         try {
             os = OSFactory.builder()
                     .endpoint(keystoneUrl)
                     .credentials(username, password)
-//                    .tenantName(keystoneTenant)
-//                    .perspective(Facing.ADMIN)
                     .authenticate();
         } catch (Exception e) {
             os = null;
@@ -730,31 +649,6 @@ public class BillingController {
     }
 
     /**
-     * This method constructs a measurement URL
-     *
-     * @param url
-     * @param measurement
-     * @param timeFrom
-     * @param timeTo
-     * @return
-     */
-    private String constructMeasurementUrl(String url, String measurement, String tenant, long timeFrom, long timeTo) {
-        String resultUrl;
-        if (timeFrom > 0) {
-            if (timeTo > 0) {
-                resultUrl = url + measurement + "?from=" + timeFrom + "&to=" + timeTo + "&account=" + tenant;
-            } else {
-                resultUrl = url + measurement + "?from=" + timeFrom + "&account=" + tenant;
-            }
-        } else if (timeTo > 0) {
-            resultUrl = url + measurement + "?to=" + timeTo + "&account=" + tenant;
-        } else {
-            resultUrl = url + measurement + "?account=" + tenant;
-        }
-        return resultUrl;
-    }
-
-    /**
      * This method constructs a measurement URL for a specified page number
      *
      * @param url
@@ -778,23 +672,6 @@ public class BillingController {
         String url = Loader.getSettings().getCyclopsSettings().getCdrDataUrl();
         APICaller.Response response = new APICaller().get(new URL(constructMeasurementUrlForPage(url, page)));
         return (CdrMeasurement) response.getAsClass(CdrMeasurement.class);
-    }
-
-    /**
-     * this method gets the measurement data for a specified meter and tenant in a specified timeframe
-     *
-     * @param graphSelection
-     * @param tenant
-     * @param timeFrom
-     * @param timeTo
-     * @return
-     * @throws Exception
-     */
-    private UdrMeasurement getSingleMeasurement(String graphSelection, String tenant, Long timeFrom, Long timeTo) throws Exception {
-        String url = Loader.getSettings().getCyclopsSettings().getUdrDataUrl();
-        String udrMeasurementUrl = this.constructMeasurementUrl(url, graphSelection, tenant, timeFrom, timeTo);
-        APICaller.Response response = new APICaller().get(new URL(udrMeasurementUrl));
-        return (UdrMeasurement) response.getAsClass(UdrMeasurement.class);
     }
 
     private UdrMeasurement getUdrMeasurement(String tenant, Long timeFrom, Long timeTo) throws Exception {
@@ -825,19 +702,6 @@ public class BillingController {
             resultUrl = url + "?account=" + tenant;
         }
         return resultUrl;
-    }
-
-    /**
-     * This method is used to get the List of Measurements
-     *
-     * @return
-     * @throws Exception
-     */
-    private List<String> getMeasurementList() throws Exception {
-        APICaller.Response response;
-        String udrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getUdrDataUrl();
-        response = new APICaller().get(new URL(udrMeasurementsUrl));
-        return response.getAsList();
     }
 
     /**
@@ -888,23 +752,6 @@ public class BillingController {
             measurementData.put(resource, slicesData);
             sliceMap.put(measurement, measurementData);
         }
-    }
-
-    /**
-     * This method adds the usage to the values list.
-     *
-     * @param values
-     * @param data
-     * @param timestamps
-     */
-    private void addUsageToValuesPie(List<Double> values, GenericUsageData data, List<Long> timestamps) {
-        if (values == null) {
-            values = new ArrayList<>();
-        }
-        Double usage = data.getUsage();
-        Long time = data.getTime();
-        values.add(usage);
-        timestamps.add(time);
     }
 
     private long initialiseFrom(String from) {
