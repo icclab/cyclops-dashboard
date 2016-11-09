@@ -49,7 +49,7 @@ To start the Dashboard simply run the following command from the root folder:
 
 All the output will be stored in cyclops-dashboard/nohup.out and whenever you want to stop the Dashboard the only needed command is:
 
-	$ ./stop.sh
+     $ ./stop.sh
 
 
 ### Documentation

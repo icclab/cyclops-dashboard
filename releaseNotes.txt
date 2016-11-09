@@ -1,7 +1,7 @@
 Version 0.2.1
 Date 9/Nov/2016
 Notes
-1. Separation between Keystone autentication and no autentication
+1. Separation between Keystone authentication and no authentication
 2. Local bill support
 3. Documentation
 
