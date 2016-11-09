@@ -1,3 +1,12 @@
+Version 0.2.1
+Date 9/Nov/2016
+Notes
+1. Separation between Keystone autentication and no autentication
+2. Local bill support
+3. Documentation
+
+*************************************************************
+
 Version 0.2.0
 Date 1/Nov/2016
 Notes
@@ -5,7 +14,6 @@ Notes
 2. Installation Scripts
 3. Deployment Scripts
 4. Documentation
-
 
 *************************************************************
 

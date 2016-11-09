@@ -1,10 +1,7 @@
 package ch.cyclops;
 
 import ch.cyclops.load.Loader;
-import ch.cyclops.model.Cyclops.Bill;
-import ch.cyclops.model.Cyclops.CDR;
-import ch.cyclops.model.Cyclops.LocalBillRequest;
-import ch.cyclops.model.Cyclops.UDR;
+import ch.cyclops.model.Cyclops.*;
 import ch.cyclops.model.Data.CdrMeasurement;
 import ch.cyclops.model.Data.GenericChargeData;
 import ch.cyclops.model.Data.GenericUsageData;
@@ -15,15 +12,11 @@ import com.google.gson.Gson;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.api.types.Facing;
-import org.openstack4j.model.identity.Tenant;
-import org.openstack4j.model.identity.TenantUser;
 import org.openstack4j.model.identity.User;
 import org.openstack4j.openstack.OSFactory;
-import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.data.Header;
 import org.restlet.data.MediaType;
-import org.restlet.data.Protocol;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
@@ -137,7 +130,7 @@ public class BillingController {
             OpenStackTenant tenant = tenants.get(i);
             ArrayList<OpenStackTenantUser> tenantUsers = getOpenStackTenantUserList(authorizedOSClient, tenant);
             for (int j = 0; j < tenantUsers.size(); j++) {
-                    OpenStackTenantUser temp = tenantUsers.get(j);
+                OpenStackTenantUser temp = tenantUsers.get(j);
                 if (temp.getName().equalsIgnoreCase(username)) {
                     OpenStackUser test = new OpenStackUser();
                     test.setUserId(tenant.getId());
@@ -152,14 +145,15 @@ public class BillingController {
 
     /**
      * This method gets the users present in a specified tenant.
+     *
      * @param os
      * @param tenant
      * @return
      */
     private ArrayList<OpenStackTenantUser> getOpenStackTenantUserList(OSClient os, OpenStackTenant tenant) {
-        try{
+        try {
             Gson gson = new Gson();
-            String url = Loader.getSettings().getOpenStackCredentials().getKeystoneAdminUrl() + "/tenants/"+tenant.getId()+"/users";
+            String url = Loader.getSettings().getOpenStackCredentials().getKeystoneAdminUrl() + "/tenants/" + tenant.getId() + "/users";
 
             ClientResource cr = new ClientResource(url);
             Request req = cr.getRequest();
@@ -176,9 +170,9 @@ public class BillingController {
             OpenStackTenantUserListResponse response = gson.fromJson(output.getText(), OpenStackTenantUserListResponse.class);
 
             return response.getUsers();
-        }catch(Exception e) {
+        } catch (Exception e) {
             //Log
-            System.out.println("Error while getting the list of users using a tenant: "+e.getMessage());
+            System.out.println("Error while getting the list of users using a tenant: " + e.getMessage());
             return null;
         }
     }
@@ -276,26 +270,51 @@ public class BillingController {
 //        linked.add("X");
         List<Bill> list = new ArrayList();
         for (int i = 0; i < tenants.length; i++) {
-            LocalBillRequest billRequest = new LocalBillRequest(tenants[i], linked, timeFrom, timeTo);
-            try {
-                APICaller.Response response = new APICaller().post(new URL(billingUrl), billRequest);
+            if (!Loader.getSettings().getCyclopsSettings().getBillType().equals("")) {
+                //TODO: manage bill requests
+                LocalBillRequest billRequest = new LocalBillRequest(tenants[i], linked, timeFrom, timeTo);
                 try {
-                    list = response.getAsListOfType(Bill.class);
+                    APICaller.Response response = new APICaller().post(new URL(billingUrl), billRequest);
+                    try {
+                        list = response.getAsListOfType(Bill.class);
+                    } catch (Exception e) {
+                        //ignored, it's not a list
+                        Bill bill = (Bill) response.getAsClass(Bill.class);
+                        list.add(bill);
+                    }
+                    for (int o = 0; o < list.size(); o++) {
+                        Bill bill = list.get(o);
+
+                        bill.setUtcFrom(bill.getFrom());
+                        bill.setUtcTo(bill.getTo());
+                    }
+                    model.addAttribute("bills", list);
+
                 } catch (Exception e) {
-                    //ignored, it's not a list
-                    Bill bill = (Bill) response.getAsClass(Bill.class);
-                    list.add(bill);
+                    System.out.println("Error while requesting the local bill: " + e.getMessage());
                 }
-                for (int o = 0; o < list.size(); o++) {
-                    Bill bill = list.get(o);
+            } else {
+                BillRequest billRequest = new BillRequest(tenants[i], linked, timeFrom, timeTo);
+                try {
+                    APICaller.Response response = new APICaller().post(new URL(billingUrl), billRequest);
+                    try {
+                        list = response.getAsListOfType(Bill.class);
+                    } catch (Exception e) {
+                        //ignored, it's not a list
+                        Bill bill = (Bill) response.getAsClass(Bill.class);
+                        list.add(bill);
+                    }
+                    for (int o = 0; o < list.size(); o++) {
+                        Bill bill = list.get(o);
 
-                    bill.setUtcFrom(bill.getFrom());
-                    bill.setUtcTo(bill.getTo());
+                        bill.setUtcFrom(bill.getFrom());
+                        bill.setUtcTo(bill.getTo());
+                    }
+                    model.addAttribute("bills", list);
+
+                } catch (Exception e) {
+                    System.out.println("Error while requesting the bill: " + e.getMessage());
                 }
-                model.addAttribute("bills", list);
-
-            } catch (Exception e) {
-                System.out.println("Error while requesting the bill: " + e.getMessage());
             }
         }
         model.addAttribute("tenants", Arrays.asList(tenants));
