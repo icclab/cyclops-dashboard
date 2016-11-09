@@ -35,10 +35,9 @@
     <input type="hidden" name="username" th:value="${username}">
     <input type="hidden" name="password" th:value="${password}">
 </form>
-<form id="linkTenantSelection" method="post" action="/tenants">
+<form id="linkUserSelection" method="post" action="/user_bill">
     <input type="hidden" name="username" th:value="${username}">
     <input type="hidden" name="password" th:value="${password}">
-    <input type="hidden" name="selectedUser" th:value="${username}">
 </form>
 <div class="container body">
     <div class="main_container">
@@ -82,7 +81,7 @@
                         <h3>Billing</h3>
                         <ul class="nav side-menu">
                             <li>
-                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkTenantSelection').submit();"><i class="fa fa-credit-card"></i> Invoice</a></li>
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkUserSelection').submit();"><i class="fa fa-credit-card"></i> Invoice</a></li>
                             </li>
                         </ul>
                     </div>
@@ -340,7 +339,6 @@
 
         var graphSelection = [[${graphSelection}]];
         var units = [[${measurementUnits}]];
-
 
         if (graphSelection) {
             // Create a container for each Measurement depending on its chartType
@@ -1183,56 +1181,6 @@
     });
 </script>
 <!-- /datepicker -->
-
-<!-- Graph Selection Script by Manu -->
-<script th:inline="javascript">
-    // Prepare all the needed variables.
-    var legend = [[${legendValues}]];
-    var tenants = [[${userIdList}]];
-    var tenantNameList = [[${tenantNameList}]];
-
-    //Trigger the function once the document is ready.
-    $(document).ready(function () {
-        loadGraphSelection();
-        loadTenantSelection();
-    });
-
-    function loadTenantSelection() {
-        for (var i = 0; i < tenants.length; i++) {
-            var value = tenants[i];
-            var name = tenantNameList[i];
-            if (i == 0)
-                $('#tenantSelection').html('<option value="' + value + '">' + name + '</option>');
-            else
-                $('#tenantSelection').append('<option value="' + value + '">' + name + '</option>');
-        }
-    }
-
-    function loadGraphSelection() {
-        for (var i = 0; i < legend.length; i++) {
-            var value = legend[i];
-            if (legend.length / 2 >= 1) {
-                var nextVal = legend[i + 1];
-                if (legend[i + 1]) {
-                    if (i == 0) {
-                        $('#graphSelection').html('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] +
-                                '</p></td><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + nextVal + '">' + legend[i + 1] + '</p></td></tr>');
-                        i++;
-                    } else
-                        $('#graphSelection').append('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] +
-                                '</p></td><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + nextVal + '">' + legend[i + 1] + '</p></td></tr>');
-                } else {
-                    if (i == 0)
-                        $('#graphSelection').html('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] + '</p></td></tr>');
-                    else
-                        $('#graphSelection').append('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] + '</p></td></tr>');
-                }
-            } else {
-                $('#graphSelection').html('<tr><td><p><input type="checkbox" name="graphSelection" class="flat" value="' + value + '">' + legend[i] + '</p></td></tr>');
-            }
-        }
-    }
-</script>
 <!-- / Graph Selection Script -->
 </body>
 </html>

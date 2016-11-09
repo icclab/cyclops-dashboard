@@ -6,7 +6,6 @@ The **Cyclops Dashboard** is one of the support services as part of CYCLOPS - A 
 ### Features
 Currently, the following features are implemented:
 
-  * Authentication / Authorisation via Keystone
   * Dynamically created charts for usage data
   * Usage data over time details
   * Dynamically created charts for charge data
@@ -15,17 +14,17 @@ Currently, the following features are implemented:
   * Create bills for Tenants
   * Cyclops with OpenStack Event Collector
   * Cyclops with OpenStack Ceilometer Collector
+  * Cyclops with CloudStack Collector
+  * Cyclops with self-developed collectors
 
 ### Limitations
 Currently Cyclops Dashboard has the following limitations:
 
-  * No Generic Authentication / Authorisation implemented
-  * No support for Cyclops with CloudStack collector
-  * No support for Cyclops with self-developed collectors
+  * No Authentication / Authorisation implemented. Log in via the **account** specified in the usage records.
   * User information displayed in the landing page as well as in the bill are placeholders.
 
 ### Screenshot
-<img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard-2-overview.png" alt="Dashboard screenshot" height="331" width="900"></img>
+<img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard-2-overview.png" alt="Dashboard screenshot" width="800"></img>
 
 ### Download
      $ git clone https://github.com/icclab/cyclops-dashboard.git
@@ -49,14 +48,14 @@ To start the Dashboard simply run the following command from the root folder:
 
 All the output will be stored in cyclops-dashboard/nohup.out and whenever you want to stop the Dashboard the only needed command is:
 
-	$ ./stop.sh
+     $ ./stop.sh
 
 
 ### Documentation
-  Visit the <a href="https://github.com/icclab/cyclops-dashboard/wiki">Wiki</a> for detailed installation steps, how to tutorials, as well as OpenAM guide.
+  Visit the <a href="https://github.com/icclab/cyclops-dashboard/wiki">Wiki</a> for detailed installation steps.
   
 ### Cyclops architecture
-<img align="middle" src="http://icclab.github.io/cyclops/assets/images/architecture/arch_new.png" alt="CYCLOPS Architecture" height="500" width="900"></img>
+<img align="middle" src="http://icclab.github.io/cyclops/assets/images/architecture/arch_new.png" alt="CYCLOPS Architecture" width="800"></img>
 
 ### Bugs and issues
   To report any bugs or issues, please use <a href="https://github.com/icclab/cyclops-dashboard/issues">Github Issues</a>

@@ -1,10 +1,7 @@
 package ch.cyclops;
 
 import ch.cyclops.load.Loader;
-import ch.cyclops.model.Cyclops.Bill;
-import ch.cyclops.model.Cyclops.CDR;
-import ch.cyclops.model.Cyclops.LocalBillRequest;
-import ch.cyclops.model.Cyclops.UDR;
+import ch.cyclops.model.Cyclops.*;
 import ch.cyclops.model.Data.CdrMeasurement;
 import ch.cyclops.model.Data.GenericChargeData;
 import ch.cyclops.model.Data.GenericUsageData;
@@ -15,15 +12,11 @@ import com.google.gson.Gson;
 import org.openstack4j.api.OSClient;
 import org.openstack4j.api.exceptions.AuthenticationException;
 import org.openstack4j.api.types.Facing;
-import org.openstack4j.model.identity.Tenant;
-import org.openstack4j.model.identity.TenantUser;
 import org.openstack4j.model.identity.User;
 import org.openstack4j.openstack.OSFactory;
-import org.restlet.Client;
 import org.restlet.Request;
 import org.restlet.data.Header;
 import org.restlet.data.MediaType;
-import org.restlet.data.Protocol;
 import org.restlet.engine.header.HeaderConstants;
 import org.restlet.representation.Representation;
 import org.restlet.resource.ClientResource;
@@ -122,6 +115,22 @@ public class BillingController {
     }
 
     /**
+     * Requests and returns the Tenants where the selected user
+     *
+     * @param username
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/user_bill", method = RequestMethod.POST)
+    public String getUserBilling(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
+
+        model.addAttribute("username", username);
+        model.addAttribute("password", password);
+
+        return "users_billing";
+    }
+
+    /**
      * This method gets the Tenant list for a Specified Username
      *
      * @param username
@@ -137,7 +146,7 @@ public class BillingController {
             OpenStackTenant tenant = tenants.get(i);
             ArrayList<OpenStackTenantUser> tenantUsers = getOpenStackTenantUserList(authorizedOSClient, tenant);
             for (int j = 0; j < tenantUsers.size(); j++) {
-                    OpenStackTenantUser temp = tenantUsers.get(j);
+                OpenStackTenantUser temp = tenantUsers.get(j);
                 if (temp.getName().equalsIgnoreCase(username)) {
                     OpenStackUser test = new OpenStackUser();
                     test.setUserId(tenant.getId());
@@ -152,14 +161,15 @@ public class BillingController {
 
     /**
      * This method gets the users present in a specified tenant.
+     *
      * @param os
      * @param tenant
      * @return
      */
     private ArrayList<OpenStackTenantUser> getOpenStackTenantUserList(OSClient os, OpenStackTenant tenant) {
-        try{
+        try {
             Gson gson = new Gson();
-            String url = Loader.getSettings().getOpenStackCredentials().getKeystoneAdminUrl() + "/tenants/"+tenant.getId()+"/users";
+            String url = Loader.getSettings().getOpenStackCredentials().getKeystoneAdminUrl() + "/tenants/" + tenant.getId() + "/users";
 
             ClientResource cr = new ClientResource(url);
             Request req = cr.getRequest();
@@ -176,9 +186,9 @@ public class BillingController {
             OpenStackTenantUserListResponse response = gson.fromJson(output.getText(), OpenStackTenantUserListResponse.class);
 
             return response.getUsers();
-        }catch(Exception e) {
+        } catch (Exception e) {
             //Log
-            System.out.println("Error while getting the list of users using a tenant: "+e.getMessage());
+            System.out.println("Error while getting the list of users using a tenant: " + e.getMessage());
             return null;
         }
     }
@@ -258,8 +268,9 @@ public class BillingController {
 
     /**
      * This method requests billing information for a user and a specified time range to Cyclops' back end and responds with the
+     * <p>
+     * //     * @param tenants
      *
-     * @param tenants
      * @param username
      * @param from
      * @param to
@@ -267,16 +278,40 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/bill", method = RequestMethod.POST)
-    public String generateBill(@RequestParam("tenants") String[] tenants, @RequestParam("tenantName") String tenantName, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("from") String from, @RequestParam("to") String to, Model model) {
+    public String generateBill(@RequestParam("selectedUser") String userId, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
         String billingUrl = Loader.getSettings().getCyclopsSettings().getBillingUrl();
-        Long timeFrom = formatDate(from);
-        Long timeTo = formatDate(to);
+        Long timeFrom = initialiseFrom(from);
+        Long timeTo = initialiseTo(to);
         ArrayList<String> linked = new ArrayList<>();
         //TODO: add linked accounts
 //        linked.add("X");
         List<Bill> list = new ArrayList();
-        for (int i = 0; i < tenants.length; i++) {
-            LocalBillRequest billRequest = new LocalBillRequest(tenants[i], linked, timeFrom, timeTo);
+
+        if (!Loader.getSettings().getCyclopsSettings().getBillType().equals("")) {
+            //TODO: manage bill requests
+            LocalBillRequest billRequest = new LocalBillRequest(userId, linked, timeFrom, timeTo);
+            try {
+                APICaller.Response response = new APICaller().post(new URL(billingUrl), billRequest);
+                try {
+                    list = response.getAsListOfType(Bill.class);
+                } catch (Exception e) {
+                    //ignored, it's not a list
+                    Bill bill = (Bill) response.getAsClass(Bill.class);
+                    list.add(bill);
+                }
+                for (int o = 0; o < list.size(); o++) {
+                    Bill bill = list.get(o);
+
+                    bill.setUtcFrom(bill.getFrom());
+                    bill.setUtcTo(bill.getTo());
+                }
+                model.addAttribute("bills", list);
+
+            } catch (Exception e) {
+                System.out.println("Error while requesting the local bill: " + e.getMessage());
+            }
+        } else {
+            BillRequest billRequest = new BillRequest(userId, linked, timeFrom, timeTo);
             try {
                 APICaller.Response response = new APICaller().post(new URL(billingUrl), billRequest);
                 try {
@@ -298,8 +333,17 @@ public class BillingController {
                 System.out.println("Error while requesting the bill: " + e.getMessage());
             }
         }
-        model.addAttribute("tenants", Arrays.asList(tenants));
-        model.addAttribute("tenantName", tenantName);
+        for (int o = 0; o < list.size(); o++) {
+            Bill bill = list.get(o);
+
+            bill.setUtcFrom(bill.getFrom());
+            bill.setUtcTo(bill.getTo());
+        }
+        model.addAttribute("bills", list);
+
+
+        model.addAttribute("tenants", username);
+        model.addAttribute("userId", userId);
         model.addAttribute("username", username);
         model.addAttribute("password", password);
 
@@ -336,38 +380,36 @@ public class BillingController {
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
         HashMap<String, HashMap<String, Double[]>> sliceMap = new HashMap<>();
         List<String> measurements = new ArrayList<>();
-        LinkedList<OpenStackUser> tenantList = getTenantList(username, password);
         List<String> tenantNameList = new ArrayList<>();
         HashMap<String, String> measurementCharts = new HashMap<>();
         HashMap<String, String> measurementUnits = new HashMap<>();
         ArrayList<String> graphSelectionValues = new ArrayList<>();
         HashMap<String, Double> totalUsage = new HashMap<>();
-        String tenantId = "";
-        for (OpenStackUser user : tenantList) {
-            try {
-                UdrMeasurement udrMeasurement = getUdrMeasurement(user.getUserId(), timeFrom, timeTo);
-                //Iterate trhough all the pages
-                if (udrMeasurement.getPageNumber() != null)
-                    for (int page = udrMeasurement.getPageNumber(); page < ((float) udrMeasurement.getTotalRecords() / (float) udrMeasurement.getPageSize()); page++) {
-                        if (page > 0) {
-                            udrMeasurement = getUdrMeasurementForPage(page);
-                        }
-                        //Iterate through every UDR
-                        for (UDR udr : udrMeasurement.getData()) {
-                            //Iterate through every Usage Data inside the UDR and add the usage to it's place in the slices
-                            for (GenericUsageData data : udr.getData()) {
-                                String resource = (String) data.getMetadata().get(data.getSourceField());
-                                addUsageToSlicesDataHistogram(sliceMap, data, resource, udr.getTime(), timestamps, timeFrom, sliceDuration, data.get_class());
-                                fillUsageData(data, measurementUnits, timestamps, pairs, sliceMap.get(udr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalUsage, data.getSourceField(), tenantId);
-                            }
+        String tenantId = username;
+
+        try {
+            UdrMeasurement udrMeasurement = getUdrMeasurement(tenantId, timeFrom, timeTo);
+            //Iterate trhough all the pages
+            if (udrMeasurement.getPageNumber() != null)
+                for (int page = udrMeasurement.getPageNumber(); page < ((float) udrMeasurement.getTotalRecords() / (float) udrMeasurement.getPageSize()); page++) {
+                    if (page > 0) {
+                        udrMeasurement = getUdrMeasurementForPage(page);
+                    }
+                    //Iterate through every UDR
+                    for (UDR udr : udrMeasurement.getData()) {
+                        //Iterate through every Usage Data inside the UDR and add the usage to it's place in the slices
+                        for (GenericUsageData data : udr.getData()) {
+                            String source = (String) data.getMetadata().get(data.getSourceField());
+                            addUsageToSlicesDataHistogram(sliceMap, data, source, udr.getTime(), timestamps, timeFrom, sliceDuration, data.get_class());
+                            fillUsageData(data, measurementUnits, timestamps, pairs, sliceMap.get(udr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalUsage, data.getSourceField(), tenantId);
+
                         }
                     }
-            } catch (Exception e) {
-                System.out.print("Error while getting data from the tenant: " + e.getMessage());
-            }
+                }
+        } catch (Exception e) {
+            System.out.print("Error while getting data from the tenant: " + e.getMessage());
         }
         addUsageModel(model, measurementCharts, measurementUnits, pairs, sliceMap, slicePairs, timestamps, timeFrom, username, password, measurements, graphSelectionValues, tenantNameList, totalUsage);
-
 
         return "switch_udr_chartjs";
     }
@@ -378,34 +420,6 @@ public class BillingController {
             timestamps.add(timeFrom + i * sliceDuration);
         }
         return timestamps;
-    }
-
-    /**
-     * Returns to the front end the charge measurements that can be represented as graphs.
-     *
-     * @param username
-     * @param model
-     * @return
-     */
-    public String getChargePage(String username, String password, Model model) {
-        String cdrMeasurementsUrl = Loader.getSettings().getCyclopsSettings().getCdrDataUrl();
-        List<String> measurements = new ArrayList<>();
-        LinkedList<OpenStackUser> tenantList = getTenantList(username, password);
-        List<String> tenantNameList = new ArrayList<>();
-        for (OpenStackUser user : tenantList)
-            tenantNameList.add(user.getTenantName());
-        try {
-            APICaller.Response response = new APICaller().get(new URL(cdrMeasurementsUrl));
-            measurements = response.getAsList();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-        model.addAttribute("username", username);
-        model.addAttribute("password", password);
-        model.addAttribute("legendValues", measurements.toArray());
-        model.addAttribute("tenantList", tenantNameList);
-
-        return "switch_cdr_chartjs";
     }
 
     /**
@@ -428,34 +442,32 @@ public class BillingController {
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
         HashMap<String, HashMap<String, Double[]>> sliceMap = new HashMap<>();
         List<String> measurements = new ArrayList<>();
-        LinkedList<OpenStackUser> tenantList = getTenantList(username, password);
         List<String> tenantNameList = new ArrayList<>();
         HashMap<String, String> measurementCharts = new HashMap<>();
         HashMap<String, Double> measurementCharges = new HashMap<>();
         ArrayList<String> graphSelectionValues = new ArrayList<>();
-        String tenantId = "";
+        String tenantId = username;
         HashMap<String, Double> totalCharge = new HashMap<>();
-        for (OpenStackUser user : tenantList) {
-            try {
-                CdrMeasurement cdrMeasurement = getCdrMeasurement(user.getUserId(), timeFrom, timeTo);
-                //Iterate trough all the pages
-                for (int page = cdrMeasurement.getPageNumber(); page < ((float) cdrMeasurement.getTotalRecords() / (float) cdrMeasurement.getPageSize()); page++) {
-                    if (page > 0) {
-                        cdrMeasurement = getCdrMeasurementForPage(page);
-                    }
-                    //Iterate through every CDR
-                    for (CDR cdr : cdrMeasurement.getData()) {
-                        //Iterate through every Charge Data inside the CDR
-                        for (GenericChargeData data : cdr.getData()) {
-                            String resource = (String) data.getMetadata().get(data.getSourceField());
-                            addChargeToSlicesDataHistogram(sliceMap, data, resource, cdr.getTime(), timestamps, timeFrom, sliceDuration, data.get_class());
-                            fillChargeData(data, timestamps, pairs, sliceMap.get(cdr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalCharge, data.getSourceField(), tenantId);
-                        }
+        try {
+            CdrMeasurement cdrMeasurement = getCdrMeasurement(tenantId, timeFrom, timeTo);
+            //Iterate trough all the pages
+            for (int page = cdrMeasurement.getPageNumber(); page < ((float) cdrMeasurement.getTotalRecords() / (float) cdrMeasurement.getPageSize()); page++) {
+                if (page > 0) {
+                    cdrMeasurement = getCdrMeasurementForPage(page);
+                }
+                //Iterate through every CDR
+                for (CDR cdr : cdrMeasurement.getData()) {
+                    //Iterate through every Charge Data inside the CDR
+                    for (GenericChargeData data : cdr.getData()) {
+                        String resource = (String) data.getMetadata().get(data.getSourceField());
+                        addChargeToSlicesDataHistogram(sliceMap, data, resource, cdr.getTime(), timestamps, timeFrom, sliceDuration, data.get_class());
+                        fillChargeData(data, timestamps, pairs, sliceMap.get(cdr.get_class()), slicePairs, measurementCharts, graphSelectionValues, totalCharge, data.getSourceField(), tenantId);
+
                     }
                 }
-            } catch (Exception e) {
-                System.out.print("Error: " + e.getMessage());
             }
+        } catch (Exception e) {
+            System.out.print("Error: " + e.getMessage());
         }
         addChargeModel(model, measurementCharts, measurementCharges, pairs, sliceMap, slicePairs, timestamps, username, password, measurements, graphSelectionValues, tenantNameList, totalCharge);
 

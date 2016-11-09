@@ -23,6 +23,15 @@ public class CyclopsSettings {
     private String udrDataUrl;
     private String billingUrl;
     private String cdrDataUrl;
+    private String billType;
+
+    public String getBillType() {
+        return billType;
+    }
+
+    public void setBillType(String billType) {
+        this.billType = billType;
+    }
 
     public String getCdrDataUrl() {
         return cdrDataUrl;

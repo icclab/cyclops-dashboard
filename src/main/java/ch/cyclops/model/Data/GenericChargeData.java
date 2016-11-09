@@ -29,8 +29,8 @@ public class GenericChargeData {
     private Double charge;
     private Map metadata;
 
-    public String getSourceField(){
-        return this.sourceField;
+    public String getSourceField() {
+        return sourceField;
     }
 
     public String get_class() {

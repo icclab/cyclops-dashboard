@@ -73,18 +73,9 @@
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();"><i class="fa fa-area-chart"></i> Usage
                                 <!--<span class="fa fa-chevron-down"></span>-->
                             </a>
-                                <!--<ul class="nav child_menu">-->
-                                <!--&lt;!&ndash;<li><a th:href="@{/usage?username=} + ${username}">Usage Data Visualization</a></li>&ndash;&gt;-->
-                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();">Usage Data Visualization</a></li>-->
-                                <!--</ul>-->
                             </li>
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();"><i class="fa fa-money"></i> Charge
-                                <!--<span class="fa fa-chevron-down"></span>-->
                             </a>
-                                <!--<ul class="nav child_menu">-->
-                                <!--&lt;!&ndash;<li><a th:href="@{/charge?username=} + ${username}">Charge Data Visualization</a></li>&ndash;&gt;-->
-                                <!--<li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();">Charge Data Visualization</a></li>-->
-                                <!--</ul>-->
                             </li>
                         </ul>
                     </div>
@@ -274,7 +265,6 @@
                                 <table id="datatable" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
-                                        <!--<th>User ID</th>-->
                                         <th>Tenant Name</th>
                                         <th>Tenant ID</th>
                                         <th>Select this tenant</th>
@@ -283,7 +273,6 @@
                                     <tbody>
                                     <form method="post" action="/bill">
                                         <tr th:each="tenant : ${tenants}">
-                                            <!--<td th:text="${tenant.userName}">userId</td>-->
                                             <td th:text="${tenant.tenantName}" vertical-align="center">tenantName</td>
                                             <td th:text="${tenant.userId}" style="vertical-align:center;">tenantId</td>
                                             <!--TODO: Change the tenant.userName and only send the names that has been selected.-->

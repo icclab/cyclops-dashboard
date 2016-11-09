@@ -104,6 +104,7 @@ public class Settings {
         cyclopsSettings.setBillingUrl(properties.getProperty("billingUrl"));
         cyclopsSettings.setUdrDataUrl(properties.getProperty("udrDataUrl"));
         cyclopsSettings.setCdrDataUrl(properties.getProperty("cdrDataUrl"));
+        cyclopsSettings.setBillType(properties.getProperty("billType"));
 
         return cyclopsSettings;
     }
