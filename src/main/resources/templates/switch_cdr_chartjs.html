@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Usage Data Record Charts | Cyclops</title>
+    <title>Charge Data Record Charts | Cyclops</title>
 
     <!-- Bootstrap -->
     <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -64,7 +64,6 @@
                         <h3>Usage</h3>
                         <ul class="nav side-menu">
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();"><i class="fa fa-area-chart"></i> Usage
-                                <!--<span class="fa fa-chevron-down"></span>-->
                             </a>
                             </li>
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();"><i class="fa fa-money"></i> Charge
@@ -126,7 +125,7 @@
                                     </a>
                                 </li>
                                 <li><a href="javascript:;">Help</a></li>
-                                <li><a  href="javascript:void(0)" onclick="document.getElementById('linkLogout').submit();" ><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                <li><a href="javascript:void(0);" onclick="document.getElementById('linkLogout').submit();"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -140,8 +139,8 @@
             <div class="">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3>Usage Charts
-                            <small>Usage data representation</small>
+                        <h3>Charge Charts
+                            <small>Charge data representation</small>
                         </h3>
                     </div>
 
@@ -182,24 +181,32 @@
                                 </ul>
                                 <div class="clearfix"></div>
                             </div>
-                            <div class="x_content"> <!--style="display: none">-->
-                                <form name="graphSelection" method="post" th:action="@{/usage}">
-                                    <br><br>
-                                    <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
-                                        <button id="graphButton" class="btn btn-default submit" disabled>Get
-                                            Selected
-                                            Graphs
-                                        </button>
-                                        <div id="reportrange" class="col-sm-4"
-                                             style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
-                                            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
-                                            <span>Select a Date Range</span> <b class="caret"></b>
-                                            <input type="hidden" id="from" name="from">
-                                            <input type="hidden" id="to" name="to">
-                                        </div>
-
-                                    </div>
-                                </form>
+                            <div class="x_content"><!-- style="display: none">-->
+                                <table style="width:100%">
+                                    <tr width="50%">
+                                        <td class="globalTable">
+                                            <form name="graphSelection" method="post" th:action="@{/charge}">
+                                                <br><br>
+                                                <div>
+                                                    <div id="reportrange" class="col-sm-6"
+                                                         style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                                        <span>Select a Date Range</span> <b class="caret"></b>
+                                                        <input type="hidden" id="from" name="from">
+                                                        <input type="hidden" id="to" name="to">
+                                                    </div>
+                                                    <button id="graphButton" class="btn btn-default submit" disabled>Get
+                                                        Selected
+                                                        Graphs
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                        <td width="50%">
+                                            <div id="generalCharge"></div>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -214,6 +221,7 @@
                 <div class="row">
                 </div>
             </div>
+            <div id="modalContainer"></div>
             <div class="modal fade" id="modChart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -249,7 +257,6 @@
                 </div>
             </div>
         </div>
-        <!-- /page content -->
     </div>
 </div>
 
@@ -273,6 +280,10 @@
 <script src="../vendors/echarts/dist/echarts.js"></script>
 <script src="../vendors/echarts/map/js/world.js"></script>
 
+<!-- bootstrap-progressbar -->
+<script src="../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+
+
 <script th:inline="javascript">
 
     /** Creates and configures the graphs coming from the graph selection.
@@ -281,24 +292,31 @@
     $(document).ready(function () {
 
         var graphSelection = [[${graphSelection}]];
+        var totalCharge = [[${totalCharge}]];
+        var total = 0;
+        for (var i = 0; i < totalCharge.length; i++) {
+            total = total + totalCharge[i];
+        }
+
+        createGeneralChart();
 
         if (graphSelection) {
             // Create a container for each Measurement depending on its chartType
             for (var i = 0; i < graphSelection.length; i++) {
                 //The chartType parameter is a pie/doughnut chart
                 var measurement = graphSelection[i];
-                var units = [[${measurementUnits}]];
                 var pieData = getPieData(graphSelection[i]);
                 var pieColors = getStandardColors(pieData.length);
                 var pieLabels = getPieLabels(graphSelection[i]);
-                var totalUsage = [[${totalUsage}]];
+                var totalCharge = [[${totalCharge}]];
                 var pieLegendHtml = "";
-                var meterUnit = units[measurement];
                 for (var o = 0; o < pieLabels.length; o++) {
                     var label = pieLabels[o];
                     pieLegendHtml = pieLegendHtml + '<tr><td><a href="#" data-toggle="modal" data-target="#singleChart" data-filter="' + label + '"  data-source=' + measurement + '><i style="background-color: ' + pieColors[o] + '">&nbsp;&nbsp;&nbsp;&nbsp;</i>&nbsp;' + label + '</a></td></tr>'
                 }
-                $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>' + measurement + '</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Usage: ' + totalUsage[measurement] + ' ' + meterUnit + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="pie' + i + '"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + i + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table><div class="x_content"><button type="button" class="btn btn-default" data-placement="right" title="Details" data-toggle="modal" data-target="#modChart" data-source=' + measurement + '><span><i class="fa fa-bar-chart"></span></i></button></div></div></div> </div>');
+
+                $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>' + measurement + '</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Charge: ' + Math.round(totalCharge[measurement] * 100) / 100 + ' CHF' + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="pie' + i + '"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + i + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table><div class="x_content"><button type="button" class="btn btn-default" data-placement="right" title="Details"  data-toggle="modal" data-target="#modChart" data-source=' + measurement + '><span><i class="fa fa-bar-chart"></span></i></button></div></div></div></div>');
+
                 var pieChart = document.getElementById('pie' + i);
                 if (pieChart) {
                     var options = {
@@ -324,45 +342,51 @@
         }
     });
 
+    function createGeneralChart() {
 
-    /**
-     * This Method Returns an Individual Graph for a Specified Measurement and a Specified Consumer
-     *
-     * @param measurementName, consumer
-     * @returns {{name: *, type: string, smooth: boolean, itemStyle: {normal: {areaStyle: {type: string}}}, data: *}|*}
-     */
-    function getGraphForConsumer(measurementName, consumer) {
-        var graph;
-        var sliceMap = [[${sliceMap}]];
-        var metadataList = Object.keys(pairs[measurementName]);
-        //Create one data for each metadata in the list
-        for (var o = 0; o < metadataList.length; o++) {
-            if (metadataList[o] == consumer) {
-                var meterData = sliceMap[measurementName];
-                var data = meterData[metadataList[o]];
-                if (data != undefined) {
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i] == null)
-                            data[i] = undefined;
-                        graph = {
-                            name: consumer,
-                            type: 'bar',
-                            smooth: true,
-                            itemStyle: {
-                                normal: {
-                                    areaStyle: {
-                                        type: 'default'
-                                    }
-                                }
-                            },
-                            data: data
-                        }
-                    }
-                }
-                break;
+        var totalCharge = [[${totalCharge}]];
+        var total = 0;
+        var generalColors = getStandardColors(graphSelection.length);
+        var keys = Object.keys(graphSelection);
+        var measurements = [];
+        var pieData = [];
+        var pieLegendHtml = "";
+
+        if (totalCharge) {
+            for (var i = 0; i < keys.length; i++) {
+                measurements[i] = graphSelection[keys[i]];
             }
+            for (var i = 0; i < measurements.length; i++) {
+                pieData[i] = totalCharge[measurements[i]];
+                total = total + pieData[i];
+            }
+            for (var o = 0; o < measurements.length; o++) {
+                pieLegendHtml = pieLegendHtml + '<tr><td><p><i style="background-color: ' + generalColors[o] + '">&nbsp;&nbsp;&nbsp;&nbsp;</i>&nbsp;' + measurements[o] + ' </p></td></tr>'
+            }
+//            $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>General Charge</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Charge: ' + Math.round(total * 100)/100 + ' CHF' + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="generalPie"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + 0 + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table></div></div></div>');
+            $('#generalCharge').append('<div class="x_content"><table><tr><th><p>' + 'Total Charge: ' + Math.round(total * 100) / 100 + ' CHF' + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="generalPie"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + 0 + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table></div>');
         }
-        return graph;
+        var pieChart = document.getElementById('generalPie');
+        if (pieChart) {
+            var options = {
+                legend: false,
+                responsive: false
+            };
+
+            new Chart(pieChart, {
+                type: 'doughnut',
+                tooltipFillColor: "rgba(51, 51, 51, 0.55)",
+                data: {
+                    labels: measurements,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: generalColors,
+                        hoverBackgroundColor: generalColors
+                    }]
+                },
+                options: options
+            });
+        }
     }
 
     function getPieLabels(measurementName) {
@@ -466,6 +490,46 @@
             }
         }
         return graphs;
+    }
+
+    /**
+     * This Method Returns an Individual Graph for a Specified Measurement and a Specified Consumer
+     *
+     * @param measurementName, consumer
+     * @returns {{name: *, type: string, smooth: boolean, itemStyle: {normal: {areaStyle: {type: string}}}, data: *}|*}
+     */
+    function getGraphForConsumer(measurementName, consumer) {
+        var graph;
+        var sliceMap = [[${sliceMap}]];
+        var metadataList = Object.keys(pairs[measurementName]);
+        //Create one data for each metadata in the list
+        for (var o = 0; o < metadataList.length; o++) {
+            if (metadataList[o] == consumer) {
+                var meterData = sliceMap[measurementName];
+                var data = meterData[metadataList[o]];
+                if (data != undefined) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i] == null)
+                            data[i] = undefined;
+                        graph = {
+                            name: consumer,
+                            type: 'bar',
+                            smooth: true,
+                            itemStyle: {
+                                normal: {
+                                    areaStyle: {
+                                        type: 'default'
+                                    }
+                                }
+                            },
+                            data: data
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        return graph;
     }
 
     /**
@@ -709,12 +773,9 @@
     };
 
     // Variables added by Manu
-    var username = [[${username}]];
     var legend = [[${legendValues}]];
     var pairs = [[${pairs}]];
-    var slicePairs = [[${slicePairs}]];
     var graphSelection = [[${graphSelection}]];
-    var metadataTest = Object.keys(pairs[graphSelection[0]]);
 
     // ECHART LINE CONF
     var echart = document.getElementById('echart_line');
@@ -770,6 +831,58 @@
         });
     }
 
+    var single_echart = document.getElementById('single_echart_line');
+    if (single_echart) {
+        var echartLine = echarts.init(document.getElementById('single_echart_line'), theme);
+
+        echartLine.setOption({
+            title: {
+                text: 'Line Graph',
+                subtext: 'Subtitle'
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                x: 220,
+                y: 40,
+                data: legend
+            },
+            toolbox: {
+                show: true,
+                feature: {
+                    magicType: {
+                        show: true,
+                        title: {
+                            line: 'Line',
+                            bar: 'Bar',
+                            stack: 'Stack',
+                            tiled: 'Tiled'
+                        },
+                        type: ['line', 'bar', 'stack', 'tiled']
+                    },
+                    restore: {
+                        show: true,
+                        title: "Restore"
+                    },
+                    saveAsImage: {
+                        show: true,
+                        title: "Save Image"
+                    }
+                }
+            },
+            calculable: true,
+            xAxis: [{
+                type: 'category',
+                boundaryGap: false,
+                data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+            }],
+            yAxis: [{
+                type: 'value'
+            }],
+            series: getGraphs()
+        });
+    }
     function getGraphs() {
         var graphs = [];
         for (var i = 0; i < graphSelection.length; i++) {
@@ -793,11 +906,10 @@
 
 </script>
 <!-- /Chart.js -->
-
 <!-- bootstrap-daterangepicker -->
 <script src="js/moment/moment.min.js"></script>
 <script src="js/datepicker/daterangepicker.js"></script>
-
+<!-- Get date function -->
 <script type="text/javascript">
     $(document).ready(function () {
 
@@ -1179,6 +1291,7 @@
         $(this).data('bs.modal', null);
     });
 </script>
+
 <script th:inline="javascript">
     $('#singleChart').on('shown.bs.modal', function (event) {
         var legend = [[${legendValues}]];
@@ -1188,7 +1301,7 @@
         var source = link.attr('data-source');
         var filter = link.attr('data-filter');
         // get title
-        var title = source + ' usage for VM "' + filter + '"';
+        var title = source + ' charge for VM "' + filter + '"';
         // get labels
         var table = link.parents('table');
         var labels = [];
@@ -1481,6 +1594,5 @@
         $(this).data('bs.modal', null);
     });
 </script>
-<!-- / Graph Selection Script -->
 </body>
 </html>

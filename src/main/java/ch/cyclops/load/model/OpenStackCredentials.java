@@ -25,6 +25,15 @@ public class OpenStackCredentials {
     private String keystoneAccount;
     private String keystonePassword;
     private String keystoneTenant;
+    private String keystoneAdminRole;
+
+    public String getKeystoneAdminRole() {
+        return keystoneAdminRole;
+    }
+
+    public void setKeystoneAdminRole(String keystoneAdminRole) {
+        this.keystoneAdminRole = keystoneAdminRole;
+    }
 
     public String getKeystoneAdminUrl() {
         return keystoneAdminUrl;

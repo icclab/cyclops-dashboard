@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Usage Data Record Charts | Cyclops</title>
+    <title>Charge Data Record Charts | Cyclops</title>
 
     <!-- Bootstrap -->
     <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -28,9 +28,6 @@
 <form id="linkCharge" method="post" action="/charge">
 </form>
 <form id="linkOverview" method="post" action="/">
-</form>
-<form id="linkTenantSelection" method="post" action="/tenants">
-    <input type="hidden" name="selectedUser" th:value="${username}">
 </form>
 <form id="linkLogout" method="post" action="/logout">
 </form>
@@ -64,19 +61,10 @@
                         <h3>Usage</h3>
                         <ul class="nav side-menu">
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkUsage').submit();"><i class="fa fa-area-chart"></i> Usage
-                                <!--<span class="fa fa-chevron-down"></span>-->
                             </a>
                             </li>
                             <li><a href="javascript:void(0);" onclick="document.getElementById('linkCharge').submit();"><i class="fa fa-money"></i> Charge
                             </a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="menu_section">
-                        <h3>Billing</h3>
-                        <ul class="nav side-menu">
-                            <li>
-                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkTenantSelection').submit();"><i class="fa fa-credit-card"></i> Invoice</a></li>
                             </li>
                         </ul>
                     </div>
@@ -126,7 +114,7 @@
                                     </a>
                                 </li>
                                 <li><a href="javascript:;">Help</a></li>
-                                <li><a  href="javascript:void(0)" onclick="document.getElementById('linkLogout').submit();" ><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                <li><a href="javascript:void(0);" onclick="document.getElementById('linkLogout').submit();"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -140,8 +128,8 @@
             <div class="">
                 <div class="page-title">
                     <div class="title_left">
-                        <h3>Usage Charts
-                            <small>Usage data representation</small>
+                        <h3>Charge Charts
+                            <small>Charge data representation</small>
                         </h3>
                     </div>
 
@@ -149,7 +137,7 @@
                         <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Search for...">
-                                <span class="input-group-btn">
+                    <span class="input-group-btn">
                       <button class="btn btn-default" type="button">Go!</button>
                     </span>
                             </div>
@@ -183,7 +171,7 @@
                                 <div class="clearfix"></div>
                             </div>
                             <div class="x_content"> <!--style="display: none">-->
-                                <form name="graphSelection" method="post" th:action="@{/usage}">
+                                <form name="graphSelection" method="post" th:action="@{/charge}">
                                     <br><br>
                                     <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
                                         <button id="graphButton" class="btn btn-default submit" disabled>Get
@@ -214,6 +202,8 @@
                 <div class="row">
                 </div>
             </div>
+            <div id="modalContainer"></div>
+
             <div class="modal fade" id="modChart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
@@ -249,7 +239,6 @@
                 </div>
             </div>
         </div>
-        <!-- /page content -->
     </div>
 </div>
 
@@ -273,6 +262,10 @@
 <script src="../vendors/echarts/dist/echarts.js"></script>
 <script src="../vendors/echarts/map/js/world.js"></script>
 
+<!-- bootstrap-progressbar -->
+<script src="../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+
+
 <script th:inline="javascript">
 
     /** Creates and configures the graphs coming from the graph selection.
@@ -287,18 +280,17 @@
             for (var i = 0; i < graphSelection.length; i++) {
                 //The chartType parameter is a pie/doughnut chart
                 var measurement = graphSelection[i];
-                var units = [[${measurementUnits}]];
                 var pieData = getPieData(graphSelection[i]);
                 var pieColors = getStandardColors(pieData.length);
                 var pieLabels = getPieLabels(graphSelection[i]);
-                var totalUsage = [[${totalUsage}]];
+                var totalCharge = [[${totalCharge}]];
                 var pieLegendHtml = "";
-                var meterUnit = units[measurement];
                 for (var o = 0; o < pieLabels.length; o++) {
                     var label = pieLabels[o];
                     pieLegendHtml = pieLegendHtml + '<tr><td><a href="#" data-toggle="modal" data-target="#singleChart" data-filter="' + label + '"  data-source=' + measurement + '><i style="background-color: ' + pieColors[o] + '">&nbsp;&nbsp;&nbsp;&nbsp;</i>&nbsp;' + label + '</a></td></tr>'
                 }
-                $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>' + measurement + '</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Usage: ' + totalUsage[measurement] + ' ' + meterUnit + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="pie' + i + '"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + i + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table><div class="x_content"><button type="button" class="btn btn-default" data-placement="right" title="Details" data-toggle="modal" data-target="#modChart" data-source=' + measurement + '><span><i class="fa fa-bar-chart"></span></i></button></div></div></div> </div>');
+                $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>' + measurement + '</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Charge: ' + totalCharge[measurement] + ' CHF' + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="pie' + i + '"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + i + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table><div class="x_content"><button type="button" class="btn btn-default" data-placement="right" title="Details"  data-toggle="modal" data-target="#modChart" data-source=' + measurement + '><span><i class="fa fa-bar-chart"></span></i></button></div></div></div></div>');
+
                 var pieChart = document.getElementById('pie' + i);
                 if (pieChart) {
                     var options = {
@@ -1179,6 +1171,7 @@
         $(this).data('bs.modal', null);
     });
 </script>
+
 <script th:inline="javascript">
     $('#singleChart').on('shown.bs.modal', function (event) {
         var legend = [[${legendValues}]];
@@ -1188,7 +1181,7 @@
         var source = link.attr('data-source');
         var filter = link.attr('data-filter');
         // get title
-        var title = source + ' usage for VM "' + filter + '"';
+        var title = source + ' charge for VM "' + filter + '"';
         // get labels
         var table = link.parents('table');
         var labels = [];
@@ -1480,7 +1473,6 @@
         // destroy modal
         $(this).data('bs.modal', null);
     });
-</script>
-<!-- / Graph Selection Script -->
+</script>it
 </body>
 </html>
