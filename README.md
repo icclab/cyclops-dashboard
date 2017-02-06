@@ -24,7 +24,11 @@ Currently Cyclops Dashboard has the following limitations:
   * User information displayed in the landing page as well as in the bill are placeholders.
 
 ### Screenshot
+<<<<<<< HEAD
 <img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard-2-overview.png" alt="Dashboard screenshot" width="800"></img>
+=======
+<img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard-2-overview.png" alt="Dashboard screenshot" width="900"></img>
+>>>>>>> support_keystone_authentication
 
 ### Download
      $ git clone https://github.com/icclab/cyclops-dashboard.git
@@ -67,7 +71,8 @@ All the output will be stored in cyclops-dashboard/nohup.out and whenever you wa
   * Tweet us @<a href="https://twitter.com/ICC_Lab">ICC_Lab</a>
    
 ### Developed @
-<img src="http://blog.zhaw.ch/icclab/files/2014/04/icclab_logo.png" alt="ICC Lab" height="180" width="620"></img>
+<img src="https://blog.zhaw.ch/icclab/files/2016/03/cropped-service_engineering_logo_zhawblue_banner.jpg" alt="ICC Lab" height="180" width="620"></img>
+
 
 ### License
  

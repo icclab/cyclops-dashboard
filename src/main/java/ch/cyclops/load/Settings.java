@@ -73,6 +73,7 @@ public class Settings {
         openStackCredentials.setKeystoneTenant(properties.getProperty("keystoneTenant"));
         openStackCredentials.setKeystoneUrl(properties.getProperty("keystoneUrl"));
         openStackCredentials.setKeystoneAdminUrl(properties.getProperty("keystoneAdminUrl"));
+        openStackCredentials.setKeystoneAdminRole(properties.getProperty("keystoneAdminRole"));
 
         return openStackCredentials;
     }

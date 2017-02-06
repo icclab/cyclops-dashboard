@@ -24,20 +24,16 @@
 
 <body class="nav-md">
 <form id="linkUsage" method="post" action="/usage">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
 </form>
 <form id="linkCharge" method="post" action="/charge">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
 </form>
 <form id="linkOverview" method="post" action="/">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
 </form>
-<form id="linkUserSelection" method="post" action="/user_bill">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
+<form id="linkUserSelection" method="post" action="/user_bill"></form>
+<form id="linkTenantSelection" method="post" action="/tenants">
+    <input type="hidden" name="selectedUser" th:value="${username}">
+</form>
+<form id="linkLogout" method="post" action="/logout">
 </form>
 <div class="container body">
     <div class="main_container">
@@ -99,7 +95,7 @@
                     <a data-toggle="tooltip" data-placement="top" title="Lock">
                         <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
                     </a>
-                    <a data-toggle="tooltip" data-placement="top" title="Logout">
+                    <a href="javascript:void(0)" onclick="document.getElementById('linkLogout').submit();" data-toggle="tooltip" data-placement="top" title="Logout">
                         <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                     </a>
                 </div>
@@ -131,73 +127,7 @@
                                     </a>
                                 </li>
                                 <li><a href="javascript:;">Help</a></li>
-                                <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
-                            </ul>
-                        </li>
-
-                        <li role="presentation" class="dropdown">
-                            <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown"
-                               aria-expanded="false">
-                                <i class="fa fa-envelope-o"></i>
-                                <span class="badge bg-green">6</span>
-                            </a>
-                            <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
-                                <li>
-                                    <a>
-                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a>
-                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a>
-                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a>
-                                        <span class="image"><img src="images/user.png" alt="Profile Image"/></span>
-                        <span>
-                          <span>John Smith</span>
-                          <span class="time">3 mins ago</span>
-                        </span>
-                        <span class="message">
-                          Film festivals used to be do-or-die moments for movie makers. They were where...
-                        </span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <div class="text-center">
-                                        <a>
-                                            <strong>See All Alerts</strong>
-                                            <i class="fa fa-angle-right"></i>
-                                        </a>
-                                    </div>
-                                </li>
+                                <li><a href="javascript:void(0)" onclick="document.getElementById('linkLogout').submit();"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -220,7 +150,7 @@
                         <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
                             <div class="input-group">
                                 <input type="text" class="form-control" placeholder="Search for...">
-                    <span class="input-group-btn">
+                                <span class="input-group-btn">
                       <button class="btn btn-default" type="button">Go!</button>
                     </span>
                             </div>
@@ -253,10 +183,8 @@
                                 </ul>
                                 <div class="clearfix"></div>
                             </div>
-                            <div class="x_content" style="display: none">
+                            <div class="x_content"> <!--style="display: none">-->
                                 <form name="graphSelection" method="post" th:action="@{/usage}">
-                                    <input type="hidden" name="username" th:value="${username}">
-                                    <input type="hidden" name="password" th:value="${password}">
                                     <br><br>
                                     <div class="col-md-9 col-sm-9 col-xs-12 col-md-offset-3">
                                         <button id="graphButton" class="btn btn-default submit" disabled>Get
@@ -287,16 +215,32 @@
                 <div class="row">
                 </div>
             </div>
-
             <div class="modal fade" id="modChart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
-                            <h4 class="modal-title" id="myModalLabel">measurement Detail</h4></div>
+                            <h4 class="modal-title" id="myModalLabel">Loading Measurement Detail...</h4></div>
                         <div class="modal-body">
                             <div id="histogramContainer">
                                 <div class="modal_chart" id="echart_line" style="height:350px;"></div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="singleChart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">×</span></button>
+                            <h4 class="modal-title" id="singleMyModalLabel">Loading Measurement Detail...</h4></div>
+                        <div class="modal-body">
+                            <div id="singleHistogramContainer">
+                                <div class="modal_chart" id="single_echart_line" style="height:350px;"></div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -338,29 +282,24 @@
     $(document).ready(function () {
 
         var graphSelection = [[${graphSelection}]];
-        var units = [[${measurementUnits}]];
 
         if (graphSelection) {
             // Create a container for each Measurement depending on its chartType
             for (var i = 0; i < graphSelection.length; i++) {
                 //The chartType parameter is a pie/doughnut chart
                 var measurement = graphSelection[i];
+                var units = [[${measurementUnits}]];
                 var pieData = getPieData(graphSelection[i]);
-                var pieColors = getRandomColors(pieData.length);
+                var pieColors = getStandardColors(pieData.length);
                 var pieLabels = getPieLabels(graphSelection[i]);
                 var totalUsage = [[${totalUsage}]];
                 var pieLegendHtml = "";
                 var meterUnit = units[measurement];
-//                    if(meterUnit === 'bytes' || meterUnit === 'B'){
-//                        var newData = formatBytes(pieData);
-//                        var newUsage = newData[0];
-//                        meterUnit = newData[1];
-//                        totalUsage = formatBytes(totalUsage)[0];
-//                    }
                 for (var o = 0; o < pieLabels.length; o++) {
-                    pieLegendHtml = pieLegendHtml + '<tr><td><p><i style="background-color: ' + pieColors[o] + '">&nbsp;&nbsp;&nbsp;&nbsp;</i>' + pieLabels[o] + ' </p></td></tr>'
+                    var label = pieLabels[o];
+                    pieLegendHtml = pieLegendHtml + '<tr><td><a href="#" data-toggle="modal" data-target="#singleChart" data-filter="' + label + '"  data-source=' + measurement + '><i style="background-color: ' + pieColors[o] + '">&nbsp;&nbsp;&nbsp;&nbsp;</i>&nbsp;' + label + '</a></td></tr>'
                 }
-                $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>' + measurement + '</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Usage: ' + totalUsage[measurement] + ' ' + meterUnit + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="pie' + i + '"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + i + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table><div class="x_content"><button type="button" class="btn btn-default" data-toggle="tooltip" data-placement="right" title="Details"><span data-toggle="modal" data-target="#modChart" data-source=' + measurement + '><i class="fa fa-bar-chart"></span></i></button></div></div></div> </div>');
+                $('#chartContainer').append('<div class="half_x_panel"> <div class="x_title"> <h2>' + measurement + '</h2> <ul class="nav navbar-right panel_toolbox"> <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a> </li> <li class="dropdown"> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"aria-expanded="false"><i class="fa fa-wrench"></i></a> <ul class="dropdown-menu" role="menu"> <li><a href="#">Settings 1</a> </li> <li><a href="#">Settings 2</a> </li> </ul> </li> <li><a class="close-link"><i class="fa fa-close"></i></a> </li> </ul> <div class="clearfix"></div> </div> <div class="x_content" id="chartContainer"><table><tr><th><p>' + 'Total Usage: ' + totalUsage[measurement] + ' ' + meterUnit + '</p></th><th><p>Resources</p></th></tr><tr> <td><canvas id="pie' + i + '"  style="margin: 15px 10px 10px 0; width: 50%"></canvas></td><td><div class="pieUsers' + i + '"><table>' + pieLegendHtml + '</table></div></td> </tr></table><div class="x_content"><button type="button" class="btn btn-default" data-placement="right" title="Details" data-toggle="modal" data-target="#modChart" data-source=' + measurement + '><span><i class="fa fa-bar-chart"></span></i></button></div></div></div> </div>');
                 var pieChart = document.getElementById('pie' + i);
                 if (pieChart) {
                     var options = {
@@ -374,7 +313,7 @@
                         data: {
                             labels: pieLabels,
                             datasets: [{
-                                data: pieData,//newUsage
+                                data: pieData,
                                 backgroundColor: pieColors,
                                 hoverBackgroundColor: pieColors
                             }]
@@ -385,6 +324,47 @@
             }
         }
     });
+
+
+    /**
+     * This Method Returns an Individual Graph for a Specified Measurement and a Specified Consumer
+     *
+     * @param measurementName, consumer
+     * @returns {{name: *, type: string, smooth: boolean, itemStyle: {normal: {areaStyle: {type: string}}}, data: *}|*}
+     */
+    function getGraphForConsumer(measurementName, consumer) {
+        var graph;
+        var sliceMap = [[${sliceMap}]];
+        var metadataList = Object.keys(pairs[measurementName]);
+        //Create one data for each metadata in the list
+        for (var o = 0; o < metadataList.length; o++) {
+            if (metadataList[o] == consumer) {
+                var meterData = sliceMap[measurementName];
+                var data = meterData[metadataList[o]];
+                if (data != undefined) {
+                    for (var i = 0; i < data.length; i++) {
+                        if (data[i] == null)
+                            data[i] = undefined;
+                        graph = {
+                            name: consumer,
+                            type: 'bar',
+                            smooth: true,
+                            itemStyle: {
+                                normal: {
+                                    areaStyle: {
+                                        type: 'default'
+                                    }
+                                }
+                            },
+                            data: data
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        return graph;
+    }
 
     function getPieLabels(measurementName) {
         var metadataList = Object.keys(pairs[measurementName]);
@@ -404,6 +384,24 @@
             slices[o] = data;
         }
         return slices;
+    }
+
+    /**
+     * This function generates an array containing the same colors always.
+     *
+     */
+    function getStandardColors(length) {
+        var standardColors = ['#3F4A59', '#008d98', '#009812', '#789800', '#986b00', '#980000', '#98006b', '#3b0098', '#4169e1', '#ff6666', '#7fffd4', '#44bbc0', '#fd9ed7', '#a0a737', '#f10714'];
+        var colors = [];
+        var o = 0;
+        for (var i = 0; i < length; i++) {
+            if (o >= standardColors.length)
+                o = 0;
+
+            colors[i] = standardColors[o]
+            o++;
+        }
+        return colors;
     }
 
     /**
@@ -447,22 +445,25 @@
         var metadataList = Object.keys(pairs[measurementName]);
         //Create one data for each metadata in the list
         for (var o = 0; o < metadataList.length; o++) {
+//            var metadataData = sliceMap[metadataList[o]];
             var meterData = sliceMap[measurementName];
             var data = meterData[metadataList[o]];
-            if (data[o] == null)
-                data[o] = undefined;
-            graphs[o] = {
-                name: metadataList[o],
-                type: 'bar',
-                smooth: true,
-                itemStyle: {
-                    normal: {
-                        areaStyle: {
-                            type: 'default'
+            if (data != undefined) {
+                if (data[o] == null)
+                    data[o] = undefined;
+                graphs[o] = {
+                    name: metadataList[o],
+                    type: 'bar',
+                    smooth: true,
+                    itemStyle: {
+                        normal: {
+                            areaStyle: {
+                                type: 'default'
+                            }
                         }
-                    }
-                },
-                data: data
+                    },
+                    data: data
+                }
             }
         }
         return graphs;
@@ -481,323 +482,17 @@
      * This Method formats Bytes into a human readable unit
      */
     function formatBytes(bytes, decimals) {
-        for (var x = 0; x < bytes.length; x++) {
-            if (bytes[x] == 0) return '0 Byte';
-            var k = 1000; // or 1024 for binary
-            var dm = decimals + 1 || 3;
-            var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            var i = Math.floor(Math.log(bytes[x]) / Math.log(k));
-            var resultTable = [];
-            resultTable[0] = parseFloat((bytes[x] / Math.pow(k, i)).toFixed(dm));
-            resultTable[1] = sizes[i];
-        }
+        if (bytes == 0) return '0 Byte';
+        var k = 1000; // or 1024 for binary
+        var dm = decimals + 1 || 3;
+        var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        var i = Math.floor(Math.log(bytes) / Math.log(k));
+        var resultTable = [];
+        resultTable[0] = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+        resultTable[1] = sizes[i];
         return resultTable;
     }
 
-</script>
-
-<script th:inline="javascript">
-
-    $('#modChart').on('shown.bs.modal', function (event) {
-        var units = [[${measurementUnits}]];
-        var legend = [[${legendValues}]];
-        var timestamps = [[${timestamps}]];
-        var link = $(event.relatedTarget);
-        // get data source (Measurement name)
-        var source = link.attr('data-source');
-        // get title
-        var title = source;
-        // get labels
-        var table = link.parents('table');
-        var labels = [];
-        $('#' + table.attr('id') + '>thead>tr>th').each(function (index, value) {
-            // without first column
-            if (index > 0) {
-                labels.push($(value).html());
-            }
-        });
-        // get target source
-        var target = [];
-        $.each(labels, function (index, value) {
-            target.push(link.attr('data-target-source'));
-        });
-        // Chart initialisieren
-        var modal = $(this);
-        var canvas = modal.find('.modal-body canvas');
-        modal.find('.modal-title').html(title);
-
-        var theme = {
-            color: [
-                '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
-                '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
-            ],
-
-            title: {
-                itemGap: 8,
-                textStyle: {
-                    fontWeight: 'normal',
-                    color: '#408829'
-                }
-            },
-
-            dataRange: {
-                color: ['#1f610a', '#97b58d']
-            },
-
-            toolbox: {
-                color: ['#408829', '#408829', '#408829', '#408829']
-            },
-
-            tooltip: {
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                axisPointer: {
-                    type: 'line',
-                    lineStyle: {
-                        color: '#408829',
-                        type: 'dashed'
-                    },
-                    crossStyle: {
-                        color: '#408829'
-                    },
-                    shadowStyle: {
-                        color: 'rgba(200,200,200,0.3)'
-                    }
-                }
-            },
-
-            dataZoom: {
-                dataBackgroundColor: '#eee',
-                fillerColor: 'rgba(64,136,41,0.2)',
-                handleColor: '#408829'
-            },
-            grid: {
-                borderWidth: 0
-            },
-
-            categoryAxis: {
-                axisLine: {
-                    lineStyle: {
-                        color: '#408829'
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: ['#eee']
-                    }
-                }
-            },
-
-            valueAxis: {
-                axisLine: {
-                    lineStyle: {
-                        color: '#408829'
-                    }
-                },
-                splitArea: {
-                    show: true,
-                    areaStyle: {
-                        color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
-                    }
-                },
-                splitLine: {
-                    lineStyle: {
-                        color: ['#eee']
-                    }
-                }
-            },
-            timeline: {
-                lineStyle: {
-                    color: '#408829'
-                },
-                controlStyle: {
-                    normal: {color: '#408829'},
-                    emphasis: {color: '#408829'}
-                }
-            },
-
-            k: {
-                itemStyle: {
-                    normal: {
-                        color: '#68a54a',
-                        color0: '#a9cba2',
-                        lineStyle: {
-                            width: 1,
-                            color: '#408829',
-                            color0: '#86b379'
-                        }
-                    }
-                }
-            },
-            map: {
-                itemStyle: {
-                    normal: {
-                        areaStyle: {
-                            color: '#ddd'
-                        },
-                        label: {
-                            textStyle: {
-                                color: '#c12e34'
-                            }
-                        }
-                    },
-                    emphasis: {
-                        areaStyle: {
-                            color: '#99d2dd'
-                        },
-                        label: {
-                            textStyle: {
-                                color: '#c12e34'
-                            }
-                        }
-                    }
-                }
-            },
-            force: {
-                itemStyle: {
-                    normal: {
-                        linkStyle: {
-                            strokeColor: '#408829'
-                        }
-                    }
-                }
-            },
-            chord: {
-                padding: 4,
-                itemStyle: {
-                    normal: {
-                        lineStyle: {
-                            width: 1,
-                            color: 'rgba(128, 128, 128, 0.5)'
-                        },
-                        chordStyle: {
-                            lineStyle: {
-                                width: 1,
-                                color: 'rgba(128, 128, 128, 0.5)'
-                            }
-                        }
-                    },
-                    emphasis: {
-                        lineStyle: {
-                            width: 1,
-                            color: 'rgba(128, 128, 128, 0.5)'
-                        },
-                        chordStyle: {
-                            lineStyle: {
-                                width: 1,
-                                color: 'rgba(128, 128, 128, 0.5)'
-                            }
-                        }
-                    }
-                }
-            },
-            gauge: {
-                startAngle: 225,
-                endAngle: -45,
-                axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
-                        width: 8
-                    }
-                },
-                axisTick: {
-                    splitNumber: 10,
-                    length: 12,
-                    lineStyle: {
-                        color: 'auto'
-                    }
-                },
-                axisLabel: {
-                    textStyle: {
-                        color: 'auto'
-                    }
-                },
-                splitLine: {
-                    length: 18,
-                    lineStyle: {
-                        color: 'auto'
-                    }
-                },
-                pointer: {
-                    length: '90%',
-                    color: 'auto'
-                },
-                title: {
-                    textStyle: {
-                        color: '#333'
-                    }
-                },
-                detail: {
-                    textStyle: {
-                        color: 'auto'
-                    }
-                }
-            },
-            textStyle: {
-                fontFamily: 'Arial, Verdana, sans-serif'
-            }
-        };
-
-        // ECHART LINE CONF
-        var echart = document.getElementById('echart_line');
-        if (echart) {
-            var echartLine = echarts.init(echart, theme);
-
-            echartLine.setOption({
-                title: {
-                    text: "Unit: " + units[title],
-                },
-                tooltip: {
-                    trigger: 'axis'
-                },
-                legend: {
-                    x: 220,
-                    y: 40,
-                    data: legend
-                },
-                toolbox: {
-                    show: true,
-                    feature: {
-                        magicType: {
-                            show: true,
-                            title: {
-                                line: 'Line',
-                                bar: 'Bar',
-                                stack: 'Stack',
-                                tiled: 'Tiled'
-                            },
-                            type: ['line', 'bar', 'stack', 'tiled']
-                        },
-                        restore: {
-                            show: true,
-                            title: "Restore"
-                        },
-                        saveAsImage: {
-                            show: true,
-                            title: "Save Image"
-                        }
-                    }
-                },
-                calculable: true,
-                xAxis: [{
-                    type: 'category',
-                    boundaryGap: false,
-                    data: getDates(timestamps)
-                }],
-                yAxis: [{
-                    type: 'value'
-                }],
-                series: getGraph(title)
-            });
-        }
-    }).on('hidden.bs.modal', function (event) {
-        // reset canvas size
-        var modal = $(this);
-        var canvas = modal.find('.modal-body canvas');
-        canvas.attr('width', '568px').attr('height', '300px');
-        // destroy modal
-        $(this).data('bs.modal', null);
-    });
 </script>
 
 <!-- Chart.js -->
@@ -1107,6 +802,8 @@
 <script type="text/javascript">
     $(document).ready(function () {
 
+        $('[data-toggle="tooltip"]').tooltip({'placement': 'right'});
+
         var cb = function (start, end, label) {
             console.log(start.toISOString(), end.toISOString(), label);
             $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
@@ -1120,7 +817,7 @@
             startDate: moment().subtract(29, 'days'),
             endDate: moment(),
             minDate: '01/01/2012',
-            maxDate: '12/31/2016',
+            maxDate: '12/31/' + moment().year(),
 //            dateLimit: {
 //                days: 60
 //            },
@@ -1180,7 +877,612 @@
         });
     });
 </script>
-<!-- /datepicker -->
+
+<script th:inline="javascript">
+    $('#modChart').on('shown.bs.modal', function (event) {
+        var units = [[${measurementUnits}]];
+        var legend = [[${legendValues}]];
+        var timestamps = [[${timestamps}]];
+        var link = $(event.relatedTarget);
+        // get data source (Measurement name)
+        var source = link.attr('data-source');
+        // get title
+        var title = source;
+        // get labels
+        var table = link.parents('table');
+        var labels = [];
+        $('#' + table.attr('id') + '>thead>tr>th').each(function (index, value) {
+            // without first column
+            if (index > 0) {
+                labels.push($(value).html());
+            }
+        });
+        // get target source
+        var target = [];
+        $.each(labels, function (index, value) {
+            target.push(link.attr('data-target-source'));
+        });
+        // Chart initialisieren
+        var modal = $(this);
+        var canvas = modal.find('.modal-body canvas');
+        modal.find('.modal-title').html(title);
+
+        var theme = {
+            color: [
+                '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+                '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+            ],
+
+            title: {
+                itemGap: 8,
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#408829'
+                }
+            },
+
+            dataRange: {
+                color: ['#1f610a', '#97b58d']
+            },
+
+            toolbox: {
+                color: ['#408829', '#408829', '#408829', '#408829']
+            },
+
+            tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                axisPointer: {
+                    type: 'line',
+                    lineStyle: {
+                        color: '#408829',
+                        type: 'dashed'
+                    },
+                    crossStyle: {
+                        color: '#408829'
+                    },
+                    shadowStyle: {
+                        color: 'rgba(200,200,200,0.3)'
+                    }
+                }
+            },
+
+            dataZoom: {
+                dataBackgroundColor: '#eee',
+                fillerColor: 'rgba(64,136,41,0.2)',
+                handleColor: '#408829'
+            },
+            grid: {
+                borderWidth: 0
+            },
+
+            categoryAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+
+            valueAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitArea: {
+                    show: true,
+                    areaStyle: {
+                        color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+            timeline: {
+                lineStyle: {
+                    color: '#408829'
+                },
+                controlStyle: {
+                    normal: {color: '#408829'},
+                    emphasis: {color: '#408829'}
+                }
+            },
+
+            k: {
+                itemStyle: {
+                    normal: {
+                        color: '#68a54a',
+                        color0: '#a9cba2',
+                        lineStyle: {
+                            width: 1,
+                            color: '#408829',
+                            color0: '#86b379'
+                        }
+                    }
+                }
+            },
+            map: {
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            color: '#ddd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        areaStyle: {
+                            color: '#99d2dd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    }
+                }
+            },
+            force: {
+                itemStyle: {
+                    normal: {
+                        linkStyle: {
+                            strokeColor: '#408829'
+                        }
+                    }
+                }
+            },
+            chord: {
+                padding: 4,
+                itemStyle: {
+                    normal: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    }
+                }
+            },
+            gauge: {
+                startAngle: 225,
+                endAngle: -45,
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
+                        width: 8
+                    }
+                },
+                axisTick: {
+                    splitNumber: 10,
+                    length: 12,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                axisLabel: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                },
+                splitLine: {
+                    length: 18,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                pointer: {
+                    length: '90%',
+                    color: 'auto'
+                },
+                title: {
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                detail: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                }
+            },
+            textStyle: {
+                fontFamily: 'Arial, Verdana, sans-serif'
+            }
+        };
+
+        // ECHART LINE CONF
+        var echart = document.getElementById('echart_line');
+        if (echart) {
+            var echartLine = echarts.init(echart, theme);
+
+            echartLine.setOption({
+                title: {
+                    text: "(CHF)",
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    x: 220,
+                    y: 40,
+                    data: legend
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        magicType: {
+                            show: true,
+                            title: {
+                                line: 'Line',
+                                bar: 'Bar',
+                                stack: 'Stack',
+                                tiled: 'Tiled'
+                            },
+                            type: ['line', 'bar', 'stack', 'tiled']
+                        },
+                        restore: {
+                            show: true,
+                            title: "Restore"
+                        },
+                        saveAsImage: {
+                            show: true,
+                            title: "Save Image"
+                        }
+                    }
+                },
+                calculable: true,
+                xAxis: [{
+                    type: 'category',
+                    boundaryGap: false,
+                    data: getDates(timestamps)
+                }],
+                yAxis: [{
+                    type: 'value'
+                }],
+                series: getGraph(title)
+            });
+        }
+    }).on('hidden.bs.modal', function (event) {
+        // reset canvas size
+        var modal = $(this);
+        var canvas = modal.find('.modal-body canvas');
+        canvas.attr('width', '568px').attr('height', '300px');
+        // destroy modal
+        $(this).data('bs.modal', null);
+    });
+</script>
+<script th:inline="javascript">
+    $('#singleChart').on('shown.bs.modal', function (event) {
+        var legend = [[${legendValues}]];
+        var timestamps = [[${timestamps}]];
+        var link = $(event.relatedTarget);
+        // get data source (Measurement name)
+        var source = link.attr('data-source');
+        var filter = link.attr('data-filter');
+        // get title
+        var title = source + ' usage for VM "' + filter + '"';
+        // get labels
+        var table = link.parents('table');
+        var labels = [];
+        $('#' + table.attr('id') + '>thead>tr>th').each(function (index, value) {
+            // without first column
+            if (index > 0) {
+                labels.push($(value).html());
+            }
+        });
+        // get target source
+        var target = [];
+        $.each(labels, function (index, value) {
+            target.push(link.attr('data-target-source'));
+        });
+        // Chart initialisieren
+        var modal = $(this);
+        var canvas = modal.find('.modal-body canvas');
+        modal.find('.modal-title').html(title);
+
+        var theme = {
+            color: [
+                '#26B99A', '#34495E', '#BDC3C7', '#3498DB',
+                '#9B59B6', '#8abb6f', '#759c6a', '#bfd3b7'
+            ],
+
+            title: {
+                itemGap: 8,
+                textStyle: {
+                    fontWeight: 'normal',
+                    color: '#408829'
+                }
+            },
+
+            dataRange: {
+                color: ['#1f610a', '#97b58d']
+            },
+
+            toolbox: {
+                color: ['#408829', '#408829', '#408829', '#408829']
+            },
+
+            tooltip: {
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                axisPointer: {
+                    type: 'line',
+                    lineStyle: {
+                        color: '#408829',
+                        type: 'dashed'
+                    },
+                    crossStyle: {
+                        color: '#408829'
+                    },
+                    shadowStyle: {
+                        color: 'rgba(200,200,200,0.3)'
+                    }
+                }
+            },
+
+            dataZoom: {
+                dataBackgroundColor: '#eee',
+                fillerColor: 'rgba(64,136,41,0.2)',
+                handleColor: '#408829'
+            },
+            grid: {
+                borderWidth: 0
+            },
+
+            categoryAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+
+            valueAxis: {
+                axisLine: {
+                    lineStyle: {
+                        color: '#408829'
+                    }
+                },
+                splitArea: {
+                    show: true,
+                    areaStyle: {
+                        color: ['rgba(250,250,250,0.1)', 'rgba(200,200,200,0.1)']
+                    }
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#eee']
+                    }
+                }
+            },
+            timeline: {
+                lineStyle: {
+                    color: '#408829'
+                },
+                controlStyle: {
+                    normal: {color: '#408829'},
+                    emphasis: {color: '#408829'}
+                }
+            },
+
+            k: {
+                itemStyle: {
+                    normal: {
+                        color: '#68a54a',
+                        color0: '#a9cba2',
+                        lineStyle: {
+                            width: 1,
+                            color: '#408829',
+                            color0: '#86b379'
+                        }
+                    }
+                }
+            },
+            map: {
+                itemStyle: {
+                    normal: {
+                        areaStyle: {
+                            color: '#ddd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        areaStyle: {
+                            color: '#99d2dd'
+                        },
+                        label: {
+                            textStyle: {
+                                color: '#c12e34'
+                            }
+                        }
+                    }
+                }
+            },
+            force: {
+                itemStyle: {
+                    normal: {
+                        linkStyle: {
+                            strokeColor: '#408829'
+                        }
+                    }
+                }
+            },
+            chord: {
+                padding: 4,
+                itemStyle: {
+                    normal: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    },
+                    emphasis: {
+                        lineStyle: {
+                            width: 1,
+                            color: 'rgba(128, 128, 128, 0.5)'
+                        },
+                        chordStyle: {
+                            lineStyle: {
+                                width: 1,
+                                color: 'rgba(128, 128, 128, 0.5)'
+                            }
+                        }
+                    }
+                }
+            },
+            gauge: {
+                startAngle: 225,
+                endAngle: -45,
+                axisLine: {
+                    show: true,
+                    lineStyle: {
+                        color: [[0.2, '#86b379'], [0.8, '#68a54a'], [1, '#408829']],
+                        width: 8
+                    }
+                },
+                axisTick: {
+                    splitNumber: 10,
+                    length: 12,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                axisLabel: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                },
+                splitLine: {
+                    length: 18,
+                    lineStyle: {
+                        color: 'auto'
+                    }
+                },
+                pointer: {
+                    length: '90%',
+                    color: 'auto'
+                },
+                title: {
+                    textStyle: {
+                        color: '#333'
+                    }
+                },
+                detail: {
+                    textStyle: {
+                        color: 'auto'
+                    }
+                }
+            },
+            textStyle: {
+                fontFamily: 'Arial, Verdana, sans-serif'
+            }
+        };
+
+
+// ECHART LINE CONF
+        var echart = document.getElementById('single_echart_line');
+        if (echart) {
+            var echartLine = echarts.init(echart, theme);
+
+            echartLine.setOption({
+                title: {
+                    text: "(CHF)",
+                },
+                tooltip: {
+                    trigger: 'axis'
+                },
+                legend: {
+                    x: 220,
+                    y: 40,
+                    data: legend
+                },
+                toolbox: {
+                    show: true,
+                    feature: {
+                        magicType: {
+                            show: true,
+                            title: {
+                                line: 'Line',
+                                bar: 'Bar',
+                                stack: 'Stack',
+                                tiled: 'Tiled'
+                            },
+                            type: ['line', 'bar', 'stack', 'tiled']
+                        },
+                        restore: {
+                            show: true,
+                            title: "Restore"
+                        },
+                        saveAsImage: {
+                            show: true,
+                            title: "Save Image"
+                        }
+                    }
+                },
+                calculable: true,
+                xAxis: [{
+                    type: 'category',
+                    boundaryGap: false,
+                    data: getDates(timestamps)
+                }],
+                yAxis: [{
+                    type: 'value'
+                }],
+                series: getGraphForConsumer(source, filter)
+            });
+        }
+    }).on('hidden.bs.modal', function (event) {
+// reset canvas size
+        var modal = $(this);
+        var canvas = modal.find('.modal-body canvas');
+        canvas.attr('width', '568px').attr('height', '300px');
+// destroy modal
+        $(this).data('bs.modal', null);
+    });
+</script>
 <!-- / Graph Selection Script -->
-</body>
-</html>
+< / body >
+< / html >

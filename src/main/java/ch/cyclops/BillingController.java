@@ -23,9 +23,7 @@ import org.restlet.resource.ClientResource;
 import org.restlet.util.Series;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
 import java.util.*;
@@ -50,14 +48,28 @@ import java.util.*;
  */
 
 @Controller
+@SessionAttributes({"username", "password"})
 public class BillingController {
 
+    /**
+     * This method sets the session attributes to null in order to invalidate all the actions/kill the session.
+     *
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    public String logout(Model model) {
+        if (model.containsAttribute("username") && model.containsAttribute("password")) {
+            model.addAttribute("username", new String());
+            model.addAttribute("password", new String());
+        }
+        return "login";
+    }
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String helloWorld(@RequestParam(value = "username", required = true, defaultValue = "") String username, Model model) {
-        if (username.length() == 0) return "login";
-        model.addAttribute("username", username);
-        model.addAttribute("company", "ICCLab - RCB");
-        return "switch_overview";
+    public String login(@ModelAttribute("username") String username, @ModelAttribute("password") String password, Model model) {
+        if (username.equals("") || password.equals("")) return "login";
+        return generateUsageGraph(username, password, null, null, model);
     }
 
     /**
@@ -73,8 +85,11 @@ public class BillingController {
         if (username != null || password != null) {
             OSClient os = buildOSClient(username, password);
             if (os == null) {
-                return "page_403";
+                return "403";
             }
+            String adminRole = Loader.getSettings().getOpenStackCredentials().getKeystoneAdminRole();
+            List<? extends org.openstack4j.model.identity.Role> roles = os.identity().roles().list();
+
             List<? extends org.openstack4j.model.identity.User> users = os.identity().users().list();
             LinkedList<OSData> billingUsers = new LinkedList<>();
 
@@ -88,10 +103,13 @@ public class BillingController {
             model.addAttribute("username", username);
             model.addAttribute("password", password);
             model.addAttribute("users", billingUsers);
-
-            return "switch_overview";
+            // Relink to the index page, in this case the Usage page.
+            if (roles.contains(adminRole))
+                return generateUsageGraph(username, password, null, null, model);
+            else
+                return generateUsageGraph(username, password, null, null, model);
         } else {
-            return "page_403";
+            return "403";
         }
     }
 
@@ -103,7 +121,7 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/tenants", method = RequestMethod.POST)
-    public String indexSubmitGet(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("selectedUser") String selectedUser, Model model) {
+    public String indexSubmitGet(@ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam("selectedUser") String selectedUser, Model model) {
         LinkedList<OpenStackUser> tenantList = getTenantList(selectedUser, password);
 
         model.addAttribute("tenants", tenantList);
@@ -122,7 +140,7 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/user_bill", method = RequestMethod.POST)
-    public String getUserBilling(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
+    public String getUserBilling(@ModelAttribute("username") String username, @ModelAttribute("password") String password, Model model) {
 
         model.addAttribute("username", username);
         model.addAttribute("password", password);
@@ -233,7 +251,7 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/users", method = RequestMethod.POST)
-    public String indexSubmitPost(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("selectedUser") String selectedUser, Model model) {
+    public String indexSubmitPost(@ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam("selectedUser") String selectedUser, Model model) {
         LinkedList<OpenStackUser> userList = getUserList(selectedUser);
 
         model.addAttribute("users", userList);
@@ -278,7 +296,7 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/bill", method = RequestMethod.POST)
-    public String generateBill(@RequestParam("selectedUser") String userId, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
+    public String generateBill(@RequestParam("selectedUser") String userId, @RequestParam("tenantName") String tenantName, @ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam("from") String from, @RequestParam("to") String to, Model model) {
         String billingUrl = Loader.getSettings().getCyclopsSettings().getBillingUrl();
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
@@ -333,12 +351,7 @@ public class BillingController {
                 System.out.println("Error while requesting the bill: " + e.getMessage());
             }
         }
-        for (int o = 0; o < list.size(); o++) {
-            Bill bill = list.get(o);
 
-            bill.setUtcFrom(bill.getFrom());
-            bill.setUtcTo(bill.getTo());
-        }
         model.addAttribute("bills", list);
 
 
@@ -370,13 +383,15 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/usage", method = RequestMethod.POST)
-    public String generateUsageGraph(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String tenant, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
+    public String generateUsageGraph(@ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
+//        boolean isAdmin = isOpenStackAdmin(username, password);
+        //TODO: redirigir a user o a admin
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
         int slices = Loader.getSettings().getRepresentationSettings().getTimeSlices();
         long sliceDuration = (long) ((double) ((timeTo - timeFrom) / slices));
         List<Long> timestamps = getTimestamps(timeFrom, slices, sliceDuration);
-        HashMap<String, HashMap<String, Object>> pairs = new HashMap<>();
+        HashMap<String, HashMap<String, Double[]>> pairs = new HashMap<>();
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
         HashMap<String, HashMap<String, Double[]>> sliceMap = new HashMap<>();
         List<String> measurements = new ArrayList<>();
@@ -393,7 +408,7 @@ public class BillingController {
             if (udrMeasurement.getPageNumber() != null)
                 for (int page = udrMeasurement.getPageNumber(); page < ((float) udrMeasurement.getTotalRecords() / (float) udrMeasurement.getPageSize()); page++) {
                     if (page > 0) {
-                        udrMeasurement = getUdrMeasurementForPage(page);
+                        udrMeasurement = getUdrMeasurementForPage(page, tenantId, timeFrom, timeTo);
                     }
                     //Iterate through every UDR
                     for (UDR udr : udrMeasurement.getData()) {
@@ -410,7 +425,6 @@ public class BillingController {
             System.out.print("Error while getting data from the tenant: " + e.getMessage());
         }
         addUsageModel(model, measurementCharts, measurementUnits, pairs, sliceMap, slicePairs, timestamps, timeFrom, username, password, measurements, graphSelectionValues, tenantNameList, totalUsage);
-
         return "switch_udr_chartjs";
     }
 
@@ -432,13 +446,16 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/charge", method = RequestMethod.POST)
-    public String generateCharge(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String tenant, @RequestParam("username") String username, @RequestParam("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
+    public String generateCharge(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String
+            tenant, @ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam(value = "from", required = false) String
+                                         from, @RequestParam(value = "to", required = false) String to, Model model) {
+        boolean isAdmin = isOpenStackAdmin(username, password);
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
         int slices = Loader.getSettings().getRepresentationSettings().getTimeSlices();
         long sliceDuration = (long) ((double) ((timeTo - timeFrom) / slices));
         List<Long> timestamps = getTimestamps(timeFrom, slices, sliceDuration);
-        HashMap<String, HashMap<String, Object>> pairs = new HashMap<>();
+        HashMap<String, HashMap<String, Double[]>> pairs = new HashMap<>();
         HashMap<String, HashMap<String, Object>> slicePairs = new HashMap<>();
         HashMap<String, HashMap<String, Double[]>> sliceMap = new HashMap<>();
         List<String> measurements = new ArrayList<>();
@@ -453,7 +470,7 @@ public class BillingController {
             //Iterate trough all the pages
             for (int page = cdrMeasurement.getPageNumber(); page < ((float) cdrMeasurement.getTotalRecords() / (float) cdrMeasurement.getPageSize()); page++) {
                 if (page > 0) {
-                    cdrMeasurement = getCdrMeasurementForPage(page);
+                    cdrMeasurement = getCdrMeasurementForPage(page, tenantId, timeFrom, timeTo);
                 }
                 //Iterate through every CDR
                 for (CDR cdr : cdrMeasurement.getData()) {
@@ -465,19 +482,25 @@ public class BillingController {
 
                     }
                 }
+
             }
         } catch (Exception e) {
             System.out.print("Error: " + e.getMessage());
         }
         addChargeModel(model, measurementCharts, measurementCharges, pairs, sliceMap, slicePairs, timestamps, username, password, measurements, graphSelectionValues, tenantNameList, totalCharge);
 
-        return "switch_cdr_chartjs_modals";
+        if (isAdmin)
+            return "switch_cdr_chartjs";
+        else
+            return "switch_users_cdr_chartjs";
     }
 
-    private void fillChargeData(GenericChargeData data, List<Long> timestamps, HashMap<String, HashMap<String, Object>> pairs, HashMap<String, Double[]> slicesData, HashMap<String, HashMap<String, Object>> slicePairs, HashMap<String, String> measurementCharts, ArrayList<String> graphSelectionValues, HashMap<String, Double> totalCharge, String nameField, String tenantId) {
+    private void fillChargeData(GenericChargeData data, List<Long> timestamps, HashMap<String, HashMap<String, Double[]>> pairs, HashMap<String, Double[]>
+            slicesData, HashMap<String, HashMap<String, Object>> slicePairs, HashMap<String, String> measurementCharts, ArrayList<String> graphSelectionValues, HashMap<String, Double> totalCharge, String
+                                        nameField, String tenantId) {
         String pieRepresentation = "number";
-        List<Double> values;
-        HashMap<String, Object> metaHash = pairs.get(data.get_class());
+        Double[] values;
+        HashMap<String, Double[]> metaHash = pairs.get(data.get_class());
         HashMap<String, Object> sliceMetaHash = slicePairs.get(data.get_class());
         if (metaHash == null)
             metaHash = new HashMap<>();
@@ -487,14 +510,15 @@ public class BillingController {
         //Using pie representation for all of them in the overview page
         //If the data is identified by metadata we can know who is the consumer
         if (metadata != null)
-            values = (List<Double>) metaHash.get(metadata.get(nameField).toString());
+            values = metaHash.get(metadata.get(data.getSourceField()));
         else
-            values = (List<Double>) metaHash.get(tenantId);
+            values = metaHash.get(tenantId);
         if (values == null) {
-            values = new ArrayList<>();
+            values = new Double[1];
+            values[0] = 0.0;
         }
         Double charge = data.getCharge();
-        values.add(charge);
+        values[0] = values[0] + charge;
 
         if (metadata != null) {
             metaHash.put(metadata.get(nameField).toString(), values);
@@ -515,7 +539,8 @@ public class BillingController {
         }
     }
 
-    private void addChargeToSlicesDataHistogram(HashMap<String, HashMap<String, Double[]>> sliceMap, GenericChargeData data, String resource, Long time, List<Long> timestamps, Long timeFrom, long sliceDuration, String measurement) {
+    private void addChargeToSlicesDataHistogram(HashMap<String, HashMap<String, Double[]>> sliceMap, GenericChargeData data, String resource, Long
+            time, List<Long> timestamps, Long timeFrom, long sliceDuration, String measurement) {
         Double charge = data.getCharge();
         timestamps.add(time);
 
@@ -552,10 +577,13 @@ public class BillingController {
         }
     }
 
-    private void fillUsageData(GenericUsageData data, HashMap<String, String> measurementUnits, List<Long> timestamps, HashMap<String, HashMap<String, Object>> pairs, HashMap<String, Double[]> slicesData, HashMap<String, HashMap<String, Object>> slicePairs, HashMap<String, String> measurementCharts, ArrayList<String> graphSelectionValues, HashMap<String, Double> totalUsage, String nameField, String tenantId) {
+    private void fillUsageData(GenericUsageData data, HashMap<String, String> measurementUnits, List<Long> timestamps, HashMap<String, HashMap<String, Double[]>>
+            pairs, HashMap<String, Double[]>
+                                       slicesData, HashMap<String, HashMap<String, Object>> slicePairs, HashMap<String, String> measurementCharts, ArrayList<String> graphSelectionValues, HashMap<String, Double> totalUsage, String
+                                       nameField, String tenantId) {
         String pieRepresentation = "number";
-        List<Double> values;
-        HashMap<String, Object> metaHash = pairs.get(data.get_class());
+        Double[] values;
+        HashMap<String, Double[]> metaHash = pairs.get(data.get_class());
         HashMap<String, Object> sliceMetaHash = slicePairs.get(data.get_class());
         if (metaHash == null)
             metaHash = new HashMap<>();
@@ -565,14 +593,15 @@ public class BillingController {
         //Using pie representation for all of them in the overview page
         //If the data is identified by metadata we can know who is the consumer
         if (metadata != null)
-            values = (List<Double>) metaHash.get(data.getSourceField());
+            values = metaHash.get(metadata.get(data.getSourceField()));
         else
-            values = (List<Double>) metaHash.get(tenantId);
+            values = metaHash.get(tenantId);
         if (values == null) {
-            values = new ArrayList<>();
+            values = new Double[1];
+            values[0] = 0.0;
         }
         Double usage = data.getUsage();
-        values.add(usage);
+        values[0] = values[0] + usage;
 
         if (metadata != null) {
             metaHash.put(metadata.get(nameField).toString(), values);
@@ -646,6 +675,22 @@ public class BillingController {
         return os;
     }
 
+    private boolean isOpenStackAdmin(String username, String password) {
+        String keystoneUrl = Loader.getSettings().getOpenStackCredentials().getKeystoneUrl();
+
+        OSFactory.enableLegacyEndpointHandling(true);
+        try {
+            OSFactory.builder()
+                    .endpoint(keystoneUrl)
+                    .credentials(username, password)
+                    .perspective(Facing.ADMIN)
+                    .authenticate();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     /**
      * This method transforms a String date into a Timestamp
      *
@@ -674,15 +719,17 @@ public class BillingController {
             return url + "?page=" + page;
     }
 
-    private UdrMeasurement getUdrMeasurementForPage(int page) throws Exception {
+    private UdrMeasurement getUdrMeasurementForPage(int page, String tenant, Long timeFrom, Long timeTo) throws Exception {
         String url = Loader.getSettings().getCyclopsSettings().getUdrDataUrl();
-        APICaller.Response response = new APICaller().get(new URL(constructMeasurementUrlForPage(url, page)));
+        String udrMeasurementUrl = this.constructDataUrl(url, tenant, timeFrom, timeTo);
+        APICaller.Response response = new APICaller().get(new URL(constructMeasurementUrlForPage(udrMeasurementUrl, page)));
         return (UdrMeasurement) response.getAsClass(UdrMeasurement.class);
     }
 
-    private CdrMeasurement getCdrMeasurementForPage(int page) throws Exception {
+    private CdrMeasurement getCdrMeasurementForPage(int page, String tenant, Long timeFrom, Long timeTo) throws Exception {
         String url = Loader.getSettings().getCyclopsSettings().getCdrDataUrl();
-        APICaller.Response response = new APICaller().get(new URL(constructMeasurementUrlForPage(url, page)));
+        String cdrMeasurementUrl = this.constructDataUrl(url, tenant, timeFrom, timeTo);
+        APICaller.Response response = new APICaller().get(new URL(constructMeasurementUrlForPage(cdrMeasurementUrl, page)));
         return (CdrMeasurement) response.getAsClass(CdrMeasurement.class);
     }
 
@@ -728,7 +775,8 @@ public class BillingController {
      * @param sliceDuration
      * @param measurement
      */
-    private void addUsageToSlicesDataHistogram(HashMap<String, HashMap<String, Double[]>> sliceMap, GenericUsageData data, String resource, Long time, List<Long> timestamps, Long timeFrom, Long sliceDuration, String measurement) {
+    private void addUsageToSlicesDataHistogram(HashMap<String, HashMap<String, Double[]>> sliceMap, GenericUsageData data, String resource, Long
+            time, List<Long> timestamps, Long timeFrom, Long sliceDuration, String measurement) {
         Double usage = data.getUsage();
         timestamps.add(time);
 
@@ -791,8 +839,21 @@ public class BillingController {
         }
     }
 
+    /**
+     * This method checks if the username and password values are empty.
+     *
+     * @param username
+     * @param password
+     * @return
+     */
+    private boolean isAuthenticated(String username, String password) {
+        return !(username.equals("") || password.equals(""));
+    }
 
-    private void addUsageModel(Model model, HashMap<String, String> measurementCharts, HashMap<String, String> measurementUnits, HashMap<String, HashMap<String, Object>> pairs, HashMap<String, HashMap<String, Double[]>> sliceMap, HashMap<String, HashMap<String, Object>> slicePairs, List<Long> timestamps, Long timeFrom, String username, String password, List<String> measurements, ArrayList<String> graphSelectionValues, List<String> tenantNameList, HashMap<String, Double> totalUsage) {
+    private void addUsageModel(Model
+                                       model, HashMap<String, String> measurementCharts, HashMap<String, String> measurementUnits, HashMap<String, HashMap<String, Double[]>>
+                                       pairs, HashMap<String, HashMap<String, Double[]>> sliceMap, HashMap<String, HashMap<String, Object>> slicePairs, List<Long> timestamps, Long timeFrom, String
+                                       username, String password, List<String> measurements, ArrayList<String> graphSelectionValues, List<String> tenantNameList, HashMap<String, Double> totalUsage) {
         model.addAttribute("timeSlices", Loader.getSettings().getRepresentationSettings().getTimeSlices());
         model.addAttribute("measurementCharts", measurementCharts);
         model.addAttribute("measurementUnits", measurementUnits);
@@ -808,7 +869,10 @@ public class BillingController {
         model.addAttribute("totalUsage", totalUsage);
     }
 
-    private void addChargeModel(Model model, HashMap<String, String> measurementCharts, HashMap<String, Double> measurementCharges, HashMap<String, HashMap<String, Object>> pairs, HashMap<String, HashMap<String, Double[]>> sliceMap, HashMap<String, HashMap<String, Object>> slicePairs, List<Long> timestamps, String username, String password, List<String> measurements, ArrayList<String> graphSelectionValues, List<String> tenantNameList, HashMap<String, Double> totalCharge) {
+    private void addChargeModel(Model
+                                        model, HashMap<String, String> measurementCharts, HashMap<String, Double> measurementCharges, HashMap<String, HashMap<String, Double[]>>
+                                        pairs, HashMap<String, HashMap<String, Double[]>> sliceMap, HashMap<String, HashMap<String, Object>> slicePairs, List<Long> timestamps, String username, String
+                                        password, List<String> measurements, ArrayList<String> graphSelectionValues, List<String> tenantNameList, HashMap<String, Double> totalCharge) {
         model.addAttribute("timeSlices", Loader.getSettings().getRepresentationSettings().getTimeSlices());
         model.addAttribute("measurementCharts", measurementCharts);
         model.addAttribute("measurementCharges", measurementCharges);
