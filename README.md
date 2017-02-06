@@ -24,11 +24,8 @@ Currently Cyclops Dashboard has the following limitations:
   * User information displayed in the landing page as well as in the bill are placeholders.
 
 ### Screenshot
-<<<<<<< HEAD
+
 <img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard-2-overview.png" alt="Dashboard screenshot" width="800"></img>
-=======
-<img align="middle" src="http://icclab.github.io/cyclops/assets/images/dashboard/dashboard-2-overview.png" alt="Dashboard screenshot" width="900"></img>
->>>>>>> support_keystone_authentication
 
 ### Download
      $ git clone https://github.com/icclab/cyclops-dashboard.git
