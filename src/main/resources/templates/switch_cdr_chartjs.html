@@ -29,6 +29,7 @@
 </form>
 <form id="linkOverview" method="post" action="/">
 </form>
+<form id="linkUserSelection" method="post" action="/user_bill"></form>
 <form id="linkTenantSelection" method="post" action="/tenants">
     <input type="hidden" name="selectedUser" th:value="${username}">
 </form>
@@ -75,7 +76,7 @@
                         <h3>Billing</h3>
                         <ul class="nav side-menu">
                             <li>
-                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkTenantSelection').submit();"><i class="fa fa-credit-card"></i> Invoice</a></li>
+                            <li><a href="javascript:void(0);" onclick="document.getElementById('linkUserSelection').submit();"><i class="fa fa-credit-card"></i> Invoice</a></li>
                             </li>
                         </ul>
                     </div>

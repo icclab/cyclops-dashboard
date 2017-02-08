@@ -83,30 +83,10 @@ public class BillingController {
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public String indexSubmit(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
         if (username != null || password != null) {
-            OSClient os = buildOSClient(username, password);
-            if (os == null) {
-                return "403";
-            }
-            String adminRole = Loader.getSettings().getOpenStackCredentials().getKeystoneAdminRole();
-            List<? extends org.openstack4j.model.identity.Role> roles = os.identity().roles().list();
-
-            List<? extends org.openstack4j.model.identity.User> users = os.identity().users().list();
             LinkedList<OSData> billingUsers = new LinkedList<>();
-
-            for (int i = 0; i < users.size(); i++) {
-                org.openstack4j.model.identity.User temp = users.get(i);
-                OSData test = new OSData();
-                test.id = temp.getId();
-                test.name = temp.getUsername();
-                billingUsers.add(test);
-            }
             model.addAttribute("username", username);
             model.addAttribute("password", password);
             model.addAttribute("users", billingUsers);
-            // Relink to the index page, in this case the Usage page.
-            if (roles.contains(adminRole))
-                return generateUsageGraph(username, password, null, null, model);
-            else
                 return generateUsageGraph(username, password, null, null, model);
         } else {
             return "403";
@@ -296,7 +276,7 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/bill", method = RequestMethod.POST)
-    public String generateBill(@RequestParam("selectedUser") String userId, @RequestParam("tenantName") String tenantName, @ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam("from") String from, @RequestParam("to") String to, Model model) {
+    public String generateBill(@RequestParam("selectedUser") String userId, @ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam("from") String from, @RequestParam("to") String to, Model model) {
         String billingUrl = Loader.getSettings().getCyclopsSettings().getBillingUrl();
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
@@ -449,7 +429,7 @@ public class BillingController {
     public String generateCharge(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String
             tenant, @ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam(value = "from", required = false) String
                                          from, @RequestParam(value = "to", required = false) String to, Model model) {
-        boolean isAdmin = isOpenStackAdmin(username, password);
+//        boolean isAdmin = isOpenStackAdmin(username, password);
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
         int slices = Loader.getSettings().getRepresentationSettings().getTimeSlices();
@@ -489,10 +469,10 @@ public class BillingController {
         }
         addChargeModel(model, measurementCharts, measurementCharges, pairs, sliceMap, slicePairs, timestamps, username, password, measurements, graphSelectionValues, tenantNameList, totalCharge);
 
-        if (isAdmin)
+//        if (isAdmin)
             return "switch_cdr_chartjs";
-        else
-            return "switch_users_cdr_chartjs";
+//        else
+//            return "switch_users_cdr_chartjs";
     }
 
     private void fillChargeData(GenericChargeData data, List<Long> timestamps, HashMap<String, HashMap<String, Double[]>> pairs, HashMap<String, Double[]>

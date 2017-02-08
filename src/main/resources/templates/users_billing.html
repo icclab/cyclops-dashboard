@@ -30,20 +30,14 @@
 
 <body class="nav-md">
 <form id="linkUsage" method="post" action="/usage">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
 </form>
 <form id="linkCharge" method="post" action="/charge">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
 </form>
 <form id="linkOverview" method="post" action="/">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
+</form>
+<form id="linkLogout" method="post" action="/logout">
 </form>
 <form id="linkUserSelection" method="post" action="/user_bill">
-    <input type="hidden" name="username" th:value="${username}">
-    <input type="hidden" name="password" th:value="${password}">
 </form>
 <div class="container body">
     <div class="main_container">
@@ -105,7 +99,7 @@
                     <a data-toggle="tooltip" data-placement="top" title="Lock">
                         <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
                     </a>
-                    <a data-toggle="tooltip" data-placement="top" title="Logout">
+                    <a href="javascript:void(0)" onclick="document.getElementById('linkLogout').submit();" data-toggle="tooltip" data-placement="top" title="Logout">
                         <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
                     </a>
                 </div>
@@ -137,7 +131,7 @@
                                     </a>
                                 </li>
                                 <li><a href="javascript:;">Help</a></li>
-                                <li><a href="login.html"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                                <li><a  href="javascript:void(0)" onclick="document.getElementById('linkLogout').submit();" ><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
                             </ul>
                         </li>
 
@@ -378,7 +372,7 @@
             startDate: moment().subtract(29, 'days'),
             endDate: moment(),
             minDate: '01/01/2012',
-            maxDate: '12/31/2016',
+            maxDate: '12/31/' + moment().year(),
 //            dateLimit: {
 //                days: 60
 //            },
