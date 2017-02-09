@@ -35,9 +35,8 @@ In order to install the Dashboard you will only have to run the commands bellow:
 
      $ cd cyclops-dashboard/install
      $ chmod +x ./*
+     $ ./install_mvn_java.sh
 
-#### Dashboard
-Then continue with Dashboard installation using following command, where you provide the same credentials as with Gatekeeper:
 
 #### Configuration
  * Make sure you configure the Dashboard properly with the needed fields in the configuration file stored in cyclops-dashboard/conf/dashboard.conf
@@ -50,7 +49,6 @@ To start the Dashboard simply run the following command from the root folder:
 All the output will be stored in cyclops-dashboard/nohup.out and whenever you want to stop the Dashboard the only needed command is:
 
      $ ./stop.sh
-
 
 ### Documentation
   Visit the <a href="https://github.com/icclab/cyclops-dashboard/wiki">Wiki</a> for detailed installation steps.
