@@ -105,9 +105,9 @@ public class BillingController {
             model.addAttribute("users", billingUsers);
             // Relink to the index page, in this case the Usage page.
             if (roles.contains(adminRole))
-                return generateUsageGraph(username, password, null, null, model);
+                return generateCharge(username, password, null, null, model);
             else
-                return generateUsageGraph(username, password, null, null, model);
+                return generateCharge(username, password, null, null, model);
         } else {
             return "403";
         }
@@ -150,11 +150,17 @@ public class BillingController {
             for (int j = 0; j < tenantUsers.size(); j++) {
                 OpenStackTenantUser temp = tenantUsers.get(j);
                 if (temp.getName().equalsIgnoreCase(username)) {
-                    OpenStackUser test = new OpenStackUser();
-                    test.setUserId(tenant.getId());
-                    test.setTenantName(tenant.getName());
-                    test.setUserName(username);
-                    tenantList.add(test);
+                    OpenStackUser userWithTenantId = new OpenStackUser();
+                    userWithTenantId.setUserId(tenant.getId());
+                    userWithTenantId.setTenantName(tenant.getName());
+                    userWithTenantId.setUserName(username);
+                    tenantList.add(userWithTenantId);
+
+                    OpenStackUser userWithUserId = new OpenStackUser();
+                    userWithUserId.setUserId(temp.getId());
+                    userWithUserId.setTenantName(tenant.getName());
+                    userWithUserId.setUserName(temp.getName());
+                    tenantList.add(userWithUserId);
                 }
             }
         }
@@ -431,7 +437,7 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/charge", method = RequestMethod.POST)
-    public String generateCharge(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String tenant, @ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
+    public String generateCharge(@ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam(value = "from", required = false) String from, @RequestParam(value = "to", required = false) String to, Model model) {
         boolean isAdmin = isOpenStackAdmin(username, password);
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
