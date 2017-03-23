@@ -67,9 +67,12 @@ public class BillingController {
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String login(@ModelAttribute("username") String username, @ModelAttribute("password") String password, Model model) {
-        if (username.equals("") || password.equals("")) return "login";
-        return generateUsageGraph(username, password, null, null, model);
+    public String login(Model model) {
+        HashMap attributes = (HashMap) model.asMap();
+        if (!attributes.containsKey("username"))
+            return "login";
+        else if (attributes.get("username").equals("") || attributes.get("password").equals("")) return "login";
+        return generateCharge((String) attributes.get("username"), (String) attributes.get("password"), null, null, model);
     }
 
     /**
@@ -347,11 +350,6 @@ public class BillingController {
         model.addAttribute("password", password);
 
         return "switch_invoice";
-    }
-
-    @RequestMapping("/login")
-    public String login(Model model) {
-        return "login";
     }
 
     @RequestMapping("/overview")
