@@ -72,25 +72,13 @@ public class BillingController {
         return generateUsageGraph(username, password, null, null, model);
     }
 
-    /**
-     * Requests and returns to the front end the information of the disabled OpenStack users for the credentials passed through API.
-     *
-     * @param username
-     * @param password
-     * @param model
-     * @return
-     */
-    @RequestMapping(value = "/", method = RequestMethod.POST)
-    public String indexSubmit(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
-        if (username != null || password != null) {
-            LinkedList<OSData> billingUsers = new LinkedList<>();
-            model.addAttribute("username", username);
-            model.addAttribute("password", password);
-            model.addAttribute("users", billingUsers);
-                return generateUsageGraph(username, password, null, null, model);
-        } else {
-            return "403";
-        }
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public String login(Model model) {
+        HashMap attributes = (HashMap) model.asMap();
+        if (!attributes.containsKey("username"))
+            return "login";
+        else if (attributes.get("username").equals("") || attributes.get("password").equals("")) return "login";
+        return generateCharge((String) attributes.get("username"), (String) attributes.get("password"), null, null, model);
     }
 
     /**
@@ -343,11 +331,6 @@ public class BillingController {
         return "switch_invoice";
     }
 
-    @RequestMapping("/login")
-    public String login(Model model) {
-        return "login";
-    }
-
     @RequestMapping("/overview")
     public String overview() {
 
@@ -426,9 +409,8 @@ public class BillingController {
      * @return
      */
     @RequestMapping(value = "/charge", method = RequestMethod.POST)
-    public String generateCharge(@RequestParam(value = "graphSelection", required = false) String[] graphSelection, @RequestParam(value = "tenant", required = false) String
-            tenant, @ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam(value = "from", required = false) String
-                                         from, @RequestParam(value = "to", required = false) String to, Model model) {
+    public String generateCharge(@ModelAttribute("username") String username, @ModelAttribute("password") String password, @RequestParam(value = "from", required = false) String
+            from, @RequestParam(value = "to", required = false) String to, Model model) {
 //        boolean isAdmin = isOpenStackAdmin(username, password);
         Long timeFrom = initialiseFrom(from);
         Long timeTo = initialiseTo(to);
@@ -470,7 +452,7 @@ public class BillingController {
         addChargeModel(model, measurementCharts, measurementCharges, pairs, sliceMap, slicePairs, timestamps, username, password, measurements, graphSelectionValues, tenantNameList, totalCharge);
 
 //        if (isAdmin)
-            return "switch_cdr_chartjs";
+        return "switch_cdr_chartjs";
 //        else
 //            return "switch_users_cdr_chartjs";
     }

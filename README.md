@@ -46,7 +46,7 @@ To start the Dashboard simply run the following command from the root folder:
 
      $ ./start.sh
 
-Cyclops-dashboard will bind to port 8080, to login browse to IP:8080/login, logging in with admin/admin.
+Cyclops-dashboard will bind to port 8080, to login browse to IP:8080/ login with any the account ID the data is generated for and any password as the Master branch does not currently support any authentication.
 
 All the output will be stored in cyclops-dashboard/nohup.out and whenever you want to stop the Dashboard the only needed command is:
 
