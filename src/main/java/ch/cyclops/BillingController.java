@@ -66,10 +66,17 @@ public class BillingController {
         return "login";
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String login(@ModelAttribute("username") String username, @ModelAttribute("password") String password, Model model) {
-        if (username.equals("") || password.equals("")) return "login";
-        return generateUsageGraph(username, password, null, null, model);
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    public String indexSubmit(@RequestParam("username") String username, @RequestParam("password") String password, Model model) {
+        if (username != null || password != null) {
+            LinkedList<OSData> billingUsers = new LinkedList<>();
+            model.addAttribute("username", username);
+            model.addAttribute("password", password);
+            model.addAttribute("users", billingUsers);
+            return generateUsageGraph(username, password, null, null, model);
+        } else {
+            return "403";
+        }
     }
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
